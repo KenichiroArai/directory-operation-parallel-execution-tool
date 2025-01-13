@@ -4,7 +4,9 @@ import com.example.directorytool.model.OperationMode;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,8 +16,8 @@ public class DirectoryService {
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public void processDirectory(String srcPath, String destPath, OperationMode mode) throws IOException {
-        Path source = Paths.get(srcPath);
-        Path destination = Paths.get(destPath);
+        Path source = Path.of(srcPath);
+        Path destination = Path.of(destPath);
 
         if (!Files.exists(source)) {
             throw new IOException("Source directory does not exist");
