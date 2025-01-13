@@ -1,4 +1,4 @@
-package com.example.directorytool.model;
+package kmg.tool.directorytool.model;
 
 public enum OperationMode {
     COPY,

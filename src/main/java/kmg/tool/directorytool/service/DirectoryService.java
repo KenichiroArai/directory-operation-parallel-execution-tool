@@ -1,6 +1,6 @@
-package com.example.directorytool.service;
+package kmg.tool.directorytool.service;
 
-import com.example.directorytool.model.OperationMode;
+import kmg.tool.directorytool.model.OperationMode;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

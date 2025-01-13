@@ -1,12 +1,12 @@
-package com.example.directorytool.runner;
+package kmg.tool.directorytool.runner;
 
 import java.io.IOException;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.example.directorytool.model.OperationMode;
-import com.example.directorytool.service.DirectoryService;
+import kmg.tool.directorytool.model.OperationMode;
+import kmg.tool.directorytool.service.DirectoryService;
 
 @Component
 public class CommandLineAppRunner implements CommandLineRunner {
