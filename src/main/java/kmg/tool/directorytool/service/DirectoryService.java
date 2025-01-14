@@ -1,14 +1,19 @@
 package kmg.tool.directorytool.service;
 
-import kmg.tool.directorytool.model.OperationMode;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.stereotype.Service;
+
+import kmg.tool.directorytool.model.OperationMode;
 
 /**
  * ディレクトリ操作の主要なビジネスロジックを提供するサービスクラス。
@@ -57,35 +62,63 @@ public class DirectoryService {
             Files.createDirectories(destination);
         }
 
+        List<Future<?>> futures = new ArrayList<>();
+
         // ソースディレクトリを再帰的に走査
         try (var stream = Files.walk(source)) {
-            stream.forEach(path -> executorService.submit(() -> {
-                try {
-                    // 相対パスを計算
-                    Path relativePath = source.relativize(path);
-                    Path targetPath = destination.resolve(relativePath);
+            stream.forEach(path -> {
+                Future<?> future = executorService.submit(() -> {
+                    try {
+                        // 相対パスを計算
+                        Path relativePath = source.relativize(path);
+                        Path targetPath = destination.resolve(relativePath);
 
-                    // ディレクトリの場合の処理
-                    if (Files.isDirectory(path)) {
-                        if (!Files.exists(targetPath)) {
-                            // ターゲットディレクトリが存在しない場合は作成
-                            Files.createDirectories(targetPath);
+                        // ディレクトリの場合の処理
+                        if (Files.isDirectory(path)) {
+                            if (!Files.exists(targetPath)) {
+                                // ターゲットディレクトリが存在しない場合は作成
+                                Files.createDirectories(targetPath);
+                            }
+                        } else {
+                            // ファイルの場合の処理
+                            if (mode == OperationMode.COPY) {
+                                // コピーモードの場合、ファイルをコピー
+                                Files.copy(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                            } else if (mode == OperationMode.MOVE) {
+                                // ムーブモードの場合、ファイルを移動
+                                Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                            }
                         }
-                    } else {
-                        // ファイルの場合の処理
-                        if (mode == OperationMode.COPY) {
-                            // コピーモードの場合、ファイルをコピー
-                            Files.copy(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                        } else if (mode == OperationMode.MOVE) {
-                            // ムーブモードの場合、ファイルを移動
-                            Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                        }
+                    } catch (IOException e) {
+                        // ファイル処理中にエラーが発生した場合
+                        throw new RuntimeException("Failed to process file: " + path, e);
                     }
-                } catch (IOException e) {
-                    // ファイル処理中にエラーが発生した場合
-                    throw new RuntimeException("Failed to process file: " + path, e);
-                }
-            }));
+                });
+                futures.add(future);
+            });
+        }
+
+        // すべてのタスクの完了を待つ
+        for (Future<?> future : futures) {
+            try {
+                future.get(30, TimeUnit.SECONDS);
+            } catch (InterruptedException | java.util.concurrent.ExecutionException | java.util.concurrent.TimeoutException e) {
+                throw new IOException("Failed to process directory: " + e.getMessage(), e);
+            }
+        }
+
+        // 移動モードの場合、空になったディレクトリを削除
+        if (mode == OperationMode.MOVE) {
+            try (var stream = Files.walk(source)) {
+                stream.sorted((a, b) -> b.toString().length() - a.toString().length())
+                     .forEach(path -> {
+                         try {
+                             Files.deleteIfExists(path);
+                         } catch (IOException e) {
+                             // 削除に失敗した場合は無視
+                         }
+                     });
+            }
         }
     }
 }
