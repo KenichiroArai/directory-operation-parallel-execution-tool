@@ -78,29 +78,25 @@ public class DirectoryService {
 
                         // ディレクトリの場合の処理
                         if (Files.isDirectory(path)) {
-                            if (!Files.exists(targetPath)) {
-                                // ターゲットディレクトリが存在しない場合は作成
+                            if (mode != OperationMode.DIFF && !Files.exists(targetPath)) {
+                                // DIFFモード以外の場合のみディレクトリを作成
                                 Files.createDirectories(targetPath);
+                            } else if (mode == OperationMode.DIFF && !Files.exists(targetPath)) {
+                                System.out.println("Directory only in source: " + relativePath);
                             }
                         } else {
                             // ファイルの場合の処理
-                            if (mode == OperationMode.COPY) {
-                                // コピーモードの場合、ファイルをコピー
-                                Files.copy(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                            } else if (mode == OperationMode.MOVE) {
-                                // ムーブモードの場合、ファイルを移動
-                                Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                            } else if (mode == OperationMode.DIFF) {
-                                // DIFFモードの場合、ファイルの差分を比較
+                            if (mode == OperationMode.DIFF) {
+                                // DIFFモードの場合、ファイルの差分を比較のみ行う
                                 if (!Files.exists(targetPath)) {
-                                    if (Files.isDirectory(path)) {
-                                        System.out.println("Directory only in source: " + relativePath);
-                                    } else {
-                                        System.out.println("Only in source: " + relativePath);
-                                    }
-                                } else if (!Files.isDirectory(path) && !compareFiles(path, targetPath)) {
+                                    System.out.println("Only in source: " + relativePath);
+                                } else if (!compareFiles(path, targetPath)) {
                                     System.out.println("Different: " + relativePath);
                                 }
+                            } else if (mode == OperationMode.COPY) {
+                                Files.copy(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                            } else if (mode == OperationMode.MOVE) {
+                                Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
                             }
                         }
                     } catch (IOException e) {
