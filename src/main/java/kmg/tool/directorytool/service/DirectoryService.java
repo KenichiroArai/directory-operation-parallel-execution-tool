@@ -16,28 +16,31 @@ import org.springframework.stereotype.Service;
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
- * ディレクトリ操作の主要なビジネスロジックを提供するサービスクラス。
- * マルチスレッドを使用して並列処理を行い、大規模なディレクトリ操作を効率的に実行する。
+ * ディレクトリ操作の主要なビジネスロジックを提供するサービスクラス。 マルチスレッドを使用して並列処理を行い、大規模なディレクトリ操作を効率的に実行する。
  */
 @Service
 public class DirectoryService {
 
     /**
-     * 並列処理用のスレッドプール。
-     * 4つのスレッドを使用してファイル操作を並列実行する。
+     * 並列処理で使用するスレッド数
      */
-    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private static final int THREAD_POOL_SIZE = 4;
 
     /**
-     * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。
-     * 処理内容は指定された操作モード（COPYまたはMOVE）に依存する。
+     * 並列処理用のスレッドプール。
+     */
+    private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
+    /**
+     * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。 処理内容は指定された操作モード（COPYまたはMOVE）に依存する。
      *
      * @param srcPath ソースディレクトリのパス
      * @param destPath ターゲットディレクトリのパス
      * @param mode 操作モード（COPYまたはMOVE）
      * @throws IOException ディレクトリ操作中にエラーが発生した場合
      */
-    public void processDirectory(String srcPath, String destPath, OperationMode mode) throws IOException {
+    public void processDirectory(String srcPath, String destPath, OperationMode mode)
+            throws IOException {
         // パスオブジェクトの作成
         Path source = Path.of(srcPath);
         Path destination = Path.of(destPath);
@@ -102,7 +105,8 @@ public class DirectoryService {
         for (Future<?> future : futures) {
             try {
                 future.get(30, TimeUnit.SECONDS);
-            } catch (InterruptedException | java.util.concurrent.ExecutionException | java.util.concurrent.TimeoutException e) {
+            } catch (InterruptedException | java.util.concurrent.ExecutionException
+                    | java.util.concurrent.TimeoutException e) {
                 throw new IOException("Failed to process directory: " + e.getMessage(), e);
             }
         }
@@ -111,13 +115,13 @@ public class DirectoryService {
         if (mode == OperationMode.MOVE) {
             try (var stream = Files.walk(source)) {
                 stream.sorted((a, b) -> b.toString().length() - a.toString().length())
-                     .forEach(path -> {
-                         try {
-                             Files.deleteIfExists(path);
-                         } catch (IOException e) {
-                             // 削除に失敗した場合は無視
-                         }
-                     });
+                        .forEach(path -> {
+                            try {
+                                Files.deleteIfExists(path);
+                            } catch (IOException e) {
+                                // 削除に失敗した場合は無視
+                            }
+                        });
             }
         }
     }
