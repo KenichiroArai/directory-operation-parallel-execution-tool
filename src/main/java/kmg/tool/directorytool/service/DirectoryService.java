@@ -118,6 +118,21 @@ public class DirectoryService {
             }
         }
 
+        // DIFFモードの場合、ターゲットディレクトリを走査してソースにないファイルを検出
+        if (mode == OperationMode.DIFF) {
+            try (var stream = Files.walk(destination)) {
+                stream.forEach(path -> {
+                    if (!Files.isDirectory(path)) {
+                        Path relativePath = destination.relativize(path);
+                        Path sourcePath = source.resolve(relativePath);
+                        if (!Files.exists(sourcePath)) {
+                            System.out.println("Only in destination: " + relativePath);
+                        }
+                    }
+                });
+            }
+        }
+
         // 移動モードの場合、空になったディレクトリを削除
         if (mode == OperationMode.MOVE) {
             try (var stream = Files.walk(source)) {
