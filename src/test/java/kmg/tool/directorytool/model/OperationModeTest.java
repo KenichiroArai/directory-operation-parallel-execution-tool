@@ -34,11 +34,12 @@ class OperationModeTest {
      */
     @Test
     void testInvalidValue() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> OperationMode.valueOf("INVALID"),
-            "無効な値でIllegalArgumentExceptionがスローされること"
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> OperationMode.valueOf("INVALID"),
+                "無効な値でIllegalArgumentExceptionがスローされること"
         );
+        assertTrue(exception.getMessage().contains("INVALID"), "例外メッセージに無効な値が含まれていること");
     }
 
     /**

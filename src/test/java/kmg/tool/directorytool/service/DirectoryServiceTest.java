@@ -18,8 +18,7 @@ import org.junit.jupiter.api.io.TempDir;
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
- * DirectoryServiceのテストクラス
- * 正常系、異常系、エッジケースを網羅的にテストする
+ * DirectoryServiceのテストクラス 正常系、異常系、エッジケースを網羅的にテストする
  */
 class DirectoryServiceTest {
 
@@ -35,7 +34,7 @@ class DirectoryServiceTest {
      * テストの前準備
      */
     @BeforeEach
-    void setUp() throws IOException {
+    public void setUp() throws IOException {
         directoryService = new DirectoryService();
 
         // テスト用のディレクトリ構造を作成
@@ -89,8 +88,8 @@ class DirectoryServiceTest {
     void testNonExistentSourceDirectory() {
         Path nonExistentDir = tempDir.resolve("non-existent");
 
-        IOException exception = assertThrows(IOException.class, () ->
-            directoryService.processDirectory(nonExistentDir.toString(), targetDir.toString(), OperationMode.COPY)
+        IOException exception = assertThrows(IOException.class, ()
+                -> directoryService.processDirectory(nonExistentDir.toString(), targetDir.toString(), OperationMode.COPY)
         );
 
         assertEquals("Source directory does not exist", exception.getMessage());
@@ -104,8 +103,8 @@ class DirectoryServiceTest {
         Path sourceFile = tempDir.resolve("source.txt");
         Files.writeString(sourceFile, "test");
 
-        IOException exception = assertThrows(IOException.class, () ->
-            directoryService.processDirectory(sourceFile.toString(), targetDir.toString(), OperationMode.COPY)
+        IOException exception = assertThrows(IOException.class, ()
+                -> directoryService.processDirectory(sourceFile.toString(), targetDir.toString(), OperationMode.COPY)
         );
 
         assertEquals("Source path is not a directory", exception.getMessage());
@@ -120,8 +119,8 @@ class DirectoryServiceTest {
         Path targetFile = tempDir.resolve("target");
         Files.writeString(targetFile, "existing file");
 
-        IOException exception = assertThrows(IOException.class, () ->
-            directoryService.processDirectory(sourceDir.toString(), targetFile.toString(), OperationMode.COPY)
+        IOException exception = assertThrows(IOException.class, ()
+                -> directoryService.processDirectory(sourceDir.toString(), targetFile.toString(), OperationMode.COPY)
         );
 
         assertEquals("Destination path exists but is not a directory", exception.getMessage());
@@ -175,30 +174,30 @@ class DirectoryServiceTest {
      * テスト後のクリーンアップ処理
      */
     @AfterEach
-    void tearDown() throws IOException {
+    public void tearDown() throws IOException {
         // テスト後のクリーンアップ
         if (Files.exists(sourceDir)) {
             Files.walk(sourceDir)
-                 .sorted((a, b) -> b.toString().length() - a.toString().length())
-                 .forEach(path -> {
-                     try {
-                         Files.delete(path);
-                     } catch (IOException e) {
-                         // クリーンアップ中のエラーは無視
-                     }
-                 });
+                    .sorted((a, b) -> b.toString().length() - a.toString().length())
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            // クリーンアップ中のエラーは無視
+                        }
+                    });
         }
 
         if (Files.exists(targetDir)) {
             Files.walk(targetDir)
-                 .sorted((a, b) -> b.toString().length() - a.toString().length())
-                 .forEach(path -> {
-                     try {
-                         Files.delete(path);
-                     } catch (IOException e) {
-                         // クリーンアップ中のエラーは無視
-                     }
-                 });
+                    .sorted((a, b) -> b.toString().length() - a.toString().length())
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            // クリーンアップ中のエラーは無視
+                        }
+                    });
         }
     }
 }
