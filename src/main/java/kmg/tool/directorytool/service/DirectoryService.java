@@ -93,8 +93,12 @@ public class DirectoryService {
                             } else if (mode == OperationMode.DIFF) {
                                 // DIFFモードの場合、ファイルの差分を比較
                                 if (!Files.exists(targetPath)) {
-                                    System.out.println("Only in source: " + relativePath);
-                                } else if (!compareFiles(path, targetPath)) {
+                                    if (Files.isDirectory(path)) {
+                                        System.out.println("Directory only in source: " + relativePath);
+                                    } else {
+                                        System.out.println("Only in source: " + relativePath);
+                                    }
+                                } else if (!Files.isDirectory(path) && !compareFiles(path, targetPath)) {
                                     System.out.println("Different: " + relativePath);
                                 }
                             }
@@ -122,10 +126,12 @@ public class DirectoryService {
         if (mode == OperationMode.DIFF) {
             try (var stream = Files.walk(destination)) {
                 stream.forEach(path -> {
-                    if (!Files.isDirectory(path)) {
-                        Path relativePath = destination.relativize(path);
-                        Path sourcePath = source.resolve(relativePath);
-                        if (!Files.exists(sourcePath)) {
+                    Path relativePath = destination.relativize(path);
+                    Path sourcePath = source.resolve(relativePath);
+                    if (!Files.exists(sourcePath)) {
+                        if (Files.isDirectory(path)) {
+                            System.out.println("Directory only in destination: " + relativePath);
+                        } else {
                             System.out.println("Only in destination: " + relativePath);
                         }
                     }
