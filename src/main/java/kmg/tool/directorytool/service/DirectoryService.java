@@ -32,11 +32,11 @@ public class DirectoryService {
     private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     /**
-     * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。 処理内容は指定された操作モード（COPYまたはMOVE）に依存する。
+     * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。 処理内容は指定された操作モード（COPY、MOVE、またはDIFF）に依存する。
      *
      * @param srcPath ソースディレクトリのパス
      * @param destPath ターゲットディレクトリのパス
-     * @param mode 操作モード（COPYまたはMOVE）
+     * @param mode 操作モード（COPY、MOVE、またはDIFF）
      * @throws IOException ディレクトリ操作中にエラーが発生した場合
      */
     public void processDirectory(String srcPath, String destPath, OperationMode mode)
@@ -90,6 +90,13 @@ public class DirectoryService {
                             } else if (mode == OperationMode.MOVE) {
                                 // ムーブモードの場合、ファイルを移動
                                 Files.move(path, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                            } else if (mode == OperationMode.DIFF) {
+                                // DIFFモードの場合、ファイルの差分を比較
+                                if (!Files.exists(targetPath)) {
+                                    System.out.println("Only in source: " + relativePath);
+                                } else if (!compareFiles(path, targetPath)) {
+                                    System.out.println("Different: " + relativePath);
+                                }
                             }
                         }
                     } catch (IOException e) {
@@ -124,5 +131,20 @@ public class DirectoryService {
                         });
             }
         }
+    }
+
+    /**
+     * 2つのファイルの内容を比較する。
+     *
+     * @param file1 比較する最初のファイル
+     * @param file2 比較する2番目のファイル
+     * @return ファイルの内容が同じ場合はtrue、異なる場合はfalse
+     * @throws IOException ファイルの読み取り中にエラーが発生した場合
+     */
+    private boolean compareFiles(Path file1, Path file2) throws IOException {
+        if (Files.size(file1) != Files.size(file2)) {
+            return false;
+        }
+        return Files.mismatch(file1, file2) == -1;
     }
 }
