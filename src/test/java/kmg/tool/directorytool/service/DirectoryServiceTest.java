@@ -41,6 +41,7 @@ class DirectoryServiceTest {
         sourceDir = tempDir.resolve("source");
         targetDir = tempDir.resolve("target");
         Files.createDirectories(sourceDir);
+        Files.createDirectories(targetDir);
     }
 
     /**
@@ -116,7 +117,7 @@ class DirectoryServiceTest {
     @Test
     void testTargetPathExistsAsFile() throws IOException {
         Files.createDirectories(sourceDir);
-        Path targetFile = tempDir.resolve("target");
+        Path targetFile = tempDir.resolve("target_file.txt");
         Files.writeString(targetFile, "existing file");
 
         IOException exception = assertThrows(IOException.class, ()
