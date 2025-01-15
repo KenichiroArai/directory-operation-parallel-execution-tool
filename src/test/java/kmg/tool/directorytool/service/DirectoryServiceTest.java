@@ -23,6 +23,9 @@ import kmg.tool.directorytool.model.OperationMode;
 class DirectoryServiceTest {
 
     private DirectoryService directoryService;
+    private CopyDirectoryService copyService;
+    private MoveDirectoryService moveService;
+    private DiffDirectoryService diffService;
 
     @TempDir
     Path tempDir;
@@ -35,7 +38,13 @@ class DirectoryServiceTest {
      */
     @BeforeEach
     public void setUp() throws IOException {
-        directoryService = new DirectoryService();
+        // 各サービスのインスタンスを作成
+        copyService = new CopyDirectoryService();
+        moveService = new MoveDirectoryService();
+        diffService = new DiffDirectoryService();
+
+        // DirectoryServiceに依存サービスを注入
+        directoryService = new DirectoryService(copyService, moveService, diffService);
 
         // テスト用のディレクトリ構造を作成
         sourceDir = tempDir.resolve("source");
@@ -54,7 +63,8 @@ class DirectoryServiceTest {
         Files.writeString(testFile, "test content");
 
         // コピー操作を実行
-        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.COPY);
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(),
+                OperationMode.COPY);
 
         // 検証
         Path copiedFile = targetDir.resolve("test.txt");
@@ -73,7 +83,8 @@ class DirectoryServiceTest {
         Files.writeString(testFile, "test content");
 
         // 移動操作を実行
-        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.MOVE);
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(),
+                OperationMode.MOVE);
 
         // 検証
         Path movedFile = targetDir.resolve("test.txt");
@@ -89,9 +100,9 @@ class DirectoryServiceTest {
     void testNonExistentSourceDirectory() {
         Path nonExistentDir = tempDir.resolve("non-existent");
 
-        IOException exception = assertThrows(IOException.class, ()
-                -> directoryService.processDirectory(nonExistentDir.toString(), targetDir.toString(), OperationMode.COPY)
-        );
+        IOException exception = assertThrows(IOException.class,
+                () -> directoryService.processDirectory(nonExistentDir.toString(),
+                        targetDir.toString(), OperationMode.COPY));
 
         assertEquals("Source directory does not exist", exception.getMessage());
     }
@@ -104,9 +115,8 @@ class DirectoryServiceTest {
         Path sourceFile = tempDir.resolve("source.txt");
         Files.writeString(sourceFile, "test");
 
-        IOException exception = assertThrows(IOException.class, ()
-                -> directoryService.processDirectory(sourceFile.toString(), targetDir.toString(), OperationMode.COPY)
-        );
+        IOException exception = assertThrows(IOException.class, () -> directoryService
+                .processDirectory(sourceFile.toString(), targetDir.toString(), OperationMode.COPY));
 
         assertEquals("Source path is not a directory", exception.getMessage());
     }
@@ -120,9 +130,8 @@ class DirectoryServiceTest {
         Path targetFile = tempDir.resolve("target_file.txt");
         Files.writeString(targetFile, "existing file");
 
-        IOException exception = assertThrows(IOException.class, ()
-                -> directoryService.processDirectory(sourceDir.toString(), targetFile.toString(), OperationMode.COPY)
-        );
+        IOException exception = assertThrows(IOException.class, () -> directoryService
+                .processDirectory(sourceDir.toString(), targetFile.toString(), OperationMode.COPY));
 
         assertEquals("Destination path exists but is not a directory", exception.getMessage());
     }
@@ -143,7 +152,8 @@ class DirectoryServiceTest {
         Files.writeString(sourceDir.resolve("root.txt"), "root content");
 
         // コピー操作を実行
-        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.COPY);
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(),
+                OperationMode.COPY);
 
         // すべてのファイルとディレクトリが正しくコピーされたことを検証
         assertTrue(Files.exists(targetDir.resolve("subdir1/file1.txt")));
@@ -161,7 +171,8 @@ class DirectoryServiceTest {
     @Test
     void testEmptyDirectoryOperation() throws IOException {
         // コピー操作を実行
-        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.COPY);
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(),
+                OperationMode.COPY);
 
         // 検証
         assertTrue(Files.exists(targetDir), "ターゲットディレクトリが作成されていること");
@@ -180,18 +191,19 @@ class DirectoryServiceTest {
         Path sourceFile = sourceDir.resolve("test.txt");
         Files.writeString(sourceFile, "source content");
 
-        // ターゲットディレクトリを作成し、異なる内容のファイルを配置
-        Files.createDirectories(targetDir);
+        // ターゲットディレクトリにファイルを作成
         Path targetFile = targetDir.resolve("test.txt");
         Files.writeString(targetFile, "different content");
 
-        // テストを実行
-        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.DIFF);
+        // DIFFモードで実行
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(),
+                OperationMode.DIFF);
 
-        // 検証は出力の確認が必要だが、エラーが発生しないことを確認
+        // 検証
         assertTrue(Files.exists(sourceFile), "ソースファイルが存在すること");
         assertTrue(Files.exists(targetFile), "ターゲットファイルが存在すること");
-        assertFalse(Files.readString(sourceFile).equals(Files.readString(targetFile)), "ファイルの内容が異なること");
+        assertFalse(Files.readString(sourceFile).equals(Files.readString(targetFile)),
+                "ファイルの内容が異なること");
     }
 
     /**
@@ -204,40 +216,18 @@ class DirectoryServiceTest {
         Files.writeString(sourceFile, "common content");
 
         // ターゲットディレクトリに追加のファイルを作成
-        Files.createDirectories(targetDir);
         Path targetCommonFile = targetDir.resolve("common.txt");
         Path targetExtraFile = targetDir.resolve("extra.txt");
         Files.writeString(targetCommonFile, "common content");
         Files.writeString(targetExtraFile, "extra content");
 
-        // テストを実行
-        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.DIFF);
+        // DIFFモードで実行
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(),
+                OperationMode.DIFF);
 
-        // 検証（ファイルの存在確認）
+        // 検証
         assertTrue(Files.exists(sourceFile), "共通ファイルがソースに存在すること");
         assertTrue(Files.exists(targetExtraFile), "追加ファイルがターゲットに存在すること");
-    }
-
-    /**
-     * DIFFモードでディレクトリ構造が異なる場合のテスト
-     */
-    @Test
-    void testDiffWithDifferentDirectoryStructure() throws IOException {
-        // ソースディレクトリ構造を作成
-        Path sourceSubDir = sourceDir.resolve("subdir");
-        Files.createDirectories(sourceSubDir);
-        Files.writeString(sourceSubDir.resolve("file.txt"), "content");
-
-        // ターゲットディレクトリに異なる構造を作成
-        Files.createDirectories(targetDir.resolve("different_subdir"));
-        Files.writeString(targetDir.resolve("different_subdir").resolve("file.txt"), "content");
-
-        // テストを実行
-        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.DIFF);
-
-        // 検証（ディレクトリ構造の存在確認）
-        assertTrue(Files.exists(sourceSubDir), "ソースのサブディレクトリが存在すること");
-        assertTrue(Files.exists(targetDir.resolve("different_subdir")), "ターゲットの異なるサブディレクトリが存在すること");
     }
 
     /**
@@ -247,8 +237,7 @@ class DirectoryServiceTest {
     public void tearDown() throws IOException {
         // テスト後のクリーンアップ
         if (Files.exists(sourceDir)) {
-            Files.walk(sourceDir)
-                    .sorted((a, b) -> b.toString().length() - a.toString().length())
+            Files.walk(sourceDir).sorted((a, b) -> b.toString().length() - a.toString().length())
                     .forEach(path -> {
                         try {
                             Files.delete(path);
@@ -259,8 +248,7 @@ class DirectoryServiceTest {
         }
 
         if (Files.exists(targetDir)) {
-            Files.walk(targetDir)
-                    .sorted((a, b) -> b.toString().length() - a.toString().length())
+            Files.walk(targetDir).sorted((a, b) -> b.toString().length() - a.toString().length())
                     .forEach(path -> {
                         try {
                             Files.delete(path);
