@@ -15,9 +15,10 @@ class OperationModeTest {
      */
     @Test
     void testEnumValues() {
-        assertEquals(2, OperationMode.values().length, "列挙型は2つの値を持つこと");
+        assertEquals(3, OperationMode.values().length, "列挙型は3つの値を持つこと");
         assertTrue(containsEnumConstant("COPY"), "COPYが定義されていること");
         assertTrue(containsEnumConstant("MOVE"), "MOVEが定義されていること");
+        assertTrue(containsEnumConstant("DIFF"), "DIFFが定義されていること");
     }
 
     /**
@@ -27,6 +28,7 @@ class OperationModeTest {
     void testValueOf() {
         assertEquals(OperationMode.COPY, OperationMode.valueOf("COPY"), "COPYの文字列変換が正しいこと");
         assertEquals(OperationMode.MOVE, OperationMode.valueOf("MOVE"), "MOVEの文字列変換が正しいこと");
+        assertEquals(OperationMode.DIFF, OperationMode.valueOf("DIFF"), "DIFFの文字列変換が正しいこと");
     }
 
     /**
