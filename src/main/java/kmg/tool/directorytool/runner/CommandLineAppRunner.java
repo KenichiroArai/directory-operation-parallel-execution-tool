@@ -37,7 +37,7 @@ public class CommandLineAppRunner implements CommandLineRunner {
         // 引数の数をチェック
         if (args.length != 3) {
             System.out.println("Usage: java -jar directory-tool.jar <src> <dest> <mode>");
-            System.out.println("Modes: COPY, MOVE");
+            System.out.println("Modes: COPY, MOVE, DIFF");
             return;
         }
 
@@ -56,7 +56,7 @@ public class CommandLineAppRunner implements CommandLineRunner {
         } catch (IllegalArgumentException e) {
             // 無効なモードが指定された場合
             System.out.println("Invalid mode: " + modeStr);
-            System.out.println("Valid modes are: COPY, MOVE");
+            System.out.println("Valid modes are: COPY, MOVE, DIFF");
         } catch (IOException e) {
             // ディレクトリ操作中にエラーが発生した場合
             System.out.println("Error: " + e.getMessage());

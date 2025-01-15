@@ -76,7 +76,7 @@ class CommandLineAppRunnerTest {
         verify(directoryService, never()).processDirectory(any(), any(), any());
         String output = outputStream.toString();
         assertTrue(output.contains("Usage:"));
-        assertTrue(output.contains("Modes: COPY, MOVE"));
+        assertTrue(output.contains("Modes: COPY, MOVE, DIFF"));
     }
 
     /**
@@ -105,6 +105,18 @@ class CommandLineAppRunnerTest {
         runner.run(args);
 
         assertTrue(outputStream.toString().contains("Error: " + errorMessage));
+    }
+
+    /**
+     * DIFFモードの操作のテスト
+     */
+    @Test
+    void testDiffOperation() throws Exception {
+        String[] args = {"source", "target", "DIFF"};
+        runner.run(args);
+
+        verify(directoryService).processDirectory("source", "target", OperationMode.DIFF);
+        assertTrue(outputStream.toString().contains("Operation completed successfully"));
     }
 
     /**

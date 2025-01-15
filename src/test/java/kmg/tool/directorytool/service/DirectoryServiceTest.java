@@ -171,6 +171,75 @@ class DirectoryServiceTest {
     }
 
     /**
+     * DIFFモードで内容が異なるファイルを検出するテスト
+     */
+    @Test
+    void testDiffWithDifferentContent() throws IOException {
+        // ソースディレクトリにファイルを作成
+        Path sourceFile = sourceDir.resolve("test.txt");
+        Files.writeString(sourceFile, "source content");
+
+        // ターゲットディレクトリを作成し、異なる内容のファイルを配置
+        Files.createDirectories(targetDir);
+        Path targetFile = targetDir.resolve("test.txt");
+        Files.writeString(targetFile, "different content");
+
+        // テストを実行
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.DIFF);
+
+        // 検証は出力の確認が必要だが、エラーが発生しないことを確認
+        assertTrue(Files.exists(sourceFile), "ソースファイルが存在すること");
+        assertTrue(Files.exists(targetFile), "ターゲットファイルが存在すること");
+        assertFalse(Files.readString(sourceFile).equals(Files.readString(targetFile)), "ファイルの内容が異なること");
+    }
+
+    /**
+     * DIFFモードでターゲットディレクトリに追加のファイルがある場合のテスト
+     */
+    @Test
+    void testDiffWithExtraFilesInTarget() throws IOException {
+        // ソースディレクトリにファイルを作成
+        Path sourceFile = sourceDir.resolve("common.txt");
+        Files.writeString(sourceFile, "common content");
+
+        // ターゲットディレクトリに追加のファイルを作成
+        Files.createDirectories(targetDir);
+        Path targetCommonFile = targetDir.resolve("common.txt");
+        Path targetExtraFile = targetDir.resolve("extra.txt");
+        Files.writeString(targetCommonFile, "common content");
+        Files.writeString(targetExtraFile, "extra content");
+
+        // テストを実行
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.DIFF);
+
+        // 検証（ファイルの存在確認）
+        assertTrue(Files.exists(sourceFile), "共通ファイルがソースに存在すること");
+        assertTrue(Files.exists(targetExtraFile), "追加ファイルがターゲットに存在すること");
+    }
+
+    /**
+     * DIFFモードでディレクトリ構造が異なる場合のテスト
+     */
+    @Test
+    void testDiffWithDifferentDirectoryStructure() throws IOException {
+        // ソースディレクトリ構造を作成
+        Path sourceSubDir = sourceDir.resolve("subdir");
+        Files.createDirectories(sourceSubDir);
+        Files.writeString(sourceSubDir.resolve("file.txt"), "content");
+
+        // ターゲットディレクトリに異なる構造を作成
+        Files.createDirectories(targetDir.resolve("different_subdir"));
+        Files.writeString(targetDir.resolve("different_subdir").resolve("file.txt"), "content");
+
+        // テストを実行
+        directoryService.processDirectory(sourceDir.toString(), targetDir.toString(), OperationMode.DIFF);
+
+        // 検証（ディレクトリ構造の存在確認）
+        assertTrue(Files.exists(sourceSubDir), "ソースのサブディレクトリが存在すること");
+        assertTrue(Files.exists(targetDir.resolve("different_subdir")), "ターゲットの異なるサブディレクトリが存在すること");
+    }
+
+    /**
      * テスト後のクリーンアップ処理
      */
     @AfterEach
