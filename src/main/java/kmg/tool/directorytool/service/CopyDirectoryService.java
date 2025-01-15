@@ -16,6 +16,8 @@ public class CopyDirectoryService extends AbstractDirectoryService {
         if (Files.isDirectory(sourcePath)) {
             Files.createDirectories(targetPath);
         } else {
+            // ターゲットディレクトリが存在することを保証
+            Files.createDirectories(targetPath.getParent());
             Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
         }
     }

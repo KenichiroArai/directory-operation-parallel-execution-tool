@@ -16,6 +16,8 @@ public class MoveDirectoryService extends AbstractDirectoryService {
         if (Files.isDirectory(sourcePath)) {
             Files.createDirectories(targetPath);
         } else {
+            // ファイル移動前にターゲットディレクトリが存在することを保証
+            Files.createDirectories(targetPath.getParent());
             Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
         }
     }
