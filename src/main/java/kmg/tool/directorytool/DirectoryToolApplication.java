@@ -2,6 +2,10 @@ package kmg.tool.directorytool;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
  * ディレクトリ操作ツールのメインアプリケーションクラス。
@@ -35,6 +39,26 @@ public class DirectoryToolApplication {
     }
 
     public static void main(String[] args) {
+        if (args.length < 3) {
+            exitWithError();
+            return;
+        }
+
+        String sourcePath = args[0];
+        String destPath = args[1];
+        String operationType = args[2];
+
+        Path source = Paths.get(sourcePath);
+        if (!Files.exists(source)) {
+            exitWithError();
+            return;
+        }
+
+        if (!Arrays.asList("COPY", "MOVE").contains(operationType)) {
+            exitWithError();
+            return;
+        }
+
         // Springアプリケーションを起動
         SpringApplication.run(DirectoryToolApplication.class, args);
 
@@ -45,6 +69,13 @@ public class DirectoryToolApplication {
             if (!Boolean.getBoolean("skipExit")) {
                 System.exit(0);
             }
+        }
+    }
+
+    private static void exitWithError() {
+        hasExited = true;
+        if (!isTestMode && !Boolean.getBoolean("skipExit")) {
+            System.exit(1);
         }
     }
 }

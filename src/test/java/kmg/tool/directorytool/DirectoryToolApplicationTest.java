@@ -92,4 +92,36 @@ class DirectoryToolApplicationTest {
         DirectoryToolApplication.setTestMode(false);
         assertFalse(DirectoryToolApplication.isTestMode());
     }
+
+    @Test
+    void mainMethodFailsWithInvalidArguments() {
+        DirectoryToolApplication.setTestMode(true);
+        DirectoryToolApplication.resetExitStatus();
+
+        // 引数が不足している場合
+        DirectoryToolApplication.main(new String[] {});
+        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with insufficient arguments");
+        DirectoryToolApplication.resetExitStatus();
+
+        // 無効な操作タイプの場合
+        DirectoryToolApplication.main(new String[] {"/source", "/dest", "INVALID"});
+        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with invalid operation type");
+    }
+
+    @Test
+    void mainMethodFailsWithInvalidPaths(@TempDir Path tempDir) {
+        DirectoryToolApplication.setTestMode(true);
+        DirectoryToolApplication.resetExitStatus();
+
+        // 存在しないソースディレクトリ
+        Path nonExistentSource = tempDir.resolve("non-existent");
+        Path destDir = tempDir.resolve("dest");
+
+        DirectoryToolApplication.main(new String[] {
+            nonExistentSource.toString(),
+            destDir.toString(),
+            "COPY"
+        });
+        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with non-existent source directory");
+    }
 }
