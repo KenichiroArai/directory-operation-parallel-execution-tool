@@ -60,7 +60,16 @@ public abstract class AbstractDirectoryService {
     }
 
     /**
-     * パスの検証を行う
+     * ソースとターゲットのパスを検証する。
+     * ソースパスが存在し、ディレクトリであることを確認する。
+     * ターゲットパスが存在する場合、ディレクトリであることを確認する。
+     * ターゲットパスが存在しない場合、ディレクトリを作成する。
+     *
+     * @param source ソースディレクトリのパス
+     * @param destination ターゲットディレクトリのパス
+     * @throws IOException ソースパスが存在しない、またはディレクトリでない場合、
+     *                     ターゲットパスが存在するがディレクトリでない場合、
+     *                     ターゲットディレクトリの作成に失敗した場合
      */
     protected void validatePaths(Path source, Path destination) throws IOException {
         if (!Files.exists(source)) {
@@ -81,18 +90,37 @@ public abstract class AbstractDirectoryService {
     }
 
     /**
-     * 個別のパスに対する処理を実行する
+     * 個々のファイル/ディレクトリに対して具体的な操作を実行する。
+     * サブクラスで実装されるべき抽象メソッド。
+     *
+     * @param sourcePath 処理対象のソースパス
+     * @param targetPath 処理対象のターゲットパス
+     * @param relativePath ソースディレクトリからの相対パス
+     * @throws IOException ファイル操作中にエラーが発生した場合
      */
     protected abstract void processPath(Path sourcePath, Path targetPath, Path relativePath)
             throws IOException;
 
     /**
-     * すべてのファイル処理後の後処理を実行する
+     * すべてのファイル処理が完了した後に実行する後処理。
+     * サブクラスで実装されるべき抽象メソッド。
+     * 主にリソースの解放や最終的な状態確認などを行う。
+     *
+     * @param source ソースディレクトリのパス
+     * @param destination ターゲットディレクトリのパス
+     * @throws IOException 後処理中にエラーが発生した場合
      */
     protected abstract void postProcess(Path source, Path destination) throws IOException;
 
     /**
-     * 2つのファイルの内容を比較する
+     * 2つのファイルの内容をバイト単位で比較する。
+     * ファイルサイズが異なる場合は即座にfalseを返す。
+     * ファイルサイズが同じ場合、内容が完全に一致する場合にtrueを返す。
+     *
+     * @param file1 比較対象のファイル1
+     * @param file2 比較対象のファイル2
+     * @return ファイル内容が完全に一致する場合true、それ以外の場合false
+     * @throws IOException ファイルの読み取り中にエラーが発生した場合
      */
     protected boolean compareFiles(Path file1, Path file2) throws IOException {
         if (Files.size(file1) != Files.size(file2)) {
@@ -102,7 +130,13 @@ public abstract class AbstractDirectoryService {
     }
 
     /**
-     * すべてのタスクの完了を待つ
+     * すべての非同期タスクの完了を待機する。
+     * 各タスクには30秒のタイムアウトが設定されており、
+     * タイムアウトした場合やエラーが発生した場合はIOExceptionをスローする。
+     *
+     * @param futures 完了を待機するFutureオブジェクトのリスト
+     * @throws IOException タスクの実行中にエラーが発生した場合、
+     *                     またはタイムアウトした場合
      */
     protected void waitForCompletion(List<Future<?>> futures) throws IOException {
         for (Future<?> future : futures) {
