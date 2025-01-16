@@ -44,17 +44,43 @@ class DirectoryToolApplicationTest {
         DirectoryToolApplication.setTestMode(true);
 
         // mainメソッドを実行（テストデータディレクトリを使用）
-        DirectoryToolApplication.main(new String[] {
-            sourceDir.toString(),
-            destDir.toString(),
-            "COPY"
-        });
+        DirectoryToolApplication
+                .main(new String[] {sourceDir.toString(), destDir.toString(), "COPY"});
 
         // 結果の検証
         assertTrue(Files.exists(destDir));
         assertTrue(Files.exists(destDir.resolve("test1.txt")));
         assertTrue(Files.exists(destDir.resolve("test2.txt")));
         assertTrue(Files.exists(destDir.resolve("subdir/test3.txt")));
+    }
+
+    @Test
+    void mainMethodExecutesSuccessfullyInNonTestMode(@TempDir Path tempDir) throws IOException {
+        // テストデータを作成
+        Path sourceDir = createTestDirectory(tempDir);
+        Path destDir = tempDir.resolve("dest");
+
+        // テストモードをオフに設定
+        DirectoryToolApplication.setTestMode(false);
+        DirectoryToolApplication.resetExitStatus();
+
+        // System.exitを実行しないようにする
+        System.setProperty("skipExit", "true");
+
+        DirectoryToolApplication
+                .main(new String[] {sourceDir.toString(), destDir.toString(), "COPY"});
+
+        // アプリケーションが終了しようとしたことを確認
+        assertTrue(DirectoryToolApplication.hasExited());
+
+        // 結果の検証
+        assertTrue(Files.exists(destDir));
+        assertTrue(Files.exists(destDir.resolve("test1.txt")));
+        assertTrue(Files.exists(destDir.resolve("test2.txt")));
+        assertTrue(Files.exists(destDir.resolve("subdir/test3.txt")));
+
+        // プロパティをリセット
+        System.clearProperty("skipExit");
     }
 
     @Test
