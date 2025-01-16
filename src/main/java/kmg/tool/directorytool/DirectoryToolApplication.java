@@ -18,11 +18,9 @@ import java.util.Arrays;
 @SpringBootApplication
 public class DirectoryToolApplication {
     /**
-     * アプリケーションのエントリーポイント。
-     *
-     * @param args コマンドライン引数
+     * テストモードを制御するフラグ。
+     * trueの場合、アプリケーションはテストモードで動作し、System.exitが呼び出されない。
      */
-    /** テストモードフラグ */
     private static boolean isTestMode = false;
 
     /**
@@ -43,7 +41,10 @@ public class DirectoryToolApplication {
         DirectoryToolApplication.isTestMode = testMode;
     }
 
-    /** アプリケーション終了フラグ */
+    /**
+     * アプリケーションの終了状態を管理するフラグ。
+     * アプリケーションが終了処理を実行した場合にtrueとなる。
+     */
     private static boolean hasExited = false;
 
     /**
@@ -63,6 +64,17 @@ public class DirectoryToolApplication {
         hasExited = false;
     }
 
+    /**
+     * アプリケーションのメインメソッド。
+     * コマンドライン引数を解析し、適切なディレクトリ操作を実行する。
+     *
+     * 引数の形式:
+     * args[0]: ソースディレクトリのパス
+     * args[1]: 対象ディレクトリのパス（COPY/MOVEの場合）
+     * args[2]: 操作タイプ（COPY/MOVE/DIFF）
+     *
+     * @param args コマンドライン引数の配列
+     */
     public static void main(String[] args) {
         if (args.length < 3) {
             if (!exitWithError()) {
