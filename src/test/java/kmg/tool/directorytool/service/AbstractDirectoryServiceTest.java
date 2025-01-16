@@ -5,9 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -99,8 +97,77 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
-     * テスト後のクリーンアップ処理
+     * サイズの異なるファイルの比較テスト
      */
+    @org.junit.jupiter.api.Test
+    void testCompareFilesWithDifferentSizes() throws IOException {
+        // 異なるサイズのファイルを作成
+        Path file1 = tempDir.resolve("file1.txt");
+        Path file2 = tempDir.resolve("file2.txt");
+        Files.writeString(file1, "content1");
+        Files.writeString(file2, "different content");
+
+        assertFalse(service.compareFiles(file1, file2), "異なるサイズのファイルは不一致となるべき");
+    }
+
+    /**
+     * ファイル処理時の例外のテスト
+     */
+    @org.junit.jupiter.api.Test
+    void testFileProcessingException() throws IOException {
+        // テスト用のファイルを作成
+        Path sourceFile = sourceDir.resolve("test.txt");
+        Files.writeString(sourceFile, "test content");
+
+        // サービスをオーバーライドして例外をシミュレート
+        AbstractDirectoryService errorService = new AbstractDirectoryService() {
+            @Override
+            protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
+                throw new IOException("Simulated error during file processing");
+            }
+
+            @Override
+            protected void postProcess(Path source, Path destination) throws IOException {
+                // 何もしない
+            }
+        };
+
+        // 処理を実行し、例外が発生することを確認
+        assertThrows(IOException.class,
+                () -> errorService.processDirectory(sourceDir.toString(), targetDir.toString()));
+    }
+
+    /**
+     * タスク実行のタイムアウトテスト
+     */
+    @org.junit.jupiter.api.Test
+    void testTaskExecutionTimeout() throws IOException {
+        // 長時間実行されるタスクを作成
+        Path sourceFile = sourceDir.resolve("test.txt");
+        Files.writeString(sourceFile, "test content");
+
+        // サービスをオーバーライドして長時間のタスクをシミュレート
+        AbstractDirectoryService slowService = new AbstractDirectoryService() {
+            @Override
+            protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
+                try {
+                    Thread.sleep(31000); // 31秒間スリープ（タイムアウトは30秒）
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            @Override
+            protected void postProcess(Path source, Path destination) throws IOException {
+                // 何もしない
+            }
+        };
+
+        // タイムアウトで例外が発生することを確認
+        assertThrows(IOException.class,
+                () -> slowService.processDirectory(sourceDir.toString(), targetDir.toString()));
+    }
+
     @AfterEach
     public void tearDown() throws IOException {
         // テスト後のクリーンアップ
