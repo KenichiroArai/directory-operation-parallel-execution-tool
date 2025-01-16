@@ -11,22 +11,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class DiffDirectoryService extends AbstractDirectoryService {
     @Override
-    protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
-        if (!sourcePath.equals(Path.of(sourcePath.getRoot().toString()))) {  // ルートディレクトリは処理しない
-            if (Files.isDirectory(sourcePath)) {
-                if (!Files.exists(targetPath)) {
-                    System.out.println("Directory only in source: " + relativePath);
-                } else if (!Files.isDirectory(targetPath)) {
-                    System.out.println("Different: " + relativePath + " (directory vs file)");
-                }
-            } else {
-                if (!Files.exists(targetPath)) {
-                    System.out.println("Only in source: " + relativePath);
-                } else if (!Files.isRegularFile(targetPath)) {
-                    System.out.println("Different: " + relativePath + " (file vs directory)");
-                } else if (!compareFiles(sourcePath, targetPath)) {
-                    System.out.println("Different: " + relativePath);
-                }
+    protected void processPath(Path sourcePath, Path targetPath, Path relativePath)
+            throws IOException {
+
+        if (Files.isDirectory(sourcePath)) {
+            if (!Files.exists(targetPath)) {
+                System.out.println("Directory only in source: " + relativePath);
+            } else if (!Files.isDirectory(targetPath)) {
+                System.out.println("Different: " + relativePath + " (directory vs file)");
+            }
+        } else {
+            if (!Files.exists(targetPath)) {
+                System.out.println("Only in source: " + relativePath);
+            } else if (!Files.isRegularFile(targetPath)) {
+                System.out.println("Different: " + relativePath + " (file vs directory)");
+            } else if (!compareFiles(sourcePath, targetPath)) {
+                System.out.println("Different: " + relativePath);
             }
         }
     }
@@ -42,7 +42,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
     }
 
     private void processDestinationPath(Path source, Path destination, Path path) {
-        if (!path.equals(destination)) {  // ルートディレクトリは除外
+        if (!path.equals(destination)) { // ルートディレクトリは除外
             Path relativePath = destination.relativize(path);
             Path sourcePath = source.resolve(relativePath);
             if (!Files.exists(sourcePath)) {
@@ -57,6 +57,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
     @Override
     public void processDirectory(String srcPath, String destPath) throws IOException {
+
         Path source = Path.of(srcPath);
         Path destination = Path.of(destPath);
 
