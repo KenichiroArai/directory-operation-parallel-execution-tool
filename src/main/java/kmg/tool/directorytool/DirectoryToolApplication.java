@@ -8,8 +8,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
- * ディレクトリ操作ツールのメインアプリケーションクラス。
- * Spring Bootアプリケーションとして起動し、コマンドラインから実行される。
+ * ディレクトリ操作ツールのメインアプリケーションクラス。 Spring Bootアプリケーションとして起動し、コマンドラインから実行される。
  */
 @SpringBootApplication
 public class DirectoryToolApplication {
@@ -45,7 +44,6 @@ public class DirectoryToolApplication {
         }
 
         String sourcePath = args[0];
-        String destPath = args[1];
         String operationType = args[2];
 
         Path source = Paths.get(sourcePath);
