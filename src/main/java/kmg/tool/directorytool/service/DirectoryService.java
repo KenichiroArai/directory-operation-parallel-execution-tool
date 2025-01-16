@@ -2,12 +2,10 @@ package kmg.tool.directorytool.service;
 
 import java.io.IOException;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
- * ディレクトリ操作のファサードとして機能するサービスクラス。
- * 操作モードに応じて適切なサービスクラスに処理を委譲する。
+ * ディレクトリ操作のファサードとして機能するサービスクラス。 操作モードに応じて適切なサービスクラスに処理を委譲する。
  */
 @Service
 public class DirectoryService {
@@ -16,10 +14,7 @@ public class DirectoryService {
     private final MoveDirectoryService moveService;
     private final DiffDirectoryService diffService;
 
-    @Autowired
-    public DirectoryService(
-            CopyDirectoryService copyService,
-            MoveDirectoryService moveService,
+    public DirectoryService(CopyDirectoryService copyService, MoveDirectoryService moveService,
             DiffDirectoryService diffService) {
         this.copyService = copyService;
         this.moveService = moveService;
@@ -27,8 +22,7 @@ public class DirectoryService {
     }
 
     /**
-     * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。
-     * 処理内容は指定された操作モード（COPY、MOVE、またはDIFF）に依存する。
+     * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。 処理内容は指定された操作モード（COPY、MOVE、またはDIFF）に依存する。
      *
      * @param srcPath ソースディレクトリのパス
      * @param destPath ターゲットディレクトリのパス

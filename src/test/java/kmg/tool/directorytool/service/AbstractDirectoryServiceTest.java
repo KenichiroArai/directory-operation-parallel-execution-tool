@@ -3,8 +3,6 @@ package kmg.tool.directorytool.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,8 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * ディレクトリ操作サービスのテストのための基底クラス。
- * 共通のセットアップ、検証、クリーンアップ機能を提供する。
+ * ディレクトリ操作サービスのテストのための基底クラス。 共通のセットアップ、検証、クリーンアップ機能を提供する。
  */
 public abstract class AbstractDirectoryServiceTest {
 
@@ -53,9 +50,8 @@ public abstract class AbstractDirectoryServiceTest {
     void testNonExistentSourceDirectory() {
         Path nonExistentDir = tempDir.resolve("non-existent");
 
-        IOException exception = assertThrows(IOException.class, ()
-                -> service.processDirectory(nonExistentDir.toString(), targetDir.toString())
-        );
+        IOException exception = assertThrows(IOException.class,
+                () -> service.processDirectory(nonExistentDir.toString(), targetDir.toString()));
 
         assertEquals("Source directory does not exist", exception.getMessage());
     }
@@ -68,9 +64,8 @@ public abstract class AbstractDirectoryServiceTest {
         Path sourceFile = tempDir.resolve("source.txt");
         Files.writeString(sourceFile, "test");
 
-        IOException exception = assertThrows(IOException.class, ()
-                -> service.processDirectory(sourceFile.toString(), targetDir.toString())
-        );
+        IOException exception = assertThrows(IOException.class,
+                () -> service.processDirectory(sourceFile.toString(), targetDir.toString()));
 
         assertEquals("Source path is not a directory", exception.getMessage());
     }
@@ -84,9 +79,8 @@ public abstract class AbstractDirectoryServiceTest {
         Path targetFile = tempDir.resolve("target_file.txt");
         Files.writeString(targetFile, "existing file");
 
-        IOException exception = assertThrows(IOException.class, ()
-                -> service.processDirectory(sourceDir.toString(), targetFile.toString())
-        );
+        IOException exception = assertThrows(IOException.class,
+                () -> service.processDirectory(sourceDir.toString(), targetFile.toString()));
 
         assertEquals("Destination path exists but is not a directory", exception.getMessage());
     }
@@ -111,8 +105,7 @@ public abstract class AbstractDirectoryServiceTest {
     public void tearDown() throws IOException {
         // テスト後のクリーンアップ
         if (Files.exists(sourceDir)) {
-            Files.walk(sourceDir)
-                    .sorted((a, b) -> b.toString().length() - a.toString().length())
+            Files.walk(sourceDir).sorted((a, b) -> b.toString().length() - a.toString().length())
                     .forEach(path -> {
                         try {
                             Files.delete(path);
@@ -123,8 +116,7 @@ public abstract class AbstractDirectoryServiceTest {
         }
 
         if (Files.exists(targetDir)) {
-            Files.walk(targetDir)
-                    .sorted((a, b) -> b.toString().length() - a.toString().length())
+            Files.walk(targetDir).sorted((a, b) -> b.toString().length() - a.toString().length())
                     .forEach(path -> {
                         try {
                             Files.delete(path);
