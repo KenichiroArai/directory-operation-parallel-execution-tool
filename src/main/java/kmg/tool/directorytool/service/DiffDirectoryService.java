@@ -10,6 +10,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DiffDirectoryService extends AbstractDirectoryService {
+    /**
+     * ソースディレクトリとターゲットディレクトリのパスを比較し、差分を検出します。
+     *
+     * @param sourcePath   ソースディレクトリのパス
+     * @param targetPath   ターゲットディレクトリのパス
+     * @param relativePath ソースディレクトリからの相対パス
+     * @throws IOException 入出力エラーが発生した場合
+     */
     @Override
     protected void processPath(Path sourcePath, Path targetPath, Path relativePath)
             throws IOException {
@@ -31,6 +39,13 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         }
     }
 
+    /**
+     * ターゲットディレクトリを走査して、ソースディレクトリに存在しないファイルを検出します。
+     *
+     * @param source      ソースディレクトリのパス
+     * @param destination ターゲットディレクトリのパス
+     * @throws IOException 入出力エラーが発生した場合
+     */
     @Override
     protected void postProcess(Path source, Path destination) throws IOException {
         // ターゲットディレクトリを走査してソースにないファイルを検出
@@ -41,6 +56,13 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         }
     }
 
+    /**
+     * ターゲットディレクトリのパスを処理し、ソースディレクトリに存在しないファイルを検出します。
+     *
+     * @param source      ソースディレクトリのパス
+     * @param destination ターゲットディレクトリのパス
+     * @param path        ターゲットディレクトリ内の現在のパス
+     */
     private void processDestinationPath(Path source, Path destination, Path path) {
         if (!path.equals(destination)) { // ルートディレクトリは除外
             Path relativePath = destination.relativize(path);
@@ -55,6 +77,13 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         }
     }
 
+    /**
+     * ソースディレクトリとターゲットディレクトリを比較し、差分を検出します。
+     *
+     * @param srcPath  ソースディレクトリのパス
+     * @param destPath ターゲットディレクトリのパス
+     * @throws IOException 入出力エラーが発生した場合
+     */
     @Override
     public void processDirectory(String srcPath, String destPath) throws IOException {
 
