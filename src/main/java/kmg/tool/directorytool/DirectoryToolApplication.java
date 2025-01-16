@@ -1,11 +1,12 @@
 package kmg.tool.directorytool;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * ディレクトリ操作ツールのメインアプリケーションクラス。 Spring Bootアプリケーションとして起動し、コマンドラインから実行される。 ディレクトリのコピー、移動、差分比較の操作を提供する。
@@ -74,9 +75,25 @@ public class DirectoryToolApplication {
             return;
         }
 
-        String sourcePath = args[0];
-        String operationType = args[2];
-
+        String sourcePath = null;;
+        String destinationPath = null;
+        String operationType = null;
+        
+        if (args.length == 4) {
+        	if (!args[0].equals("--spring.output.ansi.enabled=always")) {
+        		System.err.println("最初の引数が「--spring.output.ansi.enabled=always」以外が設定されています。");
+        		return;
+        	}
+        	sourcePath = args[1];
+        	destinationPath = args[2];
+        	operationType = args[3];
+        } else {
+        	sourcePath = args[0];
+        	destinationPath = args[1];
+        	operationType = args[2];
+        }
+        String[] params = {sourcePath,destinationPath,operationType}; 
+        
         Path source = Paths.get(sourcePath);
         if (!Files.exists(source)) {
             exitWithError();
@@ -91,7 +108,8 @@ public class DirectoryToolApplication {
         }
 
         // Springアプリケーションを起動
-        SpringApplication.run(DirectoryToolApplication.class, args);
+        
+        SpringApplication.run(DirectoryToolApplication.class, params);
 
         // テストモード以外の場合のみ、アプリケーションを終了
         if (!isTestMode) {
