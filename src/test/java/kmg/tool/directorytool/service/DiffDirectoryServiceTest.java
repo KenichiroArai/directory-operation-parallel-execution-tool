@@ -3,6 +3,8 @@ package kmg.tool.directorytool.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -158,6 +160,82 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
                     "ソースの空ディレクトリが検出されること");
             assertTrue(output.contains("Directory only in destination: empty_target"),
                     "ターゲットの空ディレクトリが検出されること");
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    /**
+     * 無効なパスのテスト
+     */
+    @Test
+    void testInvalidPaths() {
+        Path invalidSourcePath = Path.of("/invalid/source/path");
+        Path invalidTargetPath = Path.of("/invalid/target/path");
+
+        // ソースディレクトリが存在しない場合
+        Exception sourceException = assertThrows(IOException.class, () -> {
+            service.processDirectory(invalidSourcePath.toString(), targetDir.toString());
+        });
+        assertTrue(sourceException.getMessage().contains("Source directory does not exist:"),
+                "エラーメッセージに'Source directory does not exist:'が含まれること");
+
+        // ターゲットディレクトリが存在しない場合
+        Exception targetException = assertThrows(IOException.class, () -> {
+            service.processDirectory(sourceDir.toString(), invalidTargetPath.toString());
+        });
+        assertTrue(targetException.getMessage().contains("Target directory does not exist:"),
+                "エラーメッセージに'Target directory does not exist:'が含まれること");
+    }
+
+    /**
+     * ファイルとディレクトリの型の違いをテスト
+     */
+    @Test
+    void testFileVsDirectoryDiff() throws IOException {
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            // ソースにファイル、ターゲットに同名のディレクトリを作成
+            Files.writeString(sourceDir.resolve("test"), "content");
+            Files.createDirectory(targetDir.resolve("test"));
+
+            service.processDirectory(sourceDir.toString(), targetDir.toString());
+
+            String output = outContent.toString();
+            assertTrue(output.contains("Different: test (file vs directory)"),
+                    "ファイル対ディレクトリの違いが検出されること");
+
+            // 逆のケース：ソースにディレクトリ、ターゲットに同名のファイル
+            Path sourceSubDir = sourceDir.resolve("test2");
+            Files.createDirectory(sourceSubDir);
+            Files.writeString(targetDir.resolve("test2"), "content");
+
+            service.processDirectory(sourceDir.toString(), targetDir.toString());
+            output = outContent.toString();
+            assertTrue(output.contains("Different: test2 (directory vs file)"),
+                    "ディレクトリ対ファイルの違いが検出されること");
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    /**
+     * ルートディレクトリの処理が除外されることのテスト
+     */
+    @Test
+    void testRootDirectoryExclusion() throws IOException {
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outContent));
+
+        try {
+            service.processDirectory(sourceDir.toString(), targetDir.toString());
+            String output = outContent.toString();
+            assertFalse(output.contains(sourceDir.getFileName().toString()),
+                    "ルートディレクトリ自体が差分として報告されないこと");
         } finally {
             System.setOut(originalOut);
         }
