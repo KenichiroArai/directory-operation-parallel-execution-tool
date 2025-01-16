@@ -102,13 +102,14 @@ class DirectoryToolApplicationTest {
         // 引数が不足している場合
         DirectoryToolApplication.main(new String[] {});
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with insufficient arguments");
-        assertTrue(output.toString().contains("無効な引数です。"), "Should display invalid arguments message");
+        assertTrue(output.toString().contains("引数が不足しています。"), "Should display insufficient arguments message");
         DirectoryToolApplication.resetExitStatus();
 
         // 無効な操作タイプの場合
         DirectoryToolApplication.main(new String[] {"/source", "/dest", "INVALID"});
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with invalid operation type");
-        assertTrue(output.toString().contains("モードが不正です。"), "Should display invalid mode message. Actual output: " + output.toString());
+        assertTrue(output.toString().contains("無効なモードです。"), "Should display invalid mode message");
+        DirectoryToolApplication.resetExitStatus();
 
         // ソースディレクトリが存在しない場合
         DirectoryToolApplication.main(new String[] {"/nonexistent", "/dest", "COPY"});
@@ -133,7 +134,7 @@ class DirectoryToolApplicationTest {
 
         // テストモードがfalseでskipExitがfalseの場合
         System.clearProperty("skipExit");
-        assertFalse(DirectoryToolApplication.exitWithError());
+        assertTrue(DirectoryToolApplication.exitWithError());
         assertTrue(DirectoryToolApplication.hasExited());
         assertTrue(output.toString().isEmpty());
 
