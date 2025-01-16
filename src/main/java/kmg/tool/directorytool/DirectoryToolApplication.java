@@ -8,7 +8,12 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
- * ディレクトリ操作ツールのメインアプリケーションクラス。 Spring Bootアプリケーションとして起動し、コマンドラインから実行される。
+ * ディレクトリ操作ツールのメインアプリケーションクラス。
+ * Spring Bootアプリケーションとして起動し、コマンドラインから実行される。
+ * ディレクトリのコピー、移動、差分比較の操作を提供する。
+ *
+ * @author kmg
+ * @version 1.0
  */
 @SpringBootApplication
 public class DirectoryToolApplication {
@@ -17,22 +22,43 @@ public class DirectoryToolApplication {
      *
      * @param args コマンドライン引数
      */
+    /** テストモードフラグ */
     private static boolean isTestMode = false;
 
+    /**
+     * テストモードの状態を取得する。
+     *
+     * @return テストモードの場合true、それ以外の場合false
+     */
     public static boolean isTestMode() {
         return isTestMode;
     }
 
+    /**
+     * テストモードを設定する。
+     *
+     * @param testMode テストモードフラグ
+     */
     public static void setTestMode(boolean testMode) {
         DirectoryToolApplication.isTestMode = testMode;
     }
 
+    /** アプリケーション終了フラグ */
     private static boolean hasExited = false;
 
+    /**
+     * アプリケーションの終了状態を取得する。
+     *
+     * @return アプリケーションが終了している場合true、それ以外の場合false
+     */
     public static boolean hasExited() {
         return hasExited;
     }
 
+    /**
+     * アプリケーションの終了状態をリセットする。
+     * テストケース実行時に使用される。
+     */
     public static void resetExitStatus() {
         hasExited = false;
     }
@@ -76,8 +102,13 @@ public class DirectoryToolApplication {
         }
     }
 
+    /**
+     * エラー終了時の処理を行う。
+     * テストモードやskipExit設定に応じて、適切な終了処理を実行する。
+     *
+     * @return エラー処理が成功した場合true、それ以外の場合false
+     */
     private static boolean exitWithError() {
-
         boolean result = false;
 
         hasExited = true;

@@ -3,6 +3,12 @@ package kmg.tool.directorytool.model;
 /**
  * ディレクトリ操作ツールの操作モードを表す列挙型。
  * ツールがファイルに対して行う操作の種類を定義する。
+ * このenumは、コマンドライン引数として受け取った操作タイプを
+ * アプリケーション内部で扱うための型安全な表現を提供する。
+ *
+ * @author kmg
+ * @version 1.0
+ * @see kmg.tool.directorytool.DirectoryToolApplication
  */
 public enum OperationMode {
     /**

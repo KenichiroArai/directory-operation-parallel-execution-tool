@@ -11,6 +11,17 @@ import kmg.tool.directorytool.service.DirectoryService;
 /**
  * コマンドラインインターフェースを提供するクラス。
  * アプリケーション起動時にコマンドライン引数を処理し、適切なディレクトリ操作を実行する。
+ * Spring Bootのコマンドラインランナーとして実装され、DIコンテナによって管理される。
+ *
+ * <p>引数形式:
+ * java -jar directory-tool.jar &lt;src&gt; &lt;dest&gt; &lt;mode&gt;
+ *
+ * <p>mode: COPY, MOVE, DIFF
+ *
+ * @author kmg
+ * @version 1.0
+ * @see kmg.tool.directorytool.service.DirectoryService
+ * @see kmg.tool.directorytool.model.OperationMode
  */
 @Component
 public class CommandLineAppRunner implements CommandLineRunner {
@@ -19,8 +30,9 @@ public class CommandLineAppRunner implements CommandLineRunner {
 
     /**
      * DirectoryServiceをDIするコンストラクタ。
+     * Spring Bootのコンテナによって自動的にインスタンス化される。
      *
-     * @param directoryService ディレクトリ操作サービス
+     * @param directoryService ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
      */
     public CommandLineAppRunner(DirectoryService directoryService) {
         this.directoryService = directoryService;
@@ -28,9 +40,10 @@ public class CommandLineAppRunner implements CommandLineRunner {
 
     /**
      * コマンドライン引数を処理し、ディレクトリ操作を実行するメイン処理。
+     * Spring Bootアプリケーション起動時に自動的に呼び出される。
      *
-     * @param args コマンドライン引数
-     * @throws Exception 処理中にエラーが発生した場合
+     * @param args コマンドライン引数。[0]:ソースディレクトリパス、[1]:ターゲットディレクトリパス、[2]:操作モード
+     * @throws Exception ディレクトリ操作中にIO例外が発生した場合、または無効な引数が指定された場合
      */
     @Override
     public void run(String... args) throws Exception {

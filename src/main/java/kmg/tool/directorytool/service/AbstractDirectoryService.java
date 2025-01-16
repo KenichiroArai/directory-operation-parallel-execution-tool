@@ -22,7 +22,8 @@ public abstract class AbstractDirectoryService {
     /**
      * 並列処理用のスレッドプール。
      */
-    protected final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    protected final ExecutorService executorService =
+            Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     /**
      * ディレクトリの処理を実行する。
@@ -82,7 +83,8 @@ public abstract class AbstractDirectoryService {
     /**
      * 個別のパスに対する処理を実行する
      */
-    protected abstract void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException;
+    protected abstract void processPath(Path sourcePath, Path targetPath, Path relativePath)
+            throws IOException;
 
     /**
      * すべてのファイル処理後の後処理を実行する
