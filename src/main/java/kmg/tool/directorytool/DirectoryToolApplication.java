@@ -77,9 +77,8 @@ public class DirectoryToolApplication {
      */
     public static void main(String[] args) {
         if (args.length < 3) {
-            if (!exitWithError()) {
-                System.err.println("無効な引数です。");
-            }
+            exitWithError();
+            System.err.println("無効な引数です。");
             return;
         }
 
@@ -88,16 +87,14 @@ public class DirectoryToolApplication {
 
         Path source = Paths.get(sourcePath);
         if (!Files.exists(source)) {
-            if (!exitWithError()) {
-                System.err.println("ソースディレクトリが存在しません。");
-            }
+            exitWithError();
+            System.err.println("ソースディレクトリが存在しません。");
             return;
         }
 
         if (!Arrays.asList("COPY", "MOVE", "DIFF").contains(operationType)) {
-            if (!exitWithError()) {
-                System.err.println("モードが不正です。");
-            }
+            exitWithError();
+            System.err.println("モードが不正です。");
             return;
         }
 
@@ -120,15 +117,11 @@ public class DirectoryToolApplication {
      *
      * @return エラー処理が成功した場合true、それ以外の場合false
      */
-    private static boolean exitWithError() {
-        boolean result = false;
-
+    static boolean exitWithError() {
         hasExited = true;
-        if (!isTestMode && !Boolean.getBoolean("skipExit")) {
-            return result;
+        if (isTestMode || Boolean.getBoolean("skipExit")) {
+            return true;
         }
-
-        result = true;
-        return result;
+        return false;
     }
 }

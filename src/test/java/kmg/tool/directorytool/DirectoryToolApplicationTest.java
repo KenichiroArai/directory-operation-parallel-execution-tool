@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -94,22 +95,54 @@ class DirectoryToolApplicationTest {
     }
 
     @Test
-    void mainMethodFailsWithInvalidArguments() {
+    void mainMethodFailsWithInvalidArguments(CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
         // 引数が不足している場合
         DirectoryToolApplication.main(new String[] {});
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with insufficient arguments");
+        assertTrue(output.toString().contains("無効な引数です。"), "Should display invalid arguments message");
         DirectoryToolApplication.resetExitStatus();
 
         // 無効な操作タイプの場合
         DirectoryToolApplication.main(new String[] {"/source", "/dest", "INVALID"});
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with invalid operation type");
+        assertTrue(output.toString().contains("モードが不正です。"), "Should display invalid mode message. Actual output: " + output.toString());
+
+        // ソースディレクトリが存在しない場合
+        DirectoryToolApplication.main(new String[] {"/nonexistent", "/dest", "COPY"});
+        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with non-existent source directory");
+        assertTrue(output.toString().contains("ソースディレクトリが存在しません。"), "Should display source directory not found message");
     }
 
     @Test
-    void mainMethodFailsWithInvalidPaths(@TempDir Path tempDir) {
+    void testExitWithError(CapturedOutput output) {
+        // テストモードがtrueの場合
+        DirectoryToolApplication.setTestMode(true);
+        assertTrue(DirectoryToolApplication.exitWithError());
+        assertTrue(DirectoryToolApplication.hasExited());
+        assertTrue(output.toString().isEmpty());
+
+        // テストモードがfalseでskipExitがtrueの場合
+        DirectoryToolApplication.setTestMode(false);
+        System.setProperty("skipExit", "true");
+        assertTrue(DirectoryToolApplication.exitWithError());
+        assertTrue(DirectoryToolApplication.hasExited());
+        assertTrue(output.toString().isEmpty());
+
+        // テストモードがfalseでskipExitがfalseの場合
+        System.clearProperty("skipExit");
+        assertFalse(DirectoryToolApplication.exitWithError());
+        assertTrue(DirectoryToolApplication.hasExited());
+        assertTrue(output.toString().isEmpty());
+
+        // 状態をリセット
+        DirectoryToolApplication.resetExitStatus();
+    }
+
+    @Test
+    void mainMethodFailsWithInvalidPaths(@TempDir Path tempDir, CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
@@ -123,5 +156,6 @@ class DirectoryToolApplicationTest {
             "COPY"
         });
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with non-existent source directory");
+        assertTrue(output.toString().contains("ソースディレクトリが存在しません。"), "Should display source directory not found message");
     }
 }
