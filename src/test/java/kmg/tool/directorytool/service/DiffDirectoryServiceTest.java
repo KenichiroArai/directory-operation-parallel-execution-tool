@@ -177,8 +177,8 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Exception sourceException = assertThrows(IOException.class, () -> {
             service.processDirectory(invalidSourcePath.toString(), targetDir.toString());
         });
-        assertTrue(sourceException.getMessage().contains("Source directory does not exist:"),
-                "エラーメッセージに'Source directory does not exist:'が含まれること");
+        assertTrue(sourceException.getMessage().contains("Source directory does not exist"),
+                "エラーメッセージに'Source directory does not exist'が含まれること");
 
         // ターゲットディレクトリが存在しない場合
         Exception targetException = assertThrows(IOException.class, () -> {

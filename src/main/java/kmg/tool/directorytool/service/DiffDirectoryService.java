@@ -62,7 +62,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         // ソースディレクトリの存在チェック
         if (!Files.exists(source)) {
-            throw new IOException("Source directory does not exist: " + srcPath);
+            throw new IOException("Source directory does not exist");
         }
 
         // ターゲットディレクトリの存在チェック
