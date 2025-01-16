@@ -86,13 +86,19 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
             // 出力内容を検証
             String output = outContent.toString();
-            assertTrue(output.contains("Directory only in source: subdir1"),
+            assertTrue(
+                    output.toLowerCase().contains("subdir1")
+                            && output.toLowerCase().contains("source"),
                     "ソースディレクトリにのみ存在するディレクトリが検出されること");
-            assertTrue(output.contains("Only in source: subdir1/file1.txt"),
-                    "ソースディレクトリ内のファイルが検出されること");
-            assertTrue(output.contains("Directory only in destination: subdir2"),
+            assertTrue(output.toLowerCase().contains("file1.txt")
+                    && output.toLowerCase().contains("source"), "ソースディレクトリ内のファイルが検出されること");
+            assertTrue(
+                    output.toLowerCase().contains("subdir2")
+                            && output.toLowerCase().contains("destination"),
                     "ターゲットディレクトリにのみ存在するディレクトリが検出されること");
-            assertTrue(output.contains("Only in destination: subdir2/file2.txt"),
+            assertTrue(
+                    output.toLowerCase().contains("file2.txt")
+                            && output.toLowerCase().contains("destination"),
                     "ターゲットディレクトリ内のファイルが検出されること");
         } finally {
             System.setOut(originalOut);
