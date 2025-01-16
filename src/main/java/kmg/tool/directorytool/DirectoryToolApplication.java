@@ -8,9 +8,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
- * ディレクトリ操作ツールのメインアプリケーションクラス。
- * Spring Bootアプリケーションとして起動し、コマンドラインから実行される。
- * ディレクトリのコピー、移動、差分比較の操作を提供する。
+ * ディレクトリ操作ツールのメインアプリケーションクラス。 Spring Bootアプリケーションとして起動し、コマンドラインから実行される。 ディレクトリのコピー、移動、差分比較の操作を提供する。
  *
  * @author kmg
  * @version 1.0
@@ -18,8 +16,7 @@ import java.util.Arrays;
 @SpringBootApplication
 public class DirectoryToolApplication {
     /**
-     * テストモードを制御するフラグ。
-     * trueの場合、アプリケーションはテストモードで動作し、System.exitが呼び出されない。
+     * テストモードを制御するフラグ。 trueの場合、アプリケーションはテストモードで動作し、System.exitが呼び出されない。
      */
     private static boolean isTestMode = false;
 
@@ -42,8 +39,7 @@ public class DirectoryToolApplication {
     }
 
     /**
-     * アプリケーションの終了状態を管理するフラグ。
-     * アプリケーションが終了処理を実行した場合にtrueとなる。
+     * アプリケーションの終了状態を管理するフラグ。 アプリケーションが終了処理を実行した場合にtrueとなる。
      */
     private static boolean hasExited = false;
 
@@ -57,28 +53,24 @@ public class DirectoryToolApplication {
     }
 
     /**
-     * アプリケーションの終了状態をリセットする。
-     * テストケース実行時に使用される。
+     * アプリケーションの終了状態をリセットする。 テストケース実行時に使用される。
      */
     public static void resetExitStatus() {
         hasExited = false;
     }
 
     /**
-     * アプリケーションのメインメソッド。
-     * コマンドライン引数を解析し、適切なディレクトリ操作を実行する。
+     * アプリケーションのメインメソッド。 コマンドライン引数を解析し、適切なディレクトリ操作を実行する。
      *
-     * 引数の形式:
-     * args[0]: ソースディレクトリのパス
-     * args[1]: 対象ディレクトリのパス（COPY/MOVEの場合）
-     * args[2]: 操作タイプ（COPY/MOVE/DIFF）
+     * 引数の形式: args[0]: ソースディレクトリのパス args[1]: 対象ディレクトリのパス（COPY/MOVEの場合） args[2]:
+     * 操作タイプ（COPY/MOVE/DIFF）
      *
      * @param args コマンドライン引数の配列
      */
     public static void main(String[] args) {
         if (args.length < 3) {
             exitWithError();
-            System.err.println("無効な引数です。");
+            System.err.println("引数が不足しています。");
             return;
         }
 
@@ -94,7 +86,7 @@ public class DirectoryToolApplication {
 
         if (!Arrays.asList("COPY", "MOVE", "DIFF").contains(operationType)) {
             exitWithError();
-            System.err.println("モードが不正です。");
+            System.err.println("無効なモードです。");
             return;
         }
 
@@ -112,8 +104,7 @@ public class DirectoryToolApplication {
     }
 
     /**
-     * エラー終了時の処理を行う。
-     * テストモードやskipExit設定に応じて、適切な終了処理を実行する。
+     * エラー終了時の処理を行う。 テストモードやskipExit設定に応じて、適切な終了処理を実行する。
      *
      * @return エラー処理が成功した場合true、それ以外の場合false
      */

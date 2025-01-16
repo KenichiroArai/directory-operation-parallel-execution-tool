@@ -95,26 +95,34 @@ class DirectoryToolApplicationTest {
     }
 
     @Test
-    void mainMethodFailsWithInvalidArguments(CapturedOutput output) {
+    void mainMethodFailsWithInsufficientArguments(CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
-        // 引数が不足している場合
         DirectoryToolApplication.main(new String[] {});
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with insufficient arguments");
-        assertTrue(output.toString().contains("引数が不足しています。"), "Should display insufficient arguments message");
+        assertEquals("引数が不足しています。" + System.lineSeparator(), output.getErr());
+    }
+
+    @Test
+    void mainMethodFailsWithInvalidOperationType(CapturedOutput output) {
+        DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
-        // 無効な操作タイプの場合
-        DirectoryToolApplication.main(new String[] {"/source", "/dest", "INVALID"});
+        DirectoryToolApplication.main(new String[] {"/src", "/dest", "INVALID"});
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with invalid operation type");
-        assertTrue(output.toString().contains("無効なモードです。"), "Should display invalid mode message");
+        assertEquals("無効なモードです。" + System.lineSeparator(), output.getErr());
+    }
+
+    @Test
+    void mainMethodFailsWithNonExistentSourceDirectory(CapturedOutput output) {
+        DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
-        // ソースディレクトリが存在しない場合
         DirectoryToolApplication.main(new String[] {"/nonexistent", "/dest", "COPY"});
-        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with non-existent source directory");
-        assertTrue(output.toString().contains("ソースディレクトリが存在しません。"), "Should display source directory not found message");
+        assertTrue(DirectoryToolApplication.hasExited(),
+                "Should exit with non-existent source directory");
+        assertEquals("ソースディレクトリが存在しません。" + System.lineSeparator(), output.getErr());
     }
 
     @Test
@@ -123,6 +131,8 @@ class DirectoryToolApplicationTest {
         DirectoryToolApplication.setTestMode(true);
         assertTrue(DirectoryToolApplication.exitWithError());
         assertTrue(DirectoryToolApplication.hasExited());
+        assertEquals("", output.toString());
+        System.out.println(output.toString());
         assertTrue(output.toString().isEmpty());
 
         // テストモードがfalseでskipExitがtrueの場合
@@ -151,12 +161,11 @@ class DirectoryToolApplicationTest {
         Path nonExistentSource = tempDir.resolve("non-existent");
         Path destDir = tempDir.resolve("dest");
 
-        DirectoryToolApplication.main(new String[] {
-            nonExistentSource.toString(),
-            destDir.toString(),
-            "COPY"
-        });
-        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with non-existent source directory");
-        assertTrue(output.toString().contains("ソースディレクトリが存在しません。"), "Should display source directory not found message");
+        DirectoryToolApplication
+                .main(new String[] {nonExistentSource.toString(), destDir.toString(), "COPY"});
+        assertTrue(DirectoryToolApplication.hasExited(),
+                "Should exit with non-existent source directory");
+        assertTrue(output.toString().contains("ソースディレクトリが存在しません。"),
+                "Should display source directory not found message");
     }
 }
