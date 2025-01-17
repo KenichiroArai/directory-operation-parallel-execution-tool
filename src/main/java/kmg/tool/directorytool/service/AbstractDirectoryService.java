@@ -31,14 +31,10 @@ import java.util.concurrent.TimeUnit;
  * @see DiffDirectoryService
  */
 public abstract class AbstractDirectoryService {
-    /**
-     * 並列処理で使用するスレッド数。 システムで利用可能なCPUの論理コア数に基づいて設定されます。
-     */
+    /** 並列処理で使用するスレッド数。システムで利用可能なCPUの論理コア数に基づいて設定されます。 */
     protected static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
-    /**
-     * 並列処理用のスレッドプール。
-     */
+    /** 並列処理用のスレッドプール。タスクの実行を管理し、スレッドの再利用を可能にします。 */
     protected final ExecutorService executorService = Executors
             .newFixedThreadPool(AbstractDirectoryService.THREAD_POOL_SIZE);
 

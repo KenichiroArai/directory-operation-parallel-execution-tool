@@ -18,9 +18,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DirectoryToolApplication {
 
-    /**
-     * テストモードを制御するフラグ。 trueの場合、アプリケーションはテストモードで動作し、System.exitが呼び出されない。
-     */
+    /** テストモードを制御するフラグ。 trueの場合、アプリケーションはテストモードで動作し、System.exitが呼び出されない。 */
     private static boolean isTestMode = false;
 
     /**
@@ -72,7 +70,7 @@ public class DirectoryToolApplication {
      */
     public static void main(final String[] args) {
         try (ConfigurableApplicationContext context = SpringApplication.run(DirectoryToolApplication.class,
-                getParams(args))) {
+                DirectoryToolApplication.getParams(args))) {
             // テストモード以外の場合のみ、アプリケーションを終了
             if (!DirectoryToolApplication.isTestMode) {
                 DirectoryToolApplication.hasExited = true;

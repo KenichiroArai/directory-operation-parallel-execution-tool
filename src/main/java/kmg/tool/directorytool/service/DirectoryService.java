@@ -25,19 +25,13 @@ import kmg.tool.directorytool.model.OperationMode;
 @Service
 public class DirectoryService {
 
-    /**
-     * ディレクトリのコピー操作を実行するサービス。 DIコンテナによって注入される。
-     */
+    /** ディレクトリのコピー操作を実行するサービス。 DIコンテナによって注入される。 */
     private final CopyDirectoryService copyService;
 
-    /**
-     * ディレクトリの移動操作を実行するサービス。 DIコンテナによって注入される。
-     */
+    /** ディレクトリの移動操作を実行するサービス。 DIコンテナによって注入される。 */
     private final MoveDirectoryService moveService;
 
-    /**
-     * ディレクトリの差分比較操作を実行するサービス。 DIコンテナによって注入される。
-     */
+    /** ディレクトリの差分比較操作を実行するサービス。 DIコンテナによって注入される。 */
     private final DiffDirectoryService diffService;
 
     /**
