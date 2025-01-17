@@ -1,7 +1,9 @@
 package kmg.tool.directorytool.service;
 
 import java.io.IOException;
+
 import org.springframework.stereotype.Service;
+
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
@@ -48,8 +50,8 @@ public class DirectoryService {
      * @param diffService
      *                    差分比較操作を実行するサービス
      */
-    public DirectoryService(CopyDirectoryService copyService, MoveDirectoryService moveService,
-            DiffDirectoryService diffService) {
+    public DirectoryService(final CopyDirectoryService copyService, final MoveDirectoryService moveService,
+            final DiffDirectoryService diffService) {
         this.copyService = copyService;
         this.moveService = moveService;
         this.diffService = diffService;
@@ -68,11 +70,12 @@ public class DirectoryService {
      *                     ディレクトリの読み書き中にエラーが発生した場合、 またはソースディレクトリが存在しない場合
      * @see OperationMode
      */
-    public void processDirectory(String srcPath, String destPath, OperationMode mode) throws IOException {
-        AbstractDirectoryService service = switch (mode) {
-            case COPY -> copyService;
-            case MOVE -> moveService;
-            case DIFF -> diffService;
+    public void processDirectory(final String srcPath, final String destPath, final OperationMode mode)
+            throws IOException {
+        final AbstractDirectoryService service = switch (mode) {
+            case COPY -> this.copyService;
+            case MOVE -> this.moveService;
+            case DIFF -> this.diffService;
         };
         service.processDirectory(srcPath, destPath);
     }

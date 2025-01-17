@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
  * スレッドセーフな実装となっており、複数のスレッドから同時にアクセスしても安全に動作する。
  * <p>
  * 使用例：
- * 
+ *
  * <pre>
  * CopyDirectoryService service = new CopyDirectoryService();
  * service.processDirectory("/source/dir", "/target/dir");
@@ -47,7 +48,8 @@ public class CopyDirectoryService extends AbstractDirectoryService {
      *                     ディレクトリ作成またはファイルコピー中にエラーが発生した場合
      */
     @Override
-    protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
+    protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
+            throws IOException {
         if (Files.isDirectory(sourcePath)) {
             Files.createDirectories(targetPath);
         } else {
@@ -66,7 +68,7 @@ public class CopyDirectoryService extends AbstractDirectoryService {
      *                    ターゲットディレクトリのパス
      */
     @Override
-    protected void postProcess(Path source, Path destination) throws IOException {
+    protected void postProcess(final Path source, final Path destination) throws IOException {
         // コピー操作では後処理は不要
     }
 }

@@ -14,7 +14,7 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * コピーサービスのインスタンスを生成します。
-     * 
+     *
      * @return コピーサービスのインスタンス
      */
     @Override
@@ -24,7 +24,7 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 基本的なファイルコピー操作のテスト
-     * 
+     *
      * @throws IOException
      *                     ファイル操作時に発生する可能性のあるIO例外
      */
@@ -46,7 +46,7 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 複雑なディレクトリ構造のコピーテスト
-     * 
+     *
      * @throws IOException
      *                     ファイル操作時に発生する可能性のあるIO例外
      */
@@ -77,7 +77,7 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 既存のファイルの上書きコピーのテスト
-     * 
+     *
      * @throws IOException
      *                     ファイル操作時に発生する可能性のあるIO例外
      */
@@ -101,7 +101,7 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 空のディレクトリ構造のコピーテスト
-     * 
+     *
      * @throws IOException
      *                     ファイル操作時に発生する可能性のあるIO例外
      */

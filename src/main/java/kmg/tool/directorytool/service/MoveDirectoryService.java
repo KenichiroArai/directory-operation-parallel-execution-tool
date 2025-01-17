@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Service;
  * </ul>
  * <p>
  * 使用例：
- * 
+ *
  * <pre>
  * MoveDirectoryService service = new MoveDirectoryService();
  * service.processDirectory("/source/dir", "/target/dir");
@@ -56,7 +57,8 @@ public class MoveDirectoryService extends AbstractDirectoryService {
      *                     ディレクトリ作成またはファイル移動中にエラーが発生した場合
      */
     @Override
-    protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
+    protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
+            throws IOException {
         if (Files.isDirectory(sourcePath)) {
             Files.createDirectories(targetPath);
         } else {
@@ -85,13 +87,13 @@ public class MoveDirectoryService extends AbstractDirectoryService {
      *                     ディレクトリの削除中にI/Oエラーが発生した場合。例えば、削除権限がない場合など。
      */
     @Override
-    protected void postProcess(Path source, Path destination) throws IOException {
+    protected void postProcess(final Path source, final Path destination) throws IOException {
         // 空になったディレクトリを削除
         try (var stream = Files.walk(source)) {
             stream.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     // 削除に失敗した場合は無視
                 }
             });

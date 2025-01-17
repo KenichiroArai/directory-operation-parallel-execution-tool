@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -37,25 +37,25 @@ public abstract class AbstractDirectoryServiceTest {
 
     /**
      * テストの前準備
-     * 
+     *
      * @throws IOException
      *                     ディレクトリの作成に失敗した場合
      */
     @BeforeEach
     public void setUp() throws IOException {
         // テスト用のディレクトリ構造を作成
-        sourceDir = tempDir.resolve("source");
-        targetDir = tempDir.resolve("target");
-        Files.createDirectories(sourceDir);
-        Files.createDirectories(targetDir);
+        this.sourceDir = this.tempDir.resolve("source");
+        this.targetDir = this.tempDir.resolve("target");
+        Files.createDirectories(this.sourceDir);
+        Files.createDirectories(this.targetDir);
 
         // テスト対象のサービスを初期化
-        service = createService();
+        this.service = this.createService();
     }
 
     /**
      * テスト対象のサービスを作成する
-     * 
+     *
      * @return テスト対象のサービスインスタンス
      */
     protected abstract AbstractDirectoryService createService();
@@ -68,12 +68,12 @@ public abstract class AbstractDirectoryServiceTest {
      */
     @org.junit.jupiter.api.Test
     void testNonExistentSourceDirectory() {
-        Path nonExistentDir = tempDir.resolve("non-existent");
+        final Path nonExistentDir = this.tempDir.resolve("non-existent");
 
-        IOException exception = assertThrows(IOException.class,
-                () -> service.processDirectory(nonExistentDir.toString(), targetDir.toString()));
+        final IOException exception = Assertions.assertThrows(IOException.class,
+                () -> this.service.processDirectory(nonExistentDir.toString(), this.targetDir.toString()));
 
-        assertEquals("Source directory does not exist", exception.getMessage());
+        Assertions.assertEquals("Source directory does not exist", exception.getMessage());
     }
 
     /**
@@ -87,13 +87,13 @@ public abstract class AbstractDirectoryServiceTest {
      */
     @org.junit.jupiter.api.Test
     void testSourcePathNotDirectory() throws IOException {
-        Path sourceFile = tempDir.resolve("source.txt");
+        final Path sourceFile = this.tempDir.resolve("source.txt");
         Files.writeString(sourceFile, "test");
 
-        IOException exception = assertThrows(IOException.class,
-                () -> service.processDirectory(sourceFile.toString(), targetDir.toString()));
+        final IOException exception = Assertions.assertThrows(IOException.class,
+                () -> this.service.processDirectory(sourceFile.toString(), this.targetDir.toString()));
 
-        assertEquals("Source path is not a directory", exception.getMessage());
+        Assertions.assertEquals("Source path is not a directory", exception.getMessage());
     }
 
     /**
@@ -107,14 +107,14 @@ public abstract class AbstractDirectoryServiceTest {
      */
     @org.junit.jupiter.api.Test
     void testTargetPathExistsAsFile() throws IOException {
-        Files.createDirectories(sourceDir);
-        Path targetFile = tempDir.resolve("target_file.txt");
+        Files.createDirectories(this.sourceDir);
+        final Path targetFile = this.tempDir.resolve("target_file.txt");
         Files.writeString(targetFile, "existing file");
 
-        IOException exception = assertThrows(IOException.class,
-                () -> service.processDirectory(sourceDir.toString(), targetFile.toString()));
+        final IOException exception = Assertions.assertThrows(IOException.class,
+                () -> this.service.processDirectory(this.sourceDir.toString(), targetFile.toString()));
 
-        assertEquals("Destination path exists but is not a directory", exception.getMessage());
+        Assertions.assertEquals("Destination path exists but is not a directory", exception.getMessage());
     }
 
     /**
@@ -129,11 +129,11 @@ public abstract class AbstractDirectoryServiceTest {
     @org.junit.jupiter.api.Test
     void testEmptyDirectoryOperation() throws IOException {
         // 操作を実行
-        service.processDirectory(sourceDir.toString(), targetDir.toString());
+        this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         // 検証
-        assertTrue(Files.exists(targetDir), "ターゲットディレクトリが作成されていること");
-        assertTrue(Files.isDirectory(targetDir), "ターゲットパスがディレクトリであること");
+        Assertions.assertTrue(Files.exists(this.targetDir), "ターゲットディレクトリが作成されていること");
+        Assertions.assertTrue(Files.isDirectory(this.targetDir), "ターゲットパスがディレクトリであること");
     }
 
     /**
@@ -148,12 +148,12 @@ public abstract class AbstractDirectoryServiceTest {
     @org.junit.jupiter.api.Test
     void testCompareFilesWithDifferentSizes() throws IOException {
         // 異なるサイズのファイルを作成
-        Path file1 = tempDir.resolve("file1.txt");
-        Path file2 = tempDir.resolve("file2.txt");
+        final Path file1 = this.tempDir.resolve("file1.txt");
+        final Path file2 = this.tempDir.resolve("file2.txt");
         Files.writeString(file1, "content1");
         Files.writeString(file2, "different content");
 
-        assertFalse(service.compareFiles(file1, file2), "異なるサイズのファイルは不一致となるべき");
+        Assertions.assertFalse(this.service.compareFiles(file1, file2), "異なるサイズのファイルは不一致となるべき");
     }
 
     /**
@@ -168,25 +168,26 @@ public abstract class AbstractDirectoryServiceTest {
     @org.junit.jupiter.api.Test
     void testFileProcessingException() throws IOException {
         // テスト用のファイルを作成
-        Path sourceFile = sourceDir.resolve("test.txt");
+        final Path sourceFile = this.sourceDir.resolve("test.txt");
         Files.writeString(sourceFile, "test content");
 
         // サービスをオーバーライドして例外をシミュレート
-        AbstractDirectoryService errorService = new AbstractDirectoryService() {
+        final AbstractDirectoryService errorService = new AbstractDirectoryService() {
             @Override
-            protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
+            protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
+                    throws IOException {
                 throw new IOException("Simulated error during file processing");
             }
 
             @Override
-            protected void postProcess(Path source, Path destination) throws IOException {
+            protected void postProcess(final Path source, final Path destination) throws IOException {
                 // 何もしない
             }
         };
 
         // 処理を実行し、例外が発生することを確認
-        assertThrows(IOException.class,
-                () -> errorService.processDirectory(sourceDir.toString(), targetDir.toString()));
+        Assertions.assertThrows(IOException.class,
+                () -> errorService.processDirectory(this.sourceDir.toString(), this.targetDir.toString()));
     }
 
     /**
@@ -201,54 +202,56 @@ public abstract class AbstractDirectoryServiceTest {
     @org.junit.jupiter.api.Test
     void testTaskExecutionTimeout() throws IOException {
         // 長時間実行されるタスクを作成
-        Path sourceFile = sourceDir.resolve("test.txt");
+        final Path sourceFile = this.sourceDir.resolve("test.txt");
         Files.writeString(sourceFile, "test content");
 
         // サービスをオーバーライドして長時間のタスクをシミュレート
-        AbstractDirectoryService slowService = new AbstractDirectoryService() {
+        final AbstractDirectoryService slowService = new AbstractDirectoryService() {
             @Override
-            protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
+            protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
+                    throws IOException {
                 try {
                     Thread.sleep(31000); // 31秒間スリープ（タイムアウトは30秒）
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
 
             @Override
-            protected void postProcess(Path source, Path destination) throws IOException {
+            protected void postProcess(final Path source, final Path destination) throws IOException {
                 // 何もしない
             }
         };
 
         // タイムアウトで例外が発生することを確認
-        assertThrows(IOException.class, () -> slowService.processDirectory(sourceDir.toString(), targetDir.toString()));
+        Assertions.assertThrows(IOException.class,
+                () -> slowService.processDirectory(this.sourceDir.toString(), this.targetDir.toString()));
     }
 
     /**
      * テスト後のクリーンアップを実行する。 一時ファイルとディレクトリを削除する。
-     * 
+     *
      * @throws IOException
      *                     クリーンアップ操作に失敗した場合
      */
     @AfterEach
     public void tearDown() throws IOException {
         // テスト後のクリーンアップ
-        if (Files.exists(sourceDir)) {
-            Files.walk(sourceDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
+        if (Files.exists(this.sourceDir)) {
+            Files.walk(this.sourceDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
                 try {
                     Files.delete(path);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     // クリーンアップ中のエラーは無視
                 }
             });
         }
 
-        if (Files.exists(targetDir)) {
-            Files.walk(targetDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
+        if (Files.exists(this.targetDir)) {
+            Files.walk(this.targetDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
                 try {
                     Files.delete(path);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     // クリーンアップ中のエラーは無視
                 }
             });

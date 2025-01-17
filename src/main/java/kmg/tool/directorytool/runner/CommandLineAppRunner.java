@@ -12,7 +12,7 @@ import kmg.tool.directorytool.service.DirectoryService;
  * コマンドラインインターフェースを提供するクラス。 Spring Bootのコマンドラインランナーとして実装され、アプリケーションの起動時に コマンドライン引数を処理し、適切なディレクトリ操作を実行する。
  * <p>
  * 基本的な使用方法：
- * 
+ *
  * <pre>
  * java -jar directory-tool.jar &lt;src&gt; &lt;dest&gt; &lt;mode&gt;
  * </pre>
@@ -25,7 +25,7 @@ import kmg.tool.directorytool.service.DirectoryService;
  * </ul>
  * <p>
  * 使用例：
- * 
+ *
  * <pre>
  * # ディレクトリのコピー
  * java -jar directory-tool.jar /source/dir /target/dir COPY
@@ -73,7 +73,7 @@ public class CommandLineAppRunner implements CommandLineRunner {
      * @param directoryService
      *                         ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
      */
-    public CommandLineAppRunner(DirectoryService directoryService) {
+    public CommandLineAppRunner(final DirectoryService directoryService) {
         this.directoryService = directoryService;
     }
 
@@ -99,7 +99,7 @@ public class CommandLineAppRunner implements CommandLineRunner {
      *                   ディレクトリ操作中にIO例外が発生した場合、または無効な引数が指定された場合
      */
     @Override
-    public void run(String... args) throws Exception {
+    public void run(final String... args) throws Exception {
         // 引数の数をチェック
         if (args.length != 3) {
             System.out.println("Usage: java -jar directory-tool.jar <src> <dest> <mode>");
@@ -108,22 +108,22 @@ public class CommandLineAppRunner implements CommandLineRunner {
         }
 
         // 引数をパース
-        String src     = args[0];
-        String dest    = args[1];
-        String modeStr = args[2].toUpperCase();
+        final String src     = args[0];
+        final String dest    = args[1];
+        final String modeStr = args[2].toUpperCase();
 
         try {
             // モード文字列をenumに変換
-            OperationMode mode = OperationMode.valueOf(modeStr);
+            final OperationMode mode = OperationMode.valueOf(modeStr);
 
             // ディレクトリ操作を実行
-            directoryService.processDirectory(src, dest, mode);
+            this.directoryService.processDirectory(src, dest, mode);
             System.out.println("Operation completed successfully");
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             // 無効なモードが指定された場合
             System.out.println("Invalid mode: " + modeStr);
             System.out.println("Valid modes are: COPY, MOVE, DIFF");
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ディレクトリ操作中にエラーが発生した場合
             System.out.println("Error: " + e.getMessage());
         }

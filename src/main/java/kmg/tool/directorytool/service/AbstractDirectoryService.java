@@ -39,7 +39,8 @@ public abstract class AbstractDirectoryService {
     /**
      * 並列処理用のスレッドプール。
      */
-    protected final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    protected final ExecutorService executorService = Executors
+            .newFixedThreadPool(AbstractDirectoryService.THREAD_POOL_SIZE);
 
     /**
      * ディレクトリの処理を実行する。
@@ -51,22 +52,22 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     ソースディレクトリが存在しない場合、ターゲットディレクトリの作成に失敗した場合、 またはファイル処理中にエラーが発生した場合。
      */
-    public void processDirectory(String srcPath, String destPath) throws IOException {
-        Path source      = Path.of(srcPath);
-        Path destination = Path.of(destPath);
+    public void processDirectory(final String srcPath, final String destPath) throws IOException {
+        final Path source      = Path.of(srcPath);
+        final Path destination = Path.of(destPath);
 
-        validatePaths(source, destination);
+        this.validatePaths(source, destination);
 
-        List<Future<?>> futures = new ArrayList<>();
+        final List<Future<?>> futures = new ArrayList<>();
 
         try (var stream = Files.walk(source)) {
             stream.forEach(path -> {
-                Future<?> future = executorService.submit(() -> {
+                final Future<?> future = this.executorService.submit(() -> {
                     try {
-                        Path relativePath = source.relativize(path);
-                        Path targetPath   = destination.resolve(relativePath);
-                        processPath(path, targetPath, relativePath);
-                    } catch (IOException e) {
+                        final Path relativePath = source.relativize(path);
+                        final Path targetPath   = destination.resolve(relativePath);
+                        this.processPath(path, targetPath, relativePath);
+                    } catch (final IOException e) {
                         throw new RuntimeException("Failed to process file: " + path, e);
                     }
                 });
@@ -74,8 +75,8 @@ public abstract class AbstractDirectoryService {
             });
         }
 
-        waitForCompletion(futures);
-        postProcess(source, destination);
+        this.waitForCompletion(futures);
+        this.postProcess(source, destination);
     }
 
     /**
@@ -88,7 +89,7 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     ソースパスが存在しない、またはディレクトリでない場合、 ターゲットパスが存在するがディレクトリでない場合、 ターゲットディレクトリの作成に失敗した場合
      */
-    protected void validatePaths(Path source, Path destination) throws IOException {
+    protected void validatePaths(final Path source, final Path destination) throws IOException {
         if (!Files.exists(source)) {
             throw new IOException("Source directory does not exist");
         }
@@ -143,7 +144,7 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     ファイルの読み取り中にエラーが発生した場合
      */
-    protected boolean compareFiles(Path file1, Path file2) throws IOException {
+    protected boolean compareFiles(final Path file1, final Path file2) throws IOException {
         if (Files.size(file1) != Files.size(file2)) {
             return false;
         }
@@ -158,8 +159,8 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     タスクの実行中にInterruptedException, ExecutionException, TimeoutExceptionが発生した場合。
      */
-    protected void waitForCompletion(List<Future<?>> futures) throws IOException {
-        for (Future<?> future : futures) {
+    protected void waitForCompletion(final List<Future<?>> futures) throws IOException {
+        for (final Future<?> future : futures) {
             try {
                 future.get(30, TimeUnit.SECONDS);
             } catch (InterruptedException | java.util.concurrent.ExecutionException

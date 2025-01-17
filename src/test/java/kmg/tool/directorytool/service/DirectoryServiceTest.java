@@ -1,9 +1,11 @@
 package kmg.tool.directorytool.service;
 
 import java.io.IOException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
@@ -42,8 +44,8 @@ class DirectoryServiceTest {
      */
     @Test
     void testCopyModeCallsCorrectService() throws IOException {
-        String srcPath  = "source";
-        String destPath = "target";
+        final String srcPath  = "source";
+        final String destPath = "target";
 
         this.directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
 
@@ -60,8 +62,8 @@ class DirectoryServiceTest {
      */
     @Test
     void testMoveModeCallsCorrectService() throws IOException {
-        String srcPath  = "source";
-        String destPath = "target";
+        final String srcPath  = "source";
+        final String destPath = "target";
 
         this.directoryService.processDirectory(srcPath, destPath, OperationMode.MOVE);
 
@@ -78,8 +80,8 @@ class DirectoryServiceTest {
      */
     @Test
     void testDiffModeCallsCorrectService() throws IOException {
-        String srcPath  = "source";
-        String destPath = "target";
+        final String srcPath  = "source";
+        final String destPath = "target";
 
         this.directoryService.processDirectory(srcPath, destPath, OperationMode.DIFF);
 
@@ -96,15 +98,15 @@ class DirectoryServiceTest {
      */
     @Test
     void testExceptionPropagation() throws IOException {
-        String      srcPath           = "source";
-        String      destPath          = "target";
-        IOException expectedException = new IOException("Test error");
+        final String      srcPath           = "source";
+        final String      destPath          = "target";
+        final IOException expectedException = new IOException("Test error");
 
         Mockito.doThrow(expectedException).when(this.copyService).processDirectory(srcPath, destPath);
 
         try {
             this.directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             org.junit.jupiter.api.Assertions.assertEquals(expectedException, e);
         }
     }

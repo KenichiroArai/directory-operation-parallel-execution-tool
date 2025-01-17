@@ -3,6 +3,7 @@ package kmg.tool.directorytool.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Service;
  * </ul>
  * <p>
  * 出力形式：
- * 
+ *
  * <pre>
  * Only in source: path/to/file          - ソースのみに存在するファイル
  * Only in destination: path/to/file     - ターゲットのみに存在するファイル
@@ -40,7 +41,7 @@ import org.springframework.stereotype.Service;
  * スレッドセーフな実装となっており、複数のスレッドから同時にアクセスしても安全に動作する。
  * <p>
  * 使用例：
- * 
+ *
  * <pre>
  * DiffDirectoryService service = new DiffDirectoryService();
  * service.processDirectory("/source/dir", "/target/dir");
@@ -67,7 +68,8 @@ public class DiffDirectoryService extends AbstractDirectoryService {
      *                     ファイルまたはディレクトリの存在確認中にI/Oエラーが発生した場合。
      */
     @Override
-    protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
+    protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
+            throws IOException {
 
         if (Files.isDirectory(sourcePath)) {
             if (!Files.exists(targetPath)) {
@@ -75,14 +77,12 @@ public class DiffDirectoryService extends AbstractDirectoryService {
             } else if (!Files.isDirectory(targetPath)) {
                 System.out.println("Different: " + relativePath + " (directory vs file)");
             }
-        } else {
-            if (!Files.exists(targetPath)) {
-                System.out.println("Only in source: " + relativePath);
-            } else if (!Files.isRegularFile(targetPath)) {
-                System.out.println("Different: " + relativePath + " (file vs directory)");
-            } else if (!compareFiles(sourcePath, targetPath)) {
-                System.out.println("Different: " + relativePath);
-            }
+        } else if (!Files.exists(targetPath)) {
+            System.out.println("Only in source: " + relativePath);
+        } else if (!Files.isRegularFile(targetPath)) {
+            System.out.println("Different: " + relativePath + " (file vs directory)");
+        } else if (!this.compareFiles(sourcePath, targetPath)) {
+            System.out.println("Different: " + relativePath);
         }
     }
 
@@ -97,11 +97,11 @@ public class DiffDirectoryService extends AbstractDirectoryService {
      *                     ディレクトリの走査中にI/Oエラーが発生した場合。
      */
     @Override
-    protected void postProcess(Path source, Path destination) throws IOException {
+    protected void postProcess(final Path source, final Path destination) throws IOException {
         // ターゲットディレクトリを走査してソースにないファイルを検出
         if (Files.exists(destination)) {
             try (var stream = Files.walk(destination)) {
-                stream.forEach(path -> processDestinationPath(source, destination, path));
+                stream.forEach(path -> this.processDestinationPath(source, destination, path));
             }
         }
     }
@@ -116,10 +116,10 @@ public class DiffDirectoryService extends AbstractDirectoryService {
      * @param path
      *                    ターゲットディレクトリ内の現在のパス
      */
-    private void processDestinationPath(Path source, Path destination, Path path) {
+    private void processDestinationPath(final Path source, final Path destination, final Path path) {
         if (!path.equals(destination)) { // ルートディレクトリは除外
-            Path relativePath = destination.relativize(path);
-            Path sourcePath   = source.resolve(relativePath);
+            final Path relativePath = destination.relativize(path);
+            final Path sourcePath   = source.resolve(relativePath);
             if (!Files.exists(sourcePath)) {
                 if (Files.isDirectory(path)) {
                     System.out.println("Directory only in destination: " + relativePath);
@@ -141,10 +141,10 @@ public class DiffDirectoryService extends AbstractDirectoryService {
      *                     ソースディレクトリまたはターゲットディレクトリが存在しない場合に発生します。
      */
     @Override
-    public void processDirectory(String srcPath, String destPath) throws IOException {
+    public void processDirectory(final String srcPath, final String destPath) throws IOException {
 
-        Path source      = Path.of(srcPath);
-        Path destination = Path.of(destPath);
+        final Path source      = Path.of(srcPath);
+        final Path destination = Path.of(destPath);
 
         // ソースディレクトリの存在チェック
         if (!Files.exists(source)) {
@@ -156,22 +156,22 @@ public class DiffDirectoryService extends AbstractDirectoryService {
             throw new IOException("Target directory does not exist: " + destPath);
         }
 
-        validatePaths(source, destination);
+        this.validatePaths(source, destination);
 
         // ソースディレクトリの処理
         try (var stream = Files.walk(source)) {
             stream.forEach(path -> {
                 try {
-                    Path relativePath = source.relativize(path);
-                    Path targetPath   = destination.resolve(relativePath);
-                    processPath(path, targetPath, relativePath);
-                } catch (IOException e) {
+                    final Path relativePath = source.relativize(path);
+                    final Path targetPath   = destination.resolve(relativePath);
+                    this.processPath(path, targetPath, relativePath);
+                } catch (final IOException e) {
                     throw new RuntimeException("Failed to process file: " + path, e);
                 }
             });
         }
 
         // ターゲットディレクトリの処理
-        postProcess(source, destination);
+        this.postProcess(source, destination);
     }
 }
