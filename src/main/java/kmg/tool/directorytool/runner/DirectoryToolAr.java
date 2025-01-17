@@ -7,6 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.ExitCodeExceptionMapper;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import kmg.tool.directorytool.model.OperationMode;
 import kmg.tool.directorytool.service.DirectoryService;
@@ -24,7 +25,6 @@ import kmg.tool.directorytool.service.DirectoryService;
  * <ul>
  * <li><src> - 操作対象のソースディレクトリパス
  * <li><dest> - 操作対象のターゲットディレクトリパス
- * <li><mode> - 実行する操作のモード（COPY/MOVE/DIFF）
  * </ul>
  * <p>
  * 使用例：
@@ -65,20 +65,16 @@ import kmg.tool.directorytool.service.DirectoryService;
 public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, ExitCodeExceptionMapper {
 
     /** ディレクトリ操作サービス。 Spring DIコンテナによって注入される {@link DirectoryService} のインスタンス。 */
-    private final DirectoryService directoryService;
+    @Autowired
+    private DirectoryService directoryService;
 
     /** 終了コード */
     private int exitCode;
 
     /**
-     * DirectoryServiceをDIするコンストラクタ。 Spring Bootのコンテナによって自動的にインスタンス化される。 {@link DirectoryService}のインスタンスは、操作モードに応じて
-     * 適切な実装クラスを選択・実行する。
-     *
-     * @param service
-     *                ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
+     * 基本コンストラクタ。 Spring Bootのコンテナによって自動的にインスタンス化される。
      */
-    public DirectoryToolAr(final DirectoryService service) {
-        this.directoryService = service;
+    public DirectoryToolAr() {
         this.exitCode = 0;      // TODO 2025/01/18 列挙型で定義する
     }
 
