@@ -60,7 +60,7 @@ import kmg.tool.directorytool.service.DirectoryService;
  * @see kmg.tool.directorytool.model.OperationMode
  */
 @Component
-public class CommandLineAppRunner implements ApplicationRunner {
+public class DirectoryApplicationRunner implements ApplicationRunner {
 
     /**
      * ディレクトリ操作サービス。 Spring DIコンテナによって注入される {@link DirectoryService} のインスタンス。
@@ -74,7 +74,7 @@ public class CommandLineAppRunner implements ApplicationRunner {
      * @param service
      *                ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
      */
-    public CommandLineAppRunner(final DirectoryService service) {
+    public DirectoryApplicationRunner(final DirectoryService service) {
         this.directoryService = service;
     }
 
