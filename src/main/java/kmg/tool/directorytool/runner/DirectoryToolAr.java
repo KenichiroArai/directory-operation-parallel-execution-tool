@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.ExitCodeExceptionMapper;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
 import kmg.tool.directorytool.model.OperationMode;
@@ -60,12 +62,13 @@ import kmg.tool.directorytool.service.DirectoryService;
  * @see kmg.tool.directorytool.model.OperationMode
  */
 @Component
-public class DirectoryApplicationRunner implements ApplicationRunner {
+public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, ExitCodeExceptionMapper {
 
-    /**
-     * ディレクトリ操作サービス。 Spring DIコンテナによって注入される {@link DirectoryService} のインスタンス。
-     */
+    /** ディレクトリ操作サービス。 Spring DIコンテナによって注入される {@link DirectoryService} のインスタンス。 */
     private final DirectoryService directoryService;
+
+    /** 終了コード */
+    private int exitCode;
 
     /**
      * DirectoryServiceをDIするコンストラクタ。 Spring Bootのコンテナによって自動的にインスタンス化される。 {@link DirectoryService}のインスタンスは、操作モードに応じて
@@ -74,8 +77,27 @@ public class DirectoryApplicationRunner implements ApplicationRunner {
      * @param service
      *                ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
      */
-    public DirectoryApplicationRunner(final DirectoryService service) {
+    public DirectoryToolAr(final DirectoryService service) {
         this.directoryService = service;
+        this.exitCode = 0;      // TODO 2025/01/18 列挙型で定義する
+    }
+
+    /**
+     * 終了コードを返す。 このメソッドはSpring Bootによって自動的 に呼び出される。
+     */
+    @Override
+    public int getExitCode() {
+        final int result = this.exitCode;
+        return result;
+    }
+
+    /**
+     * 例外を受け取り、終了コードを返す。 このメソッドはSpring Bootによって自動的に呼び出される。
+     */
+    @Override
+    public int getExitCode(final Throwable exception) {
+        final int result = 2;
+        return result;
     }
 
     /**
@@ -102,7 +124,7 @@ public class DirectoryApplicationRunner implements ApplicationRunner {
     @Override
     public void run(final ApplicationArguments args) throws Exception {
         // 非オプション引数を取得
-        String[] nonOptionArgs = args.getNonOptionArgs().toArray(new String[0]);
+        final String[] nonOptionArgs = args.getNonOptionArgs().toArray(new String[0]);
 
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
@@ -125,13 +147,13 @@ public class DirectoryApplicationRunner implements ApplicationRunner {
             System.out.println("Operation completed successfully");
         } catch (final IllegalArgumentException e) {
             // 無効なモードが指定された場合
+            this.exitCode = 1;
             System.out.println("Invalid mode: " + modeStr);
             System.out.println("Valid modes are: COPY, MOVE, DIFF");
-            System.err.println("Error details: " + e.getMessage());
+            e.printStackTrace();
         } catch (final IOException e) {
             // ディレクトリ操作中にエラーが発生した場合
-            System.out.println("Error: " + e.getMessage());
-            System.err.println("Stack trace: ");
+            this.exitCode = 1;
             e.printStackTrace();
         }
     }

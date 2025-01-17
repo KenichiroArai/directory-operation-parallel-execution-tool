@@ -22,11 +22,11 @@ import kmg.tool.directorytool.model.OperationMode;
 import kmg.tool.directorytool.service.DirectoryService;
 
 /**
- * DirectoryApplicationRunnerのテストクラス
+ * DirectoryToolArのテストクラス
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class DirectoryApplicationRunnerTest implements AutoCloseable {
+class DirectoryToolArTest implements AutoCloseable {
 
     /**
      * テスト対象のDirectoryServiceモック
@@ -41,9 +41,9 @@ class DirectoryApplicationRunnerTest implements AutoCloseable {
     private ApplicationArguments applicationArguments;
 
     /**
-     * テスト対象のDirectoryApplicationRunnerインスタンス
+     * テスト対象のDirectoryToolArインスタンス
      */
-    private DirectoryApplicationRunner runner;
+    private DirectoryToolAr runner;
 
     /**
      * テスト用の出力ストリーム
@@ -60,7 +60,7 @@ class DirectoryApplicationRunnerTest implements AutoCloseable {
      */
     @BeforeEach
     void setUp() {
-        this.runner = new DirectoryApplicationRunner(this.directoryService);
+        this.runner = new DirectoryToolAr(this.directoryService);
         System.setOut(new PrintStream(this.outputStream));
     }
 
