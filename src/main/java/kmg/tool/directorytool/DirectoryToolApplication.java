@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class DirectoryToolApplication {
+
     /**
      * テストモードを制御するフラグ。 trueの場合、アプリケーションはテストモードで動作し、System.exitが呼び出されない。
      */
@@ -27,15 +28,16 @@ public class DirectoryToolApplication {
      * @return テストモードの場合true、それ以外の場合false
      */
     public static boolean isTestMode() {
-        return isTestMode;
+        return DirectoryToolApplication.isTestMode;
     }
 
     /**
      * テストモードを設定する。
      *
-     * @param testMode テストモードフラグ
+     * @param testMode
+     *                 テストモードフラグ
      */
-    public static void setTestMode(boolean testMode) {
+    public static void setTestMode(final boolean testMode) {
         DirectoryToolApplication.isTestMode = testMode;
     }
 
@@ -50,70 +52,72 @@ public class DirectoryToolApplication {
      * @return アプリケーションが終了している場合true、それ以外の場合false
      */
     public static boolean hasExited() {
-        return hasExited;
+        return DirectoryToolApplication.hasExited;
     }
 
     /**
      * アプリケーションの終了状態をリセットする。 テストケース実行時に使用される。
      */
     public static void resetExitStatus() {
-        hasExited = false;
+        DirectoryToolApplication.hasExited = false;
     }
 
     /**
-     * アプリケーションのメインメソッド。 コマンドライン引数を解析し、適切なディレクトリ操作を実行する。
+     * アプリケーションのメインメソッド。 コマンドライン引数を解析し、適切なディレクトリ操作を実行する。 引数の形式: args[0]: ソースディレクトリのパス args[1]: 対象ディレクトリのパス（COPY/MOVEの場合）
+     * args[2]: 操作タイプ（COPY/MOVE/DIFF）
      *
-     * 引数の形式: args[0]: ソースディレクトリのパス args[1]: 対象ディレクトリのパス（COPY/MOVEの場合） args[2]:
-     * 操作タイプ（COPY/MOVE/DIFF）
-     *
-     * @param args コマンドライン引数の配列
+     * @param args
+     *             コマンドライン引数の配列
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         if (args.length < 3) {
-            exitWithError();
+            DirectoryToolApplication.exitWithError();
             System.err.println("引数が不足しています。");
             return;
         }
 
-        String sourcePath = null;;
+        String sourcePath = null;
+
         String destinationPath = null;
-        String operationType = null;
-        
+        String operationType   = null;
+
         if (args.length == 4) {
-        	if (!args[0].equals("--spring.output.ansi.enabled=always")) {
-        		System.err.println("最初の引数が「--spring.output.ansi.enabled=always」以外が設定されています。");
-        		return;
-        	}
-        	sourcePath = args[1];
-        	destinationPath = args[2];
-        	operationType = args[3];
+            if (!"--spring.output.ansi.enabled=always".equals(args[0])) {
+                System.err.println("最初の引数が「--spring.output.ansi.enabled=always」以外が設定されています。");
+                return;
+            }
+            sourcePath = args[1];
+            destinationPath = args[2];
+            operationType = args[3];
         } else {
-        	sourcePath = args[0];
-        	destinationPath = args[1];
-        	operationType = args[2];
+            sourcePath = args[0];
+            destinationPath = args[1];
+            operationType = args[2];
         }
-        String[] params = {sourcePath,destinationPath,operationType}; 
-        
-        Path source = Paths.get(sourcePath);
+        final String[] params = {
+                sourcePath, destinationPath, operationType
+        };
+
+        final Path source = Paths.get(sourcePath);
         if (!Files.exists(source)) {
-            exitWithError();
+            DirectoryToolApplication.exitWithError();
             System.err.println("ソースディレクトリが存在しません。");
             return;
         }
 
         if (!Arrays.asList("COPY", "MOVE", "DIFF").contains(operationType)) {
-            exitWithError();
+            DirectoryToolApplication.exitWithError();
             System.err.println("無効なモードです。");
             return;
         }
 
         // Springアプリケーションを起動
-        
+
         SpringApplication.run(DirectoryToolApplication.class, params);
 
         // テストモード以外の場合のみ、アプリケーションを終了
-        if (!isTestMode) {
-            hasExited = true;
+        if (!DirectoryToolApplication.isTestMode) {
+            DirectoryToolApplication.hasExited = true;
             // 実際の本番環境でのみSystem.exitを呼び出す
             if (!Boolean.getBoolean("skipExit")) {
                 System.exit(0);
@@ -127,8 +131,8 @@ public class DirectoryToolApplication {
      * @return エラー処理が成功した場合true、それ以外の場合false
      */
     static boolean exitWithError() {
-        hasExited = true;
-        if (isTestMode || Boolean.getBoolean("skipExit")) {
+        DirectoryToolApplication.hasExited = true;
+        if (DirectoryToolApplication.isTestMode || Boolean.getBoolean("skipExit")) {
             return true;
         }
         return false;

@@ -9,14 +9,11 @@ import kmg.tool.directorytool.model.OperationMode;
 import kmg.tool.directorytool.service.DirectoryService;
 
 /**
- * コマンドラインインターフェースを提供するクラス。
- * アプリケーション起動時にコマンドライン引数を処理し、適切なディレクトリ操作を実行する。
- * Spring Bootのコマンドラインランナーとして実装され、DIコンテナによって管理される。
- *
- * <p>引数形式:
- * java -jar directory-tool.jar &lt;src&gt; &lt;dest&gt; &lt;mode&gt;
- *
- * <p>mode: COPY, MOVE, DIFF
+ * コマンドラインインターフェースを提供するクラス。 アプリケーション起動時にコマンドライン引数を処理し、適切なディレクトリ操作を実行する。 Spring Bootのコマンドラインランナーとして実装され、DIコンテナによって管理される。
+ * <p>
+ * 引数形式: java -jar directory-tool.jar <src> <dest> <mode>
+ * <p>
+ * mode: COPY, MOVE, DIFF
  *
  * @author kmg
  * @version 1.0
@@ -26,24 +23,28 @@ import kmg.tool.directorytool.service.DirectoryService;
 @Component
 public class CommandLineAppRunner implements CommandLineRunner {
 
+    /**
+     * ディレクトリ操作サービス。
+     */
     private final DirectoryService directoryService;
 
     /**
-     * DirectoryServiceをDIするコンストラクタ。
-     * Spring Bootのコンテナによって自動的にインスタンス化される。
+     * DirectoryServiceをDIするコンストラクタ。 Spring Bootのコンテナによって自動的にインスタンス化される。
      *
-     * @param directoryService ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
+     * @param directoryService
+     *                         ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
      */
     public CommandLineAppRunner(DirectoryService directoryService) {
         this.directoryService = directoryService;
     }
 
     /**
-     * コマンドライン引数を処理し、ディレクトリ操作を実行するメイン処理。
-     * Spring Bootアプリケーション起動時に自動的に呼び出される。
+     * コマンドライン引数を処理し、ディレクトリ操作を実行するメイン処理。 Spring Bootアプリケーション起動時に自動的に呼び出される。
      *
-     * @param args コマンドライン引数。[0]:ソースディレクトリパス、[1]:ターゲットディレクトリパス、[2]:操作モード
-     * @throws Exception ディレクトリ操作中にIO例外が発生した場合、または無効な引数が指定された場合
+     * @param args
+     *             コマンドライン引数。args[0]: ソースディレクトリパス、args[1]: ターゲットディレクトリパス、args[2]: 操作モード (COPY, MOVE, DIFF)
+     * @throws Exception
+     *                   ディレクトリ操作中にIO例外が発生した場合、または無効な引数が指定された場合
      */
     @Override
     public void run(String... args) throws Exception {
@@ -55,8 +56,8 @@ public class CommandLineAppRunner implements CommandLineRunner {
         }
 
         // 引数をパース
-        String src = args[0];
-        String dest = args[1];
+        String src     = args[0];
+        String dest    = args[1];
         String modeStr = args[2].toUpperCase();
 
         try {

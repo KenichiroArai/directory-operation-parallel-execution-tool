@@ -12,15 +12,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class CopyDirectoryService extends AbstractDirectoryService {
     /**
-     * 個々のファイル/ディレクトリに対してコピー操作を実行する。
-     * ソースがディレクトリの場合、ターゲットディレクトリを作成する。
-     * ソースがファイルの場合、親ディレクトリを作成し、ファイルをコピーする。
-     * 既存のファイルは上書きされる。
+     * 個々のファイル/ディレクトリに対してコピー操作を実行する。 ソースがディレクトリの場合、ターゲットディレクトリを作成する。 ソースがファイルの場合、親ディレクトリを作成し、ファイルをコピーする。 既存のファイルは上書きされる。
      *
-     * @param sourcePath コピー元のパス
-     * @param targetPath コピー先のパス
-     * @param relativePath ソースディレクトリからの相対パス
-     * @throws IOException ディレクトリ作成またはファイルコピー中にエラーが発生した場合
+     * @param sourcePath
+     *                     コピー元のパス
+     * @param targetPath
+     *                     コピー先のパス
+     * @param relativePath
+     *                     ソースディレクトリからの相対パス
+     * @throws IOException
+     *                     ディレクトリ作成またはファイルコピー中にエラーが発生した場合
      */
     @Override
     protected void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException {
@@ -34,12 +35,12 @@ public class CopyDirectoryService extends AbstractDirectoryService {
     }
 
     /**
-     * コピー操作後の後処理を実行する。
-     * この実装では特に処理は行わない。
+     * コピー操作後の後処理を実行する。 この実装では特に処理は行わないため、例外はスローされません。
      *
-     * @param source ソースディレクトリのパス
-     * @param destination ターゲットディレクトリのパス
-     * @throws IOException 後処理中にエラーが発生した場合
+     * @param source
+     *                    ソースディレクトリのパス
+     * @param destination
+     *                    ターゲットディレクトリのパス
      */
     @Override
     protected void postProcess(Path source, Path destination) throws IOException {
