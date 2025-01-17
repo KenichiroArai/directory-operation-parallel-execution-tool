@@ -3,6 +3,7 @@ package kmg.tool.directorytool.runner;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.boot.ApplicationArguments;
 
 import kmg.tool.directorytool.model.OperationMode;
 import kmg.tool.directorytool.service.DirectoryService;
@@ -31,6 +33,12 @@ class CommandLineAppRunnerTest implements AutoCloseable {
      */
     @Mock
     private DirectoryService directoryService;
+
+    /**
+     * テスト対象のApplicationArgumentsモック
+     */
+    @Mock
+    private ApplicationArguments applicationArguments;
 
     /**
      * テスト対象のCommandLineAppRunnerインスタンス
@@ -64,10 +72,11 @@ class CommandLineAppRunnerTest implements AutoCloseable {
      */
     @Test
     void testSuccessfulCopyOperation() throws Exception {
-        final String[] args = {
-                "source", "target", "COPY"
-        };
-        this.runner.run(args);
+        // ApplicationArguments のモック設定
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("source", "target", "COPY"));
+
+        this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
         Assertions.assertTrue(this.outputStream.toString().contains("Operation completed successfully"));
@@ -81,10 +90,10 @@ class CommandLineAppRunnerTest implements AutoCloseable {
      */
     @Test
     void testSuccessfulMoveOperation() throws Exception {
-        final String[] args = {
-                "source", "target", "MOVE"
-        };
-        this.runner.run(args);
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("source", "target", "MOVE"));
+
+        this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
         Assertions.assertTrue(this.outputStream.toString().contains("Operation completed successfully"));
@@ -98,10 +107,9 @@ class CommandLineAppRunnerTest implements AutoCloseable {
      */
     @Test
     void testInsufficientArguments() throws Exception {
-        final String[] args = {
-                "source", "target"
-        };
-        this.runner.run(args);
+        Mockito.when(this.applicationArguments.getNonOptionArgs()).thenReturn(Arrays.asList("source", "target"));
+
+        this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -118,10 +126,10 @@ class CommandLineAppRunnerTest implements AutoCloseable {
      */
     @Test
     void testInvalidMode() throws Exception {
-        final String[] args = {
-                "source", "target", "INVALID"
-        };
-        this.runner.run(args);
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("source", "target", "INVALID"));
+
+        this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -136,14 +144,13 @@ class CommandLineAppRunnerTest implements AutoCloseable {
      */
     @Test
     void testIOException() throws Exception {
-        final String[] args         = {
-                "source", "target", "COPY"
-        };
-        final String   errorMessage = "Test error message";
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("source", "target", "COPY"));
+        final String errorMessage = "Test error message";
         Mockito.doThrow(new IOException(errorMessage)).when(this.directoryService)
                 .processDirectory(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 
-        this.runner.run(args);
+        this.runner.run(this.applicationArguments);
 
         Assertions.assertTrue(this.outputStream.toString().contains("Error: " + errorMessage));
     }
@@ -156,10 +163,10 @@ class CommandLineAppRunnerTest implements AutoCloseable {
      */
     @Test
     void testDiffOperation() throws Exception {
-        final String[] args = {
-                "source", "target", "DIFF"
-        };
-        this.runner.run(args);
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("source", "target", "DIFF"));
+
+        this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
         Assertions.assertTrue(this.outputStream.toString().contains("Operation completed successfully"));

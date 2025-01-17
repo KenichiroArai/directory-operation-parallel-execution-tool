@@ -2,7 +2,8 @@ package kmg.tool.directorytool.runner;
 
 import java.io.IOException;
 
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import kmg.tool.directorytool.model.OperationMode;
@@ -59,7 +60,7 @@ import kmg.tool.directorytool.service.DirectoryService;
  * @see kmg.tool.directorytool.model.OperationMode
  */
 @Component
-public class CommandLineAppRunner implements CommandLineRunner {
+public class CommandLineAppRunner implements ApplicationRunner {
 
     /**
      * ディレクトリ操作サービス。 Spring DIコンテナによって注入される {@link DirectoryService} のインスタンス。
@@ -99,18 +100,21 @@ public class CommandLineAppRunner implements CommandLineRunner {
      *                   ディレクトリ操作中にIO例外が発生した場合、または無効な引数が指定された場合
      */
     @Override
-    public void run(final String... args) throws Exception {
+    public void run(final ApplicationArguments args) throws Exception {
+        // 非オプション引数を取得
+        String[] nonOptionArgs = args.getNonOptionArgs().toArray(new String[0]);
+
         // 引数の数をチェック
-        if (args.length != 3) {
+        if (nonOptionArgs.length != 3) {
             System.out.println("Usage: java -jar directory-tool.jar <src> <dest> <mode>");
             System.out.println("Modes: COPY, MOVE, DIFF");
             return;
         }
 
         // 引数をパース
-        final String src     = args[0];
-        final String dest    = args[1];
-        final String modeStr = args[2].toUpperCase();
+        final String src     = nonOptionArgs[0];
+        final String dest    = nonOptionArgs[1];
+        final String modeStr = nonOptionArgs[2].toUpperCase();
 
         try {
             // モード文字列をenumに変換
