@@ -29,7 +29,7 @@ class DirectoryToolApplicationTest {
 
     /**
      * テスト用のディレクトリ構造を作成するヘルパーメソッド。
-     *
+     * 
      * @param tempDir
      *                テスト用の一時ディレクトリ
      * @return 作成されたソースディレクトリのPath
@@ -53,14 +53,14 @@ class DirectoryToolApplicationTest {
 
     /**
      * テストモードでのmainメソッドの正常実行をテスト。
-     *
+     * 
      * @param tempDir
      *                テスト用の一時ディレクトリ
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
     @Test
-    void mainMethodExecutesSuccessfullyInTestMode(@TempDir final Path tempDir) throws IOException {
+    static void mainMethodExecutesSuccessfullyInTestMode(@TempDir final Path tempDir) throws IOException {
         // テストデータを作成
         final Path sourceDir = createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
@@ -82,14 +82,14 @@ class DirectoryToolApplicationTest {
 
     /**
      * 非テストモードでのmainメソッドの正常実行をテスト。
-     *
+     * 
      * @param tempDir
      *                テスト用の一時ディレクトリ
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
     @Test
-    void mainMethodExecutesSuccessfullyInNonTestMode(@TempDir final Path tempDir) throws IOException {
+    static void mainMethodExecutesSuccessfullyInNonTestMode(@TempDir final Path tempDir) throws IOException {
         // テストデータを作成
         final Path sourceDir = createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
@@ -122,7 +122,7 @@ class DirectoryToolApplicationTest {
      * テストモード設定の切り替え機能をテスト。
      */
     @Test
-    void setTestModeTogglesBehavior() {
+    static void setTestModeTogglesBehavior() {
         // テストモードの設定を確認
         DirectoryToolApplication.setTestMode(true);
         Assertions.assertTrue(DirectoryToolApplication.isTestMode());
@@ -133,7 +133,7 @@ class DirectoryToolApplicationTest {
 
     /**
      * 引数不足時のエラーハンドリングをテスト。
-     *
+     * 
      * @param output
      *               テスト出力のキャプチャ
      */
@@ -149,7 +149,7 @@ class DirectoryToolApplicationTest {
 
     /**
      * 無効な操作タイプが指定された場合のエラーハンドリングをテスト。
-     *
+     * 
      * @param output
      *               テスト出力のキャプチャ
      */
@@ -167,12 +167,12 @@ class DirectoryToolApplicationTest {
 
     /**
      * 存在しないソースディレクトリが指定された場合のエラーハンドリングをテスト。
-     *
+     * 
      * @param output
      *               テスト出力のキャプチャ
      */
     @Test
-    void mainMethodFailsWithNonExistentSourceDirectory(final CapturedOutput output) {
+    static void mainMethodFailsWithNonExistentSourceDirectory(final CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
@@ -185,12 +185,12 @@ class DirectoryToolApplicationTest {
 
     /**
      * エラー時の終了処理をテスト。
-     *
+     * 
      * @param output
      *               テスト出力のキャプチャ
      */
     @Test
-    void testExitWithError(final CapturedOutput output) {
+    static void testExitWithError(final CapturedOutput output) {
         // テストモードがtrueの場合
         DirectoryToolApplication.setTestMode(true);
         Assertions.assertTrue(DirectoryToolApplication.exitWithError());
@@ -218,14 +218,14 @@ class DirectoryToolApplicationTest {
 
     /**
      * 無効なパスが指定された場合のエラーハンドリングをテスト。
-     *
+     * 
      * @param tempDir
      *                テスト用の一時ディレクトリ
      * @param output
      *                テスト出力のキャプチャ
      */
     @Test
-    void mainMethodFailsWithInvalidPaths(@TempDir final Path tempDir, final CapturedOutput output) {
+    static void mainMethodFailsWithInvalidPaths(@TempDir final Path tempDir, final CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 

@@ -14,14 +14,14 @@ import kmg.tool.directorytool.service.DirectoryService;
  * 基本的な使用方法：
  *
  * <pre>
- * java -jar directory-tool.jar &lt;src&gt; &lt;dest&gt; &lt;mode&gt;
+ * java -jar directory-tool.jar <src> <dest> <mode>
  * </pre>
  * <p>
  * パラメータ：
  * <ul>
- * <li>&lt;src&gt; - 操作対象のソースディレクトリパス
- * <li>&lt;dest&gt; - 操作対象のターゲットディレクトリパス
- * <li>&lt;mode&gt; - 実行する操作のモード（COPY/MOVE/DIFF）
+ * <li><src> - 操作対象のソースディレクトリパス
+ * <li><dest> - 操作対象のターゲットディレクトリパス
+ * <li><mode> - 実行する操作のモード（COPY/MOVE/DIFF）
  * </ul>
  * <p>
  * 使用例：
@@ -119,13 +119,16 @@ public class CommandLineAppRunner implements CommandLineRunner {
             // ディレクトリ操作を実行
             this.directoryService.processDirectory(src, dest, mode);
             System.out.println("Operation completed successfully");
-        } catch (final IllegalArgumentException ignored) {
+        } catch (final IllegalArgumentException e) {
             // 無効なモードが指定された場合
             System.out.println("Invalid mode: " + modeStr);
             System.out.println("Valid modes are: COPY, MOVE, DIFF");
+            System.err.println("Error details: " + e.getMessage());
         } catch (final IOException e) {
             // ディレクトリ操作中にエラーが発生した場合
             System.out.println("Error: " + e.getMessage());
+            System.err.println("Stack trace: ");
+            e.printStackTrace();
         }
     }
 }

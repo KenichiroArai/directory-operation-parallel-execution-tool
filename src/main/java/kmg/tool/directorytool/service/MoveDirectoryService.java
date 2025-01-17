@@ -93,8 +93,9 @@ public class MoveDirectoryService extends AbstractDirectoryService {
             stream.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);
-                } catch (final IOException ignored) {
-                    // 削除に失敗した場合は無視
+                } catch (final IOException e) {
+                    System.err.println("Failed to delete path: " + path);
+                    System.err.println("Error details: " + e.getMessage());
                 }
             });
         }

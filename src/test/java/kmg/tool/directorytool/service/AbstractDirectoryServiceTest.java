@@ -38,7 +38,7 @@ public abstract class AbstractDirectoryServiceTest {
 
     /**
      * テストの前準備
-     *
+     * 
      * @throws IOException
      *                     ディレクトリの作成に失敗した場合
      */
@@ -56,7 +56,7 @@ public abstract class AbstractDirectoryServiceTest {
 
     /**
      * テスト対象のサービスを作成する
-     *
+     * 
      * @return テスト対象のサービスインスタンス
      */
     protected abstract AbstractDirectoryService createService();
@@ -213,7 +213,7 @@ public abstract class AbstractDirectoryServiceTest {
                     throws IOException {
                 try {
                     Thread.sleep(31000); // 31秒間スリープ（タイムアウトは30秒）
-                } catch (final InterruptedException ignored) {
+                } catch (@SuppressWarnings("unused") final InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
             }
@@ -243,7 +243,7 @@ public abstract class AbstractDirectoryServiceTest {
                 walk.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
                     try {
                         Files.delete(path);
-                    } catch (final IOException ignored) {
+                    } catch (@SuppressWarnings("unused") final IOException ignored) {
                         // クリーンアップ中のエラーは無視
                     }
                 });
@@ -255,7 +255,7 @@ public abstract class AbstractDirectoryServiceTest {
                 walk.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
                     try {
                         Files.delete(path);
-                    } catch (final IOException ignored) {
+                    } catch (@SuppressWarnings("unused") final IOException ignored) {
                         // クリーンアップ中のエラーは無視
                     }
                 });

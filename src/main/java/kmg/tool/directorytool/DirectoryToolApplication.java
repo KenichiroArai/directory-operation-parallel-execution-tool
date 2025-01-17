@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * ディレクトリ操作ツールのメインアプリケーションクラス。 Spring Bootアプリケーションとして起動し、コマンドラインから実行される。 ディレクトリのコピー、移動、差分比較の操作を提供する。
@@ -70,21 +71,41 @@ public class DirectoryToolApplication {
      *             コマンドライン引数の配列
      */
     public static void main(final String[] args) {
+        try (ConfigurableApplicationContext context = SpringApplication.run(DirectoryToolApplication.class,
+                getParams(args))) {
+            // テストモード以外の場合のみ、アプリケーションを終了
+            if (!DirectoryToolApplication.isTestMode) {
+                DirectoryToolApplication.hasExited = true;
+                // 実際の本番環境でのみSystem.exitを呼び出す
+                if (!Boolean.getBoolean("skipExit")) {
+                    System.exit(0);
+                }
+            }
+        }
+    }
+
+    /**
+     * コマンドライン引数を解析し、Springアプリケーションの起動パラメータを生成する。
+     *
+     * @param args
+     *             コマンドライン引数の配列
+     * @return Springアプリケーションの起動パラメータ
+     */
+    private static String[] getParams(final String[] args) {
         if (args.length < 3) {
             DirectoryToolApplication.exitWithError();
             System.err.println("引数が不足しています。");
-            return;
+            return new String[0];
         }
 
-        String sourcePath = null;
-
+        String sourcePath      = null;
         String destinationPath = null;
         String operationType   = null;
 
         if (args.length == 4) {
             if (!"--spring.output.ansi.enabled=always".equals(args[0])) {
                 System.err.println("最初の引数が「--spring.output.ansi.enabled=always」以外が設定されています。");
-                return;
+                return new String[0];
             }
             sourcePath = args[1];
             destinationPath = args[2];
@@ -94,35 +115,23 @@ public class DirectoryToolApplication {
             destinationPath = args[1];
             operationType = args[2];
         }
-        final String[] params = {
-                sourcePath, destinationPath, operationType
-        };
 
         final Path source = Paths.get(sourcePath);
         if (!Files.exists(source)) {
             DirectoryToolApplication.exitWithError();
             System.err.println("ソースディレクトリが存在しません。");
-            return;
+            return new String[0];
         }
 
         if (!Arrays.asList("COPY", "MOVE", "DIFF").contains(operationType)) {
             DirectoryToolApplication.exitWithError();
             System.err.println("無効なモードです。");
-            return;
+            return new String[0];
         }
 
-        // Springアプリケーションを起動
-
-        SpringApplication.run(DirectoryToolApplication.class, params);
-
-        // テストモード以外の場合のみ、アプリケーションを終了
-        if (!DirectoryToolApplication.isTestMode) {
-            DirectoryToolApplication.hasExited = true;
-            // 実際の本番環境でのみSystem.exitを呼び出す
-            if (!Boolean.getBoolean("skipExit")) {
-                System.exit(0);
-            }
-        }
+        return new String[] {
+                sourcePath, destinationPath, operationType
+        };
     }
 
     /**
