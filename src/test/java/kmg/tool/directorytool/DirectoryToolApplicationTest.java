@@ -36,7 +36,7 @@ class DirectoryToolApplicationTest {
      * @throws IOException
      *                     ディレクトリやファイルの作成に失敗した場合
      */
-    private Path createTestDirectory(@TempDir final Path tempDir) throws IOException {
+    private static Path createTestDirectory(@TempDir final Path tempDir) throws IOException {
         final Path sourceDir = tempDir.resolve("test-source");
         Files.createDirectories(sourceDir);
 
@@ -62,7 +62,7 @@ class DirectoryToolApplicationTest {
     @Test
     void mainMethodExecutesSuccessfullyInTestMode(@TempDir final Path tempDir) throws IOException {
         // テストデータを作成
-        final Path sourceDir = this.createTestDirectory(tempDir);
+        final Path sourceDir = createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
 
         // テストモードを設定
@@ -91,7 +91,7 @@ class DirectoryToolApplicationTest {
     @Test
     void mainMethodExecutesSuccessfullyInNonTestMode(@TempDir final Path tempDir) throws IOException {
         // テストデータを作成
-        final Path sourceDir = this.createTestDirectory(tempDir);
+        final Path sourceDir = createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
 
         // テストモードをオフに設定
@@ -138,7 +138,7 @@ class DirectoryToolApplicationTest {
      *               テスト出力のキャプチャ
      */
     @Test
-    void mainMethodFailsWithInsufficientArguments(final CapturedOutput output) {
+    static void mainMethodFailsWithInsufficientArguments(final CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
@@ -154,7 +154,7 @@ class DirectoryToolApplicationTest {
      *               テスト出力のキャプチャ
      */
     @Test
-    void mainMethodFailsWithInvalidOperationType(final CapturedOutput output) {
+    static void mainMethodFailsWithInvalidOperationType(final CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 

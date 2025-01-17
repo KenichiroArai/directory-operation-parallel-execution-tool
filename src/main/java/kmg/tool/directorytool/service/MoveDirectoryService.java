@@ -93,7 +93,7 @@ public class MoveDirectoryService extends AbstractDirectoryService {
             stream.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);
-                } catch (final IOException e) {
+                } catch (final IOException ignored) {
                     // 削除に失敗した場合は無視
                 }
             });

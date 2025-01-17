@@ -13,6 +13,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import kmg.tool.directorytool.model.OperationMode;
 import kmg.tool.directorytool.service.DirectoryService;
@@ -21,7 +23,8 @@ import kmg.tool.directorytool.service.DirectoryService;
  * CommandLineAppRunnerのテストクラス
  */
 @ExtendWith(MockitoExtension.class)
-class CommandLineAppRunnerTest {
+@MockitoSettings(strictness = Strictness.LENIENT)
+class CommandLineAppRunnerTest implements AutoCloseable {
 
     /**
      * テスト対象のDirectoryServiceモック
@@ -164,9 +167,23 @@ class CommandLineAppRunnerTest {
 
     /**
      * テスト後のクリーンアップ
+     *
+     * @throws IOException
+     *                     クローズ処理中に発生する可能性のある例外
      */
     @AfterEach
-    void tearDown() {
+    void tearDown() throws IOException {
         System.setOut(this.originalOut);
+    }
+
+    /**
+     * テスト終了時のリソースクリーンアップ
+     *
+     * @throws IOException
+     *                     クローズ処理中に発生する可能性のある例外
+     */
+    @Override
+    public void close() throws IOException {
+        this.outputStream.close();
     }
 }

@@ -81,7 +81,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
             System.out.println("Only in source: " + relativePath);
         } else if (!Files.isRegularFile(targetPath)) {
             System.out.println("Different: " + relativePath + " (file vs directory)");
-        } else if (!this.compareFiles(sourcePath, targetPath)) {
+        } else if (!AbstractDirectoryService.compareFiles(sourcePath, targetPath)) {
             System.out.println("Different: " + relativePath);
         }
     }
@@ -101,7 +101,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         // ターゲットディレクトリを走査してソースにないファイルを検出
         if (Files.exists(destination)) {
             try (var stream = Files.walk(destination)) {
-                stream.forEach(path -> this.processDestinationPath(source, destination, path));
+                stream.forEach(path -> processDestinationPath(source, destination, path));
             }
         }
     }
@@ -116,7 +116,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
      * @param path
      *                    ターゲットディレクトリ内の現在のパス
      */
-    private void processDestinationPath(final Path source, final Path destination, final Path path) {
+    private static void processDestinationPath(final Path source, final Path destination, final Path path) {
         if (!path.equals(destination)) { // ルートディレクトリは除外
             final Path relativePath = destination.relativize(path);
             final Path sourcePath   = source.resolve(relativePath);
@@ -156,7 +156,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
             throw new IOException("Target directory does not exist: " + destPath);
         }
 
-        this.validatePaths(source, destination);
+        AbstractDirectoryService.validatePaths(source, destination);
 
         // ソースディレクトリの処理
         try (var stream = Files.walk(source)) {

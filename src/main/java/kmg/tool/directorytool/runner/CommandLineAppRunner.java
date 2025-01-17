@@ -70,11 +70,11 @@ public class CommandLineAppRunner implements CommandLineRunner {
      * DirectoryServiceをDIするコンストラクタ。 Spring Bootのコンテナによって自動的にインスタンス化される。 {@link DirectoryService}のインスタンスは、操作モードに応じて
      * 適切な実装クラスを選択・実行する。
      *
-     * @param directoryService
-     *                         ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
+     * @param service
+     *                ディレクトリ操作サービス。DIコンテナにより適切な実装が注入される。
      */
-    public CommandLineAppRunner(final DirectoryService directoryService) {
-        this.directoryService = directoryService;
+    public CommandLineAppRunner(final DirectoryService service) {
+        this.directoryService = service;
     }
 
     /**
@@ -119,7 +119,7 @@ public class CommandLineAppRunner implements CommandLineRunner {
             // ディレクトリ操作を実行
             this.directoryService.processDirectory(src, dest, mode);
             System.out.println("Operation completed successfully");
-        } catch (final IllegalArgumentException e) {
+        } catch (final IllegalArgumentException ignored) {
             // 無効なモードが指定された場合
             System.out.println("Invalid mode: " + modeStr);
             System.out.println("Valid modes are: COPY, MOVE, DIFF");

@@ -3,6 +3,7 @@ package kmg.tool.directorytool.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -153,7 +154,7 @@ public abstract class AbstractDirectoryServiceTest {
         Files.writeString(file1, "content1");
         Files.writeString(file2, "different content");
 
-        Assertions.assertFalse(this.service.compareFiles(file1, file2), "異なるサイズのファイルは不一致となるべき");
+        Assertions.assertFalse(AbstractDirectoryService.compareFiles(file1, file2), "異なるサイズのファイルは不一致となるべき");
     }
 
     /**
@@ -212,7 +213,7 @@ public abstract class AbstractDirectoryServiceTest {
                     throws IOException {
                 try {
                     Thread.sleep(31000); // 31秒間スリープ（タイムアウトは30秒）
-                } catch (final InterruptedException e) {
+                } catch (final InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
             }
@@ -238,23 +239,27 @@ public abstract class AbstractDirectoryServiceTest {
     public void tearDown() throws IOException {
         // テスト後のクリーンアップ
         if (Files.exists(this.sourceDir)) {
-            Files.walk(this.sourceDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
-                try {
-                    Files.delete(path);
-                } catch (final IOException e) {
-                    // クリーンアップ中のエラーは無視
-                }
-            });
+            try (Stream<Path> walk = Files.walk(this.sourceDir)) {
+                walk.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (final IOException ignored) {
+                        // クリーンアップ中のエラーは無視
+                    }
+                });
+            }
         }
 
         if (Files.exists(this.targetDir)) {
-            Files.walk(this.targetDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
-                try {
-                    Files.delete(path);
-                } catch (final IOException e) {
-                    // クリーンアップ中のエラーは無視
-                }
-            });
+            try (Stream<Path> walk = Files.walk(this.targetDir)) {
+                walk.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (final IOException ignored) {
+                        // クリーンアップ中のエラーは無視
+                    }
+                });
+            }
         }
     }
 }

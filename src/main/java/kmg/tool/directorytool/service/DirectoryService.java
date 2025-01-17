@@ -43,18 +43,18 @@ public class DirectoryService {
     /**
      * 各種ディレクトリ操作サービスをDIするコンストラクタ。 Spring Bootのコンテナによって自動的にインスタンス化される。
      *
-     * @param copyService
-     *                    コピー操作を実行するサービス
-     * @param moveService
-     *                    移動操作を実行するサービス
-     * @param diffService
-     *                    差分比較操作を実行するサービス
+     * @param copySvc
+     *                コピー操作を実行するサービス
+     * @param moveSvc
+     *                移動操作を実行するサービス
+     * @param diffSvc
+     *                差分比較操作を実行するサービス
      */
-    public DirectoryService(final CopyDirectoryService copyService, final MoveDirectoryService moveService,
-            final DiffDirectoryService diffService) {
-        this.copyService = copyService;
-        this.moveService = moveService;
-        this.diffService = diffService;
+    public DirectoryService(final CopyDirectoryService copySvc, final MoveDirectoryService moveSvc,
+            final DiffDirectoryService diffSvc) {
+        this.copyService = copySvc;
+        this.moveService = moveSvc;
+        this.diffService = diffSvc;
     }
 
     /**

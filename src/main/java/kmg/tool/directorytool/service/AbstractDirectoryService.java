@@ -56,7 +56,7 @@ public abstract class AbstractDirectoryService {
         final Path source      = Path.of(srcPath);
         final Path destination = Path.of(destPath);
 
-        this.validatePaths(source, destination);
+        validatePaths(source, destination);
 
         final List<Future<?>> futures = new ArrayList<>();
 
@@ -75,7 +75,7 @@ public abstract class AbstractDirectoryService {
             });
         }
 
-        this.waitForCompletion(futures);
+        waitForCompletion(futures);
         this.postProcess(source, destination);
     }
 
@@ -89,7 +89,7 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     ソースパスが存在しない、またはディレクトリでない場合、 ターゲットパスが存在するがディレクトリでない場合、 ターゲットディレクトリの作成に失敗した場合
      */
-    protected void validatePaths(final Path source, final Path destination) throws IOException {
+    protected static void validatePaths(final Path source, final Path destination) throws IOException {
         if (!Files.exists(source)) {
             throw new IOException("Source directory does not exist");
         }
@@ -144,7 +144,7 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     ファイルの読み取り中にエラーが発生した場合
      */
-    protected boolean compareFiles(final Path file1, final Path file2) throws IOException {
+    protected static boolean compareFiles(final Path file1, final Path file2) throws IOException {
         if (Files.size(file1) != Files.size(file2)) {
             return false;
         }
@@ -159,7 +159,7 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     タスクの実行中にInterruptedException, ExecutionException, TimeoutExceptionが発生した場合。
      */
-    protected void waitForCompletion(final List<Future<?>> futures) throws IOException {
+    protected static void waitForCompletion(final List<Future<?>> futures) throws IOException {
         for (final Future<?> future : futures) {
             try {
                 future.get(30, TimeUnit.SECONDS);
