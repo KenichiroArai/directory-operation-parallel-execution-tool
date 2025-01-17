@@ -13,6 +13,11 @@ import org.junit.jupiter.api.Test;
  */
 class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
+    /**
+     * 移動サービスのインスタンスを生成します。
+     * 
+     * @return 移動サービスのインスタンス
+     */
     @Override
     protected AbstractDirectoryService createService() {
         return new MoveDirectoryService();
@@ -20,6 +25,9 @@ class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 基本的なファイル移動操作のテスト
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     void testBasicMoveOperation() throws IOException {
@@ -39,6 +47,9 @@ class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 複雑なディレクトリ構造の移動テスト
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     void testComplexDirectoryStructureMove() throws IOException {
@@ -70,6 +81,9 @@ class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 既存のファイルの上書き移動のテスト
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     void testOverwriteExistingFile() throws IOException {
@@ -92,6 +106,9 @@ class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * 空のディレクトリ構造の移動テスト
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     void testMoveEmptyDirectoryStructure() throws IOException {

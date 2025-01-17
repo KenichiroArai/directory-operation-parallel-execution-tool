@@ -11,15 +11,30 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.IOException;
 
+/**
+ * DirectoryToolApplicationのテストクラス。 アプリケーションの主要な機能とエラーハンドリングをテストします。
+ */
 @SpringBootTest
 @ExtendWith(OutputCaptureExtension.class)
 class DirectoryToolApplicationTest {
 
+    /**
+     * Springコンテキストが正常にロードされることを確認するテスト。
+     */
     @Test
     void contextLoads() {
         // Spring Contextが正常にロードされることを確認
     }
 
+    /**
+     * テスト用のディレクトリ構造を作成するヘルパーメソッド。
+     *
+     * @param tempDir
+     *                テスト用の一時ディレクトリ
+     * @return 作成されたソースディレクトリのPath
+     * @throws IOException
+     *                     ディレクトリやファイルの作成に失敗した場合
+     */
     private Path createTestDirectory(@TempDir Path tempDir) throws IOException {
         Path sourceDir = tempDir.resolve("test-source");
         Files.createDirectories(sourceDir);
@@ -35,18 +50,27 @@ class DirectoryToolApplicationTest {
         return sourceDir;
     }
 
+    /**
+     * テストモードでのmainメソッドの正常実行をテスト。
+     *
+     * @param tempDir
+     *                テスト用の一時ディレクトリ
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
+     */
     @Test
     void mainMethodExecutesSuccessfullyInTestMode(@TempDir Path tempDir) throws IOException {
         // テストデータを作成
         Path sourceDir = createTestDirectory(tempDir);
-        Path destDir = tempDir.resolve("dest");
+        Path destDir   = tempDir.resolve("dest");
 
         // テストモードを設定
         DirectoryToolApplication.setTestMode(true);
 
         // mainメソッドを実行（テストデータディレクトリを使用）
-        DirectoryToolApplication
-                .main(new String[] {sourceDir.toString(), destDir.toString(), "COPY"});
+        DirectoryToolApplication.main(new String[] {
+                sourceDir.toString(), destDir.toString(), "COPY"
+        });
 
         // 結果の検証
         assertTrue(Files.exists(destDir));
@@ -55,11 +79,19 @@ class DirectoryToolApplicationTest {
         assertTrue(Files.exists(destDir.resolve("subdir/test3.txt")));
     }
 
+    /**
+     * 非テストモードでのmainメソッドの正常実行をテスト。
+     *
+     * @param tempDir
+     *                テスト用の一時ディレクトリ
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
+     */
     @Test
     void mainMethodExecutesSuccessfullyInNonTestMode(@TempDir Path tempDir) throws IOException {
         // テストデータを作成
         Path sourceDir = createTestDirectory(tempDir);
-        Path destDir = tempDir.resolve("dest");
+        Path destDir   = tempDir.resolve("dest");
 
         // テストモードをオフに設定
         DirectoryToolApplication.setTestMode(false);
@@ -68,8 +100,9 @@ class DirectoryToolApplicationTest {
         // System.exitを実行しないようにする
         System.setProperty("skipExit", "true");
 
-        DirectoryToolApplication
-                .main(new String[] {sourceDir.toString(), destDir.toString(), "COPY"});
+        DirectoryToolApplication.main(new String[] {
+                sourceDir.toString(), destDir.toString(), "COPY"
+        });
 
         // アプリケーションが終了しようとしたことを確認
         assertTrue(DirectoryToolApplication.hasExited());
@@ -84,6 +117,9 @@ class DirectoryToolApplicationTest {
         System.clearProperty("skipExit");
     }
 
+    /**
+     * テストモード設定の切り替え機能をテスト。
+     */
     @Test
     void setTestModeTogglesBehavior() {
         // テストモードの設定を確認
@@ -94,6 +130,12 @@ class DirectoryToolApplicationTest {
         assertFalse(DirectoryToolApplication.isTestMode());
     }
 
+    /**
+     * 引数不足時のエラーハンドリングをテスト。
+     *
+     * @param output
+     *               テスト出力のキャプチャ
+     */
     @Test
     void mainMethodFailsWithInsufficientArguments(CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
@@ -104,27 +146,48 @@ class DirectoryToolApplicationTest {
         assertEquals("引数が不足しています。" + System.lineSeparator(), output.getErr());
     }
 
+    /**
+     * 無効な操作タイプが指定された場合のエラーハンドリングをテスト。
+     *
+     * @param output
+     *               テスト出力のキャプチャ
+     */
     @Test
     void mainMethodFailsWithInvalidOperationType(CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
-        DirectoryToolApplication.main(new String[] {"/src", "/dest", "INVALID"});
+        DirectoryToolApplication.main(new String[] {
+                "/src", "/dest", "INVALID"
+        });
         assertTrue(DirectoryToolApplication.hasExited(), "Should exit with invalid operation type");
         assertEquals("無効なモードです。" + System.lineSeparator(), output.getErr());
     }
 
+    /**
+     * 存在しないソースディレクトリが指定された場合のエラーハンドリングをテスト。
+     *
+     * @param output
+     *               テスト出力のキャプチャ
+     */
     @Test
     void mainMethodFailsWithNonExistentSourceDirectory(CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
         DirectoryToolApplication.resetExitStatus();
 
-        DirectoryToolApplication.main(new String[] {"/nonexistent", "/dest", "COPY"});
-        assertTrue(DirectoryToolApplication.hasExited(),
-                "Should exit with non-existent source directory");
+        DirectoryToolApplication.main(new String[] {
+                "/nonexistent", "/dest", "COPY"
+        });
+        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with non-existent source directory");
         assertEquals("ソースディレクトリが存在しません。" + System.lineSeparator(), output.getErr());
     }
 
+    /**
+     * エラー時の終了処理をテスト。
+     *
+     * @param output
+     *               テスト出力のキャプチャ
+     */
     @Test
     void testExitWithError(CapturedOutput output) {
         // テストモードがtrueの場合
@@ -152,6 +215,14 @@ class DirectoryToolApplicationTest {
         DirectoryToolApplication.resetExitStatus();
     }
 
+    /**
+     * 無効なパスが指定された場合のエラーハンドリングをテスト。
+     *
+     * @param tempDir
+     *                テスト用の一時ディレクトリ
+     * @param output
+     *                テスト出力のキャプチャ
+     */
     @Test
     void mainMethodFailsWithInvalidPaths(@TempDir Path tempDir, CapturedOutput output) {
         DirectoryToolApplication.setTestMode(true);
@@ -159,12 +230,12 @@ class DirectoryToolApplicationTest {
 
         // 存在しないソースディレクトリ
         Path nonExistentSource = tempDir.resolve("non-existent");
-        Path destDir = tempDir.resolve("dest");
+        Path destDir           = tempDir.resolve("dest");
 
-        DirectoryToolApplication
-                .main(new String[] {nonExistentSource.toString(), destDir.toString(), "COPY"});
-        assertTrue(DirectoryToolApplication.hasExited(),
-                "Should exit with non-existent source directory");
+        DirectoryToolApplication.main(new String[] {
+                nonExistentSource.toString(), destDir.toString(), "COPY"
+        });
+        assertTrue(DirectoryToolApplication.hasExited(), "Should exit with non-existent source directory");
         assertTrue(output.toString().contains("ソースディレクトリが存在しません。"),
                 "Should display source directory not found message");
     }

@@ -7,87 +7,103 @@ import org.mockito.Mockito;
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
- * DirectoryServiceのファサードパターンとしての機能をテストするクラス。
- * 各モードで適切なサービスが選択され、処理が委譲されることを確認する。
+ * DirectoryServiceのファサードパターンとしての機能をテストするクラス。 各モードで適切なサービスが選択され、処理が委譲されることを確認する。
  */
 class DirectoryServiceTest {
 
-    private DirectoryService directoryService;
+    /** テスト対象のDirectoryServiceインスタンス */
+    private DirectoryService     directoryService;
+    /** コピー処理を行うサービスのモック */
     private CopyDirectoryService copyService;
+    /** 移動処理を行うサービスのモック */
     private MoveDirectoryService moveService;
+    /** 差分比較を行うサービスのモック */
     private DiffDirectoryService diffService;
 
+    /**
+     * 各テストの前に実行される初期化メソッド。 各サービスのモックを作成し、DirectoryServiceに注入する。
+     */
     @BeforeEach
     void setUp() {
         // 各サービスのモックを作成
-        copyService = Mockito.mock(CopyDirectoryService.class);
-        moveService = Mockito.mock(MoveDirectoryService.class);
-        diffService = Mockito.mock(DiffDirectoryService.class);
+        this.copyService = Mockito.mock(CopyDirectoryService.class);
+        this.moveService = Mockito.mock(MoveDirectoryService.class);
+        this.diffService = Mockito.mock(DiffDirectoryService.class);
 
         // DirectoryServiceにモックを注入
-        directoryService = new DirectoryService(copyService, moveService, diffService);
+        this.directoryService = new DirectoryService(this.copyService, this.moveService, this.diffService);
     }
 
     /**
-     * COPYモードで適切なサービスが呼び出されることをテスト
+     * COPYモードで適切なサービスが呼び出されることをテスト。
+     *
+     * @throws IOException
+     *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
     void testCopyModeCallsCorrectService() throws IOException {
-        String srcPath = "source";
+        String srcPath  = "source";
         String destPath = "target";
 
-        directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
+        this.directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
 
-        Mockito.verify(copyService).processDirectory(srcPath, destPath);
-        Mockito.verifyNoInteractions(moveService);
-        Mockito.verifyNoInteractions(diffService);
+        Mockito.verify(this.copyService).processDirectory(srcPath, destPath);
+        Mockito.verifyNoInteractions(this.moveService);
+        Mockito.verifyNoInteractions(this.diffService);
     }
 
     /**
-     * MOVEモードで適切なサービスが呼び出されることをテスト
+     * MOVEモードで適切なサービスが呼び出されることをテスト。
+     *
+     * @throws IOException
+     *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
     void testMoveModeCallsCorrectService() throws IOException {
-        String srcPath = "source";
+        String srcPath  = "source";
         String destPath = "target";
 
-        directoryService.processDirectory(srcPath, destPath, OperationMode.MOVE);
+        this.directoryService.processDirectory(srcPath, destPath, OperationMode.MOVE);
 
-        Mockito.verify(moveService).processDirectory(srcPath, destPath);
-        Mockito.verifyNoInteractions(copyService);
-        Mockito.verifyNoInteractions(diffService);
+        Mockito.verify(this.moveService).processDirectory(srcPath, destPath);
+        Mockito.verifyNoInteractions(this.copyService);
+        Mockito.verifyNoInteractions(this.diffService);
     }
 
     /**
-     * DIFFモードで適切なサービスが呼び出されることをテスト
+     * DIFFモードで適切なサービスが呼び出されることをテスト。
+     *
+     * @throws IOException
+     *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
     void testDiffModeCallsCorrectService() throws IOException {
-        String srcPath = "source";
+        String srcPath  = "source";
         String destPath = "target";
 
-        directoryService.processDirectory(srcPath, destPath, OperationMode.DIFF);
+        this.directoryService.processDirectory(srcPath, destPath, OperationMode.DIFF);
 
-        Mockito.verify(diffService).processDirectory(srcPath, destPath);
-        Mockito.verifyNoInteractions(copyService);
-        Mockito.verifyNoInteractions(moveService);
+        Mockito.verify(this.diffService).processDirectory(srcPath, destPath);
+        Mockito.verifyNoInteractions(this.copyService);
+        Mockito.verifyNoInteractions(this.moveService);
     }
 
     /**
-     * サービス呼び出し時の例外が適切に伝播することをテスト
+     * サービス呼び出し時の例外が適切に伝播することをテスト。
+     *
+     * @throws IOException
+     *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
     void testExceptionPropagation() throws IOException {
-        String srcPath = "source";
-        String destPath = "target";
+        String      srcPath           = "source";
+        String      destPath          = "target";
         IOException expectedException = new IOException("Test error");
 
-        Mockito.doThrow(expectedException)
-                .when(copyService)
-                .processDirectory(srcPath, destPath);
+        Mockito.doThrow(expectedException).when(this.copyService).processDirectory(srcPath, destPath);
 
         try {
-            directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
+            this.directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
         } catch (IOException e) {
             org.junit.jupiter.api.Assertions.assertEquals(expectedException, e);
         }

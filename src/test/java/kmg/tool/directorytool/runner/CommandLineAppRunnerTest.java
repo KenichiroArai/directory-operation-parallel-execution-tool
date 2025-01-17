@@ -25,11 +25,25 @@ import kmg.tool.directorytool.service.DirectoryService;
 @ExtendWith(MockitoExtension.class)
 class CommandLineAppRunnerTest {
 
+    /**
+     * テスト対象のDirectoryServiceモック
+     */
     @Mock
     private DirectoryService directoryService;
 
+    /**
+     * テスト対象のCommandLineAppRunnerインスタンス
+     */
     private CommandLineAppRunner runner;
+
+    /**
+     * テスト用の出力ストリーム
+     */
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+    /**
+     * 標準出力の元のPrintStream
+     */
     private final PrintStream originalOut = System.out;
 
     /**
@@ -43,10 +57,15 @@ class CommandLineAppRunnerTest {
 
     /**
      * 正常系のコピー操作のテスト
+     * 
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
      */
     @Test
     void testSuccessfulCopyOperation() throws Exception {
-        String[] args = {"source", "target", "COPY"};
+        String[] args = {
+                "source", "target", "COPY"
+        };
         runner.run(args);
 
         verify(directoryService).processDirectory("source", "target", OperationMode.COPY);
@@ -55,10 +74,15 @@ class CommandLineAppRunnerTest {
 
     /**
      * 正常系の移動操作のテスト
+     * 
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
      */
     @Test
     void testSuccessfulMoveOperation() throws Exception {
-        String[] args = {"source", "target", "MOVE"};
+        String[] args = {
+                "source", "target", "MOVE"
+        };
         runner.run(args);
 
         verify(directoryService).processDirectory("source", "target", OperationMode.MOVE);
@@ -67,10 +91,15 @@ class CommandLineAppRunnerTest {
 
     /**
      * 引数が不足している場合のテスト
+     * 
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
      */
     @Test
     void testInsufficientArguments() throws Exception {
-        String[] args = {"source", "target"};
+        String[] args = {
+                "source", "target"
+        };
         runner.run(args);
 
         verify(directoryService, never()).processDirectory(any(), any(), any());
@@ -81,10 +110,15 @@ class CommandLineAppRunnerTest {
 
     /**
      * 無効な操作モードが指定された場合のテスト
+     * 
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
      */
     @Test
     void testInvalidMode() throws Exception {
-        String[] args = {"source", "target", "INVALID"};
+        String[] args = {
+                "source", "target", "INVALID"
+        };
         runner.run(args);
 
         verify(directoryService, never()).processDirectory(any(), any(), any());
@@ -93,14 +127,17 @@ class CommandLineAppRunnerTest {
 
     /**
      * IOExceptionが発生した場合のテスト
+     * 
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
      */
     @Test
     void testIOException() throws Exception {
-        String[] args = {"source", "target", "COPY"};
-        String errorMessage = "Test error message";
-        doThrow(new IOException(errorMessage))
-            .when(directoryService)
-            .processDirectory(any(), any(), any());
+        String[] args         = {
+                "source", "target", "COPY"
+        };
+        String   errorMessage = "Test error message";
+        doThrow(new IOException(errorMessage)).when(directoryService).processDirectory(any(), any(), any());
 
         runner.run(args);
 
@@ -109,10 +146,15 @@ class CommandLineAppRunnerTest {
 
     /**
      * DIFFモードの操作のテスト
+     * 
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
      */
     @Test
     void testDiffOperation() throws Exception {
-        String[] args = {"source", "target", "DIFF"};
+        String[] args = {
+                "source", "target", "DIFF"
+        };
         runner.run(args);
 
         verify(directoryService).processDirectory("source", "target", OperationMode.DIFF);

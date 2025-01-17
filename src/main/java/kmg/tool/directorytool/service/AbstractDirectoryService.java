@@ -11,7 +11,24 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ディレクトリ操作の基本機能を提供する抽象クラス。
+ * ディレクトリ操作の基本機能を提供する抽象クラス。 このクラスは、ファイルシステム操作の共通機能を実装し、具体的なディレクトリ操作（コピー、移動、差分比較）の ベースとなる機能を提供する。
+ * <p>
+ * 主な特徴：
+ * <ul>
+ * <li>マルチスレッドによる並列処理機能
+ * <li>ディレクトリ走査の共通実装
+ * <li>ファイル操作の基本的な検証機能
+ * <li>ファイル比較の共通ユーティリティ
+ * </ul>
+ * <p>
+ * このクラスを継承するサブクラスは、{@link #processPath(Path, Path, Path)}メソッドと {@link #postProcess(Path, Path)}メソッドを実装することで、
+ * 具体的なディレクトリ操作を定義する。
+ *
+ * @author kmg
+ * @version 1.0
+ * @see CopyDirectoryService
+ * @see MoveDirectoryService
+ * @see DiffDirectoryService
  */
 public abstract class AbstractDirectoryService {
     /**

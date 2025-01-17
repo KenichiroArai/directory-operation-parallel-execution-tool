@@ -6,7 +6,51 @@ import java.nio.file.Path;
 import org.springframework.stereotype.Service;
 
 /**
- * ディレクトリの差分を検出するサービスクラス。
+ * ディレクトリの差分を検出するサービスクラス。 {@link AbstractDirectoryService}を継承し、2つのディレクトリ間の差分を検出・報告する機能を提供する。
+ * <p>
+ * 主な特徴：
+ * <ul>
+ * <li>ディレクトリ構造の完全な比較
+ * <li>ファイル内容の詳細な比較
+ * <li>並列処理による高速な差分検出
+ * <li>多様な差分タイプの検出と報告
+ * </ul>
+ * <p>
+ * 検出される差分の種類：
+ * <ul>
+ * <li>ソースディレクトリのみに存在するファイル
+ * <li>ターゲットディレクトリのみに存在するファイル
+ * <li>ファイル内容の違い
+ * <li>ファイルタイプの違い（ファイルvsディレクトリ）
+ * <li>ディレクトリ構造の違い
+ * </ul>
+ * <p>
+ * 出力形式：
+ * 
+ * <pre>
+ * Only in source: path/to/file          - ソースのみに存在するファイル
+ * Only in destination: path/to/file     - ターゲットのみに存在するファイル
+ * Different: path/to/file               - 内容が異なるファイル
+ * Different: path/to/file (file vs directory) - タイプが異なるパス
+ * Directory only in source: path/to/dir      - ソースのみに存在するディレクトリ
+ * Directory only in destination: path/to/dir - ターゲットのみに存在するディレクトリ
+ * </pre>
+ * <p>
+ * このサービスはSpring Frameworkのコンポーネントとして実装され、 {@link DirectoryService}クラスによって使用される。
+ * スレッドセーフな実装となっており、複数のスレッドから同時にアクセスしても安全に動作する。
+ * <p>
+ * 使用例：
+ * 
+ * <pre>
+ * DiffDirectoryService service = new DiffDirectoryService();
+ * service.processDirectory("/source/dir", "/target/dir");
+ * // 差分が標準出力に表示される
+ * </pre>
+ *
+ * @author kmg
+ * @version 1.0
+ * @see AbstractDirectoryService
+ * @see DirectoryService
  */
 @Service
 public class DiffDirectoryService extends AbstractDirectoryService {
@@ -87,7 +131,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
     }
 
     /**
-     * ソースディレクトリとターゲットディレクトリを比較し、差分を検出します。
+     * ソースディレクトリとターゲットディレクトリを比較し、差分を検出します。 このメソッドは親クラスの実装をオーバーライドし、両方のディレクトリが存在することを 確認してから処理を開始します。
      *
      * @param srcPath
      *                 ソースディレクトリのパス

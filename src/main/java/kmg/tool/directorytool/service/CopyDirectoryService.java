@@ -7,7 +7,30 @@ import java.nio.file.StandardCopyOption;
 import org.springframework.stereotype.Service;
 
 /**
- * ディレクトリのコピー操作を実行するサービスクラス。
+ * ディレクトリのコピー操作を実行するサービスクラス。 {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的なコピー機能を提供する。
+ * <p>
+ * 主な特徴：
+ * <ul>
+ * <li>ディレクトリ構造の完全なコピー
+ * <li>既存ファイルの自動上書き
+ * <li>並列処理による高速なファイルコピー
+ * <li>ディレクトリ階層の自動作成
+ * </ul>
+ * <p>
+ * このサービスはSpring Frameworkのコンポーネントとして実装され、 {@link DirectoryService}クラスによって使用される。
+ * スレッドセーフな実装となっており、複数のスレッドから同時にアクセスしても安全に動作する。
+ * <p>
+ * 使用例：
+ * 
+ * <pre>
+ * CopyDirectoryService service = new CopyDirectoryService();
+ * service.processDirectory("/source/dir", "/target/dir");
+ * </pre>
+ *
+ * @author kmg
+ * @version 1.0
+ * @see AbstractDirectoryService
+ * @see DirectoryService
  */
 @Service
 public class CopyDirectoryService extends AbstractDirectoryService {

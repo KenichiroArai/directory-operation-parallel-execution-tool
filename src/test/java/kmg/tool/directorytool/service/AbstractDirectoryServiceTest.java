@@ -14,15 +14,32 @@ import org.junit.jupiter.api.io.TempDir;
  */
 public abstract class AbstractDirectoryServiceTest {
 
+    /**
+     * テスト用の一時ディレクトリ
+     */
     @TempDir
     protected Path tempDir;
 
+    /**
+     * テスト用のソースディレクトリ
+     */
     protected Path sourceDir;
+
+    /**
+     * テスト用のターゲットディレクトリ
+     */
     protected Path targetDir;
+
+    /**
+     * テスト対象のディレクトリ操作サービス
+     */
     protected AbstractDirectoryService service;
 
     /**
      * テストの前準備
+     * 
+     * @throws IOException
+     *                     ディレクトリの作成に失敗した場合
      */
     @BeforeEach
     public void setUp() throws IOException {
@@ -38,11 +55,16 @@ public abstract class AbstractDirectoryServiceTest {
 
     /**
      * テスト対象のサービスを作成する
+     * 
+     * @return テスト対象のサービスインスタンス
      */
     protected abstract AbstractDirectoryService createService();
 
     /**
-     * 存在しないソースディレクトリに対するテスト
+     * 存在しないソースディレクトリに対する操作をテストする。
+     * <p>
+     * 存在しないディレクトリに対して処理を実行した場合、適切な例外がスローされることを確認する。
+     * </p>
      */
     @org.junit.jupiter.api.Test
     void testNonExistentSourceDirectory() {
@@ -55,7 +77,13 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
-     * ソースパスがディレクトリでない場合のテスト
+     * ソースパスがファイルの場合の動作をテストする。
+     * <p>
+     * ディレクトリではなくファイルを指定した場合、適切な例外がスローされることを確認する。
+     * </p>
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
      */
     @org.junit.jupiter.api.Test
     void testSourcePathNotDirectory() throws IOException {
@@ -69,7 +97,13 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
-     * ターゲットパスが既存のファイルの場合のテスト
+     * ターゲットパスが既存のファイルの場合の動作をテストする。
+     * <p>
+     * ターゲットパスとして既存のファイルを指定した場合、適切な例外がスローされることを確認する。
+     * </p>
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
      */
     @org.junit.jupiter.api.Test
     void testTargetPathExistsAsFile() throws IOException {
@@ -84,7 +118,13 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
-     * 空のディレクトリに対する操作のテスト
+     * 空のディレクトリに対する操作をテストする。
+     * <p>
+     * 空のディレクトリに対して処理を実行した場合、正常にターゲットディレクトリが作成されることを確認する。
+     * </p>
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
      */
     @org.junit.jupiter.api.Test
     void testEmptyDirectoryOperation() throws IOException {
@@ -97,7 +137,13 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
-     * サイズの異なるファイルの比較テスト
+     * サイズの異なるファイルの比較をテストする。
+     * <p>
+     * 異なるサイズのファイルを比較した場合、falseが返されることを確認する。
+     * </p>
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
      */
     @org.junit.jupiter.api.Test
     void testCompareFilesWithDifferentSizes() throws IOException {
@@ -111,7 +157,13 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
-     * ファイル処理時の例外のテスト
+     * ファイル処理時の例外発生をテストする。
+     * <p>
+     * ファイル処理中に例外が発生した場合、適切に処理されることを確認する。
+     * </p>
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
      */
     @org.junit.jupiter.api.Test
     void testFileProcessingException() throws IOException {
@@ -138,7 +190,13 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
-     * タスク実行のタイムアウトテスト
+     * タスク実行のタイムアウトをテストする。
+     * <p>
+     * 処理が制限時間を超えた場合、適切にタイムアウト例外がスローされることを確認する。
+     * </p>
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
      */
     @org.junit.jupiter.api.Test
     void testTaskExecutionTimeout() throws IOException {
@@ -164,33 +222,36 @@ public abstract class AbstractDirectoryServiceTest {
         };
 
         // タイムアウトで例外が発生することを確認
-        assertThrows(IOException.class,
-                () -> slowService.processDirectory(sourceDir.toString(), targetDir.toString()));
+        assertThrows(IOException.class, () -> slowService.processDirectory(sourceDir.toString(), targetDir.toString()));
     }
 
+    /**
+     * テスト後のクリーンアップを実行する。 一時ファイルとディレクトリを削除する。
+     * 
+     * @throws IOException
+     *                     クリーンアップ操作に失敗した場合
+     */
     @AfterEach
     public void tearDown() throws IOException {
         // テスト後のクリーンアップ
         if (Files.exists(sourceDir)) {
-            Files.walk(sourceDir).sorted((a, b) -> b.toString().length() - a.toString().length())
-                    .forEach(path -> {
-                        try {
-                            Files.delete(path);
-                        } catch (IOException e) {
-                            // クリーンアップ中のエラーは無視
-                        }
-                    });
+            Files.walk(sourceDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    // クリーンアップ中のエラーは無視
+                }
+            });
         }
 
         if (Files.exists(targetDir)) {
-            Files.walk(targetDir).sorted((a, b) -> b.toString().length() - a.toString().length())
-                    .forEach(path -> {
-                        try {
-                            Files.delete(path);
-                        } catch (IOException e) {
-                            // クリーンアップ中のエラーは無視
-                        }
-                    });
+            Files.walk(targetDir).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    // クリーンアップ中のエラーは無視
+                }
+            });
         }
     }
 }
