@@ -32,9 +32,9 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractDirectoryService {
     /**
-     * 並列処理で使用するスレッド数。 CPUコア数に基づいて設定され、I/Oバウンド処理の効率を高めます。
+     * 並列処理で使用するスレッド数。 システムで利用可能なCPUの論理コア数に基づいて設定されます。
      */
-    protected static final int THREAD_POOL_SIZE = 4;
+    protected static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
     /**
      * 並列処理用のスレッドプール。
@@ -56,7 +56,7 @@ public abstract class AbstractDirectoryService {
         final Path source      = Path.of(srcPath);
         final Path destination = Path.of(destPath);
 
-        validatePaths(source, destination);
+        AbstractDirectoryService.validatePaths(source, destination);
 
         final List<Future<?>> futures = new ArrayList<>();
 
@@ -75,7 +75,7 @@ public abstract class AbstractDirectoryService {
             });
         }
 
-        waitForCompletion(futures);
+        AbstractDirectoryService.waitForCompletion(futures);
         this.postProcess(source, destination);
     }
 
