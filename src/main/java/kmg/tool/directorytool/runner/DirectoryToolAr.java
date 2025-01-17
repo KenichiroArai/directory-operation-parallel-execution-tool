@@ -101,15 +101,10 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     }
 
     /**
-     * コマンドライン引数を処理し、ディレクトリ操作を実行するメイン処理。 Spring Bootアプリケーション起動時に自動的に呼び出される。
+     * ディレクトリ操作を実行するメイン処理。
      * <p>
-     * 処理の流れ：
-     * <ol>
-     * <li>引数の数を検証（3つの引数が必要）
-     * <li>操作モードを文字列からenumに変換
-     * <li>DirectoryServiceを使用してディレクトリ操作を実行
-     * <li>結果に応じて適切なメッセージを出力
-     * </ol>
+     * コマンドライン引数を解析し、指定されたディレクトリ操作を実行する。
+     * </p>
      *
      * @param args
      *             コマンドライン引数。
