@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import kmg.tool.directorytool.model.OperationMode;
 import kmg.tool.directorytool.service.DirectoryService;
@@ -60,7 +61,8 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @BeforeEach
     void setUp() {
-        this.runner = new DirectoryToolAr(this.directoryService);
+        this.runner = new DirectoryToolAr();
+        ReflectionTestUtils.setField(this.runner, "directoryService", this.directoryService);
         System.setOut(new PrintStream(this.outputStream));
     }
 
