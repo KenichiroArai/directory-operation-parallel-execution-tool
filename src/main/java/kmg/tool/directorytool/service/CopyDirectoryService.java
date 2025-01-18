@@ -8,7 +8,10 @@ import java.nio.file.StandardCopyOption;
 import org.springframework.stereotype.Service;
 
 /**
- * ディレクトリのコピー操作を実行するサービスクラス。 {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的なコピー機能を提供する。
+ * ディレクトリのコピー操作を実行するサービスクラス。 <br>
+ * <p>
+ * {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的なコピー機能を提供する。
+ * </p>
  * <p>
  * 主な特徴：
  * <ul>
@@ -17,15 +20,11 @@ import org.springframework.stereotype.Service;
  * <li>並列処理による高速なファイルコピー
  * <li>ディレクトリ階層の自動作成
  * </ul>
- * <p>
- * このサービスはSpring Frameworkのコンポーネントとして実装され、 {@link DirectoryService}クラスによって使用される。
- * スレッドセーフな実装となっており、複数のスレッドから同時にアクセスしても安全に動作する。
- * <p>
  * 使用例：
  *
  * <pre>
  * CopyDirectoryService service = new CopyDirectoryService();
- * service.processDirectory("/source/dir", "/target/dir");
+ * service.processDirectory("/source", "/target");
  * </pre>
  *
  * @author kmg
@@ -35,8 +34,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CopyDirectoryService extends AbstractDirectoryService {
+
     /**
-     * 個々のファイル/ディレクトリに対してコピー操作を実行する。 ソースがディレクトリの場合、ターゲットディレクトリを作成する。 ソースがファイルの場合、親ディレクトリを作成し、ファイルをコピーする。 既存のファイルは上書きされる。
+     * 個々のファイル/ディレクトリに対してコピー操作を実行する。 <br>
+     * <p>
+     * ソースがディレクトリの場合、ターゲットディレクトリを作成する。 <br>
+     * ソースがファイルの場合、親ディレクトリを作成し、ファイルをコピーする。<br>
+     * 既存のファイルは上書きされる。
+     * </p>
      *
      * @param sourcePath
      *                     コピー元のパス
@@ -50,17 +55,21 @@ public class CopyDirectoryService extends AbstractDirectoryService {
     @Override
     protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
             throws IOException {
+
         if (Files.isDirectory(sourcePath)) {
             Files.createDirectories(targetPath);
-        } else {
-            // ターゲットディレクトリが存在することを保証
-            Files.createDirectories(targetPath.getParent());
-            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
         }
+
+        // ターゲットディレクトリが存在することを保証
+        Files.createDirectories(targetPath.getParent());
+        Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     /**
-     * コピー操作後の後処理を実行する。 この実装では特に処理は行わないため、例外はスローされません。
+     * コピー操作後の後処理を実行する。 <br>
+     * <p>
+     * この実装では特に処理は行わないため、例外はスローされません。
+     * </p>
      *
      * @param source
      *                    ソースディレクトリのパス

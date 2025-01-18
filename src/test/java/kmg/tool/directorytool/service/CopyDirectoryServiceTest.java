@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 /**
  * コピー操作を実行するサービスのテストクラス。
  */
-class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
+public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
      * コピーサービスのインスタンスを生成します。
@@ -19,7 +19,8 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
      */
     @Override
     protected AbstractDirectoryService createService() {
-        return new CopyDirectoryService();
+        final AbstractDirectoryService result = new CopyDirectoryService();
+        return result;
     }
 
     /**
@@ -29,19 +30,32 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
      *                     ファイル操作時に発生する可能性のあるIO例外
      */
     @Test
-    void testBasicCopyOperation() throws IOException {
+    public void testBasicCopyOperation() throws IOException {
+
+        /* 期待値の定義 */
+        final String expectedFileContent = "test content";
+
+        /* 準備 */
+
         // テストファイルを作成
         final Path testFile = this.sourceDir.resolve("test.txt");
         Files.writeString(testFile, "test content");
 
+        /* テスト対象の実行 */
+
         // コピー操作を実行
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-        // 検証
-        final Path copiedFile = this.targetDir.resolve("test.txt");
-        Assertions.assertTrue(Files.exists(copiedFile), "コピーされたファイルが存在すること");
-        Assertions.assertTrue(Files.exists(testFile), "元のファイルが残っていること");
-        Assertions.assertEquals("test content", Files.readString(copiedFile), "ファイルの内容が正しくコピーされていること");
+        /* 検証の準備 */
+        final Path    actualCopiedFile        = this.targetDir.resolve("test.txt");
+        final boolean actualCopiedFileExists  = Files.exists(actualCopiedFile);
+        final boolean actualTestFileExists    = Files.exists(testFile);
+        final String  actualCopiedFileContent = Files.readString(actualCopiedFile);
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualCopiedFileExists, "コピーされたファイルが存在すること");
+        Assertions.assertTrue(actualTestFileExists, "元のファイルが残っていること");
+        Assertions.assertEquals(expectedFileContent, actualCopiedFileContent, "ファイルの内容が正しくコピーされていること");
     }
 
     /**
@@ -51,7 +65,8 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
      *                     ファイル操作時に発生する可能性のあるIO例外
      */
     @Test
-    void testComplexDirectoryStructureCopy() throws IOException {
+    public void testComplexDirectoryStructureCopy() throws IOException {
+
         // 複雑なディレクトリ構造を作成
         final Path subDir1 = this.sourceDir.resolve("subdir1");
         final Path subDir2 = this.sourceDir.resolve("subdir2");
@@ -82,7 +97,8 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
      *                     ファイル操作時に発生する可能性のあるIO例外
      */
     @Test
-    void testOverwriteExistingFile() throws IOException {
+    public void testOverwriteExistingFile() throws IOException {
+
         // ソースファイルを作成
         final Path sourceFile = this.sourceDir.resolve("file.txt");
         Files.writeString(sourceFile, "new content");
@@ -106,7 +122,8 @@ class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
      *                     ファイル操作時に発生する可能性のあるIO例外
      */
     @Test
-    void testCopyEmptyDirectoryStructure() throws IOException {
+    public void testCopyEmptyDirectoryStructure() throws IOException {
+
         // 空のディレクトリ構造を作成
         final Path subDir1 = this.sourceDir.resolve("empty1");
         final Path subDir2 = this.sourceDir.resolve("empty2");
