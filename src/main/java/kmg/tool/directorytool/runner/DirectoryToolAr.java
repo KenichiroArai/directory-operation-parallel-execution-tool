@@ -2,12 +2,12 @@ package kmg.tool.directorytool.runner;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.ExitCodeExceptionMapper;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import kmg.tool.directorytool.model.OperationMode;
 import kmg.tool.directorytool.service.DirectoryService;
@@ -117,7 +117,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         /* 引数の変換 */
 
         // 非オプション引数を取得
-        final String[] nonOptionArgs = args.getNonOptionArgs().toArray(new String[0]);
+        final String[] nonOptionArgs = args.getNonOptionArgs().toArray(String[]::new);
 
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
@@ -129,7 +129,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         // 引数をパース
         // モード
         final String  modeStr = nonOptionArgs[0];
-        OperationMode mode    = null;
+        OperationMode mode;
         try {
             // モード文字列をenumに変換
             mode = OperationMode.valueOf(modeStr.toUpperCase());
