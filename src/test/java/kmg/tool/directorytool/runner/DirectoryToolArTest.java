@@ -81,7 +81,7 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
-        Assertions.assertTrue(this.outputStream.toString().contains("ディレクトリ操作の処理が終了しました。"));
+        Assertions.assertEquals("ディレクトリ操作の処理が終了しました。\n", this.outputStream.toString());
     }
 
     /**
@@ -98,7 +98,7 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
-        Assertions.assertTrue(this.outputStream.toString().contains("ディレクトリ操作の処理が終了しました。"));
+        Assertions.assertEquals("ディレクトリ操作の処理が終了しました。\n", this.outputStream.toString());
     }
 
     /**
@@ -128,6 +128,9 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testInvalidMode() throws Exception {
+
+        final String expected = "無効なモードが選択されています。: [INVALID]\n有効なモードの種類: COPY, MOVE, DIFF\n";
+
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("INVALID", "source", "target"));
 
@@ -135,7 +138,7 @@ class DirectoryToolArTest implements AutoCloseable {
 
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
-        Assertions.assertTrue(this.outputStream.toString().contains("無効なモードが選択されています。: [INVALID]"));
+        Assertions.assertEquals(expected, this.outputStream.toString());
     }
 
     /**
@@ -154,7 +157,7 @@ class DirectoryToolArTest implements AutoCloseable {
 
         this.runner.run(this.applicationArguments);
 
-        Assertions.assertTrue(this.outputStream.toString().contains("Error: " + errorMessage));
+        Assertions.assertEquals("Error: " + errorMessage + "\n", this.outputStream.toString());
     }
 
     /**
@@ -171,7 +174,7 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
-        Assertions.assertTrue(this.outputStream.toString().contains("ディレクトリ操作の処理が終了しました。"));
+        Assertions.assertEquals("ディレクトリ操作の処理が終了しました。\n", this.outputStream.toString());
     }
 
     /**

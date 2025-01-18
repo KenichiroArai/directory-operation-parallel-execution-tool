@@ -1,6 +1,7 @@
 package kmg.tool.directorytool.service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -61,10 +62,10 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
             // 出力内容を検証
-            final String output = outContent.toString();
-            Assertions.assertTrue(output.contains("ソースのみに存在: source_only.txt"), "ソースディレクトリにのみ存在するファイルが検出されること");
-            Assertions.assertTrue(output.contains("差異あり: different.txt"), "内容が異なるファイルが検出されること");
-            Assertions.assertTrue(output.contains("ターゲットのみに存在: target_only.txt"), "ターゲットディレクトリにのみ存在するファイルが検出されること");
+            final String[] outputLines = outContent.toString().split(System.lineSeparator());
+            Assertions.assertEquals("ソースのみに存在: source_only.txt", outputLines[0], "ソースディレクトリにのみ存在するファイルが検出されること");
+            Assertions.assertEquals("差異あり: different.txt", outputLines[1], "内容が異なるファイルが検出されること");
+            Assertions.assertEquals("ターゲットのみに存在: target_only.txt", outputLines[2], "ターゲットディレクトリにのみ存在するファイルが検出されること");
         } finally {
             System.setOut(originalOut);
         }
@@ -97,12 +98,15 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
             // 出力内容を検証
-            final String output = outContent.toString();
-            Assertions.assertTrue(output.contains("ソースディレクトリのみに存在するディレクトリ: subdir1"), "ソースディレクトリにのみ存在するディレクトリが検出されること");
-            Assertions.assertTrue(output.contains("ソースのみに存在: subdir1/file1.txt"), "ソースディレクトリ内のファイルが検出されること");
-            Assertions.assertTrue(output.contains("ターゲットディレクトリのみに存在するディレクトリ: subdir2"),
-                    "ターゲットディレクトリにのみ存在するディレクトリが検出されること");
-            Assertions.assertTrue(output.contains("ターゲットのみに存在: file2.txt"), "ターゲットディレクトリ内のファイルが検出されること");
+            final String[] outputLines = outContent.toString().split(System.lineSeparator());
+
+            // 期待値をプラットフォームの区切り文字で正規化
+            final String expectedPath = "subdir1" + File.separator + "file1.txt";
+
+            Assertions.assertEquals("ソースディレクトリのみに存在するディレクトリ: subdir1", outputLines[0]);
+            Assertions.assertEquals("ソースのみに存在: " + expectedPath, outputLines[1]);
+            Assertions.assertEquals("ターゲットディレクトリのみに存在するディレクトリ: subdir2", outputLines[2]);
+            Assertions.assertEquals("ターゲットのみに存在: file2.txt", outputLines[3]);
         } finally {
             System.setOut(originalOut);
         }
@@ -162,9 +166,9 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
             // 出力内容を検証
-            final String output = outContent.toString();
-            Assertions.assertTrue(output.contains("ソースディレクトリのみに存在するディレクトリ: empty_source"), "ソースの空ディレクトリが検出されること");
-            Assertions.assertTrue(output.contains("ターゲットディレクトリのみに存在するディレクトリ: empty_target"), "ターゲットの空ディレクトリが検出されること");
+            final String[] outputLines = outContent.toString().split(System.lineSeparator());
+            Assertions.assertEquals("ソースディレクトリのみに存在するディレクトリ: empty_source", outputLines[0], "ソースの空ディレクトリが検出されること");
+            Assertions.assertEquals("ターゲットディレクトリのみに存在するディレクトリ: empty_target", outputLines[1], "ターゲットの空ディレクトリが検出されること");
         } finally {
             System.setOut(originalOut);
         }
@@ -182,14 +186,14 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         final Exception sourceException = Assertions.assertThrows(IOException.class, () -> {
             this.service.processDirectory(invalidSourcePath.toString(), this.targetDir.toString());
         });
-        Assertions.assertTrue(sourceException.getMessage().contains("Source directory does not exist"),
+        Assertions.assertEquals("Source directory does not exist", sourceException.getMessage(),
                 "エラーメッセージに'Source directory does not exist'が含まれること");
 
         // ターゲットディレクトリが存在しない場合
         final Exception targetException = Assertions.assertThrows(IOException.class, () -> {
             this.service.processDirectory(this.sourceDir.toString(), invalidTargetPath.toString());
         });
-        Assertions.assertTrue(targetException.getMessage().contains("Target directory does not exist:"),
+        Assertions.assertEquals("Target directory does not exist:", targetException.getMessage(),
                 "エラーメッセージに'Target directory does not exist:'が含まれること");
     }
 
@@ -212,8 +216,8 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-            String output = outContent.toString();
-            Assertions.assertTrue(output.contains("差異あり: test (ファイル vs ディレクトリ)"), "ファイル対ディレクトリの違いが検出されること");
+            final String[] outputLines = outContent.toString().split(System.lineSeparator());
+            Assertions.assertEquals("差異あり: test (ファイル vs ディレクトリ)", outputLines[0]);
 
             // 逆のケース：ソースにディレクトリ、ターゲットに同名のファイル
             final Path sourceSubDir = this.sourceDir.resolve("test2");
@@ -221,8 +225,8 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             Files.writeString(this.targetDir.resolve("test2"), "content");
 
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
-            output = outContent.toString();
-            Assertions.assertTrue(output.contains("差異あり: test2 (ディレクトリ vs ファイル)"), "ディレクトリ対ファイルの違いが検出されること");
+            final String[] newOutputLines = outContent.toString().split(System.lineSeparator());
+            Assertions.assertEquals("差異あり: test2 (ディレクトリ vs ファイル)", newOutputLines[1]);
         } finally {
             System.setOut(originalOut);
         }
