@@ -38,7 +38,7 @@ public abstract class AbstractDirectoryServiceTest {
 
     /**
      * テストの前準備
-     * 
+     *
      * @throws IOException
      *                     ディレクトリの作成に失敗した場合
      */
@@ -56,7 +56,7 @@ public abstract class AbstractDirectoryServiceTest {
 
     /**
      * テスト対象のサービスを作成する
-     * 
+     *
      * @return テスト対象のサービスインスタンス
      */
     protected abstract AbstractDirectoryService createService();
@@ -74,7 +74,7 @@ public abstract class AbstractDirectoryServiceTest {
         final IOException exception = Assertions.assertThrows(IOException.class,
                 () -> this.service.processDirectory(nonExistentDir.toString(), this.targetDir.toString()));
 
-        Assertions.assertEquals("Source directory does not exist", exception.getMessage());
+        Assertions.assertEquals("ソースディレクトリが存在しません。", exception.getMessage());
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class AbstractDirectoryServiceTest {
         final IOException exception = Assertions.assertThrows(IOException.class,
                 () -> this.service.processDirectory(sourceFile.toString(), this.targetDir.toString()));
 
-        Assertions.assertEquals("Source path is not a directory", exception.getMessage());
+        Assertions.assertEquals("ソースパスはディレクトリではありません。", exception.getMessage());
     }
 
     /**
@@ -115,7 +115,7 @@ public abstract class AbstractDirectoryServiceTest {
         final IOException exception = Assertions.assertThrows(IOException.class,
                 () -> this.service.processDirectory(this.sourceDir.toString(), targetFile.toString()));
 
-        Assertions.assertEquals("Destination path exists but is not a directory", exception.getMessage());
+        Assertions.assertEquals("宛先パスは存在しますが、ディレクトリではありません。", exception.getMessage());
     }
 
     /**

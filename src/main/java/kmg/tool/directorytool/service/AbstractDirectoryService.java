@@ -92,16 +92,17 @@ public abstract class AbstractDirectoryService {
      *                     ソースパスが存在しない、またはディレクトリでない場合、 ターゲットパスが存在するがディレクトリでない場合、 ターゲットディレクトリの作成に失敗した場合
      */
     protected static void validatePaths(final Path source, final Path destination) throws IOException {
+
         if (!Files.exists(source)) {
-            throw new IOException("Source directory does not exist");
+            throw new IOException("ソースディレクトリが存在しません。");
         }
 
         if (!Files.isDirectory(source)) {
-            throw new IOException("Source path is not a directory");
+            throw new IOException("ソースパスはディレクトリではありません。");
         }
 
         if (Files.exists(destination) && !Files.isDirectory(destination)) {
-            throw new IOException("Destination path exists but is not a directory");
+            throw new IOException("宛先パスは存在しますが、ディレクトリではありません。");
         }
 
         if (!Files.exists(destination)) {

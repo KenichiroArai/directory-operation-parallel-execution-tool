@@ -101,7 +101,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         // ターゲットディレクトリを走査してソースにないファイルを検出
         if (Files.exists(destination)) {
             try (var stream = Files.walk(destination)) {
-                stream.forEach(path -> processDestinationPath(source, destination, path));
+                stream.forEach(path -> DiffDirectoryService.processDestinationPath(source, destination, path));
             }
         }
     }
@@ -148,12 +148,12 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         // ソースディレクトリの存在チェック
         if (!Files.exists(source)) {
-            throw new IOException("ソースディレクトリが存在しません");
+            throw new IOException("ソースディレクトリが存在しません。");
         }
 
         // ターゲットディレクトリの存在チェック
         if (!Files.exists(destination)) {
-            throw new IOException("ターゲットディレクトリが存在しません: " + destPath);
+            throw new IOException("ターゲットディレクトリが存在しません。: " + destPath);
         }
 
         AbstractDirectoryService.validatePaths(source, destination);
@@ -166,7 +166,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
                     final Path targetPath   = destination.resolve(relativePath);
                     this.processPath(path, targetPath, relativePath);
                 } catch (final IOException e) {
-                    throw new RuntimeException("ファイルの処理に失敗しました: " + path, e);
+                    throw new RuntimeException("ファイルの処理に失敗しました。: " + path, e);
                 }
             });
         }
