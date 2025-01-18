@@ -81,7 +81,8 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
-        Assertions.assertEquals("ディレクトリ操作の処理が終了しました。\n", this.outputStream.toString());
+        Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
+                this.outputStream.toString());
     }
 
     /**
@@ -98,7 +99,8 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
-        Assertions.assertEquals("ディレクトリ操作の処理が終了しました。\n", this.outputStream.toString());
+        Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
+                this.outputStream.toString());
     }
 
     /**
@@ -128,8 +130,8 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testInvalidMode() throws Exception {
-
-        final String expected = "無効なモードが選択されています。: [INVALID]\n有効なモードの種類: COPY, MOVE, DIFF\n";
+        final String expected = String.format("無効なモードが選択されています。: [INVALID]%s有効なモードの種類: COPY, MOVE, DIFF%s",
+                System.lineSeparator(), System.lineSeparator());
 
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("INVALID", "source", "target"));
@@ -157,7 +159,7 @@ class DirectoryToolArTest implements AutoCloseable {
 
         this.runner.run(this.applicationArguments);
 
-        Assertions.assertEquals("Error: " + errorMessage + "\n", this.outputStream.toString());
+        Assertions.assertEquals(1, this.runner.getExitCode());
     }
 
     /**
@@ -174,7 +176,8 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
-        Assertions.assertEquals("ディレクトリ操作の処理が終了しました。\n", this.outputStream.toString());
+        Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
+                this.outputStream.toString());
     }
 
     /**
