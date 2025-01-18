@@ -11,7 +11,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ディレクトリ操作の基本機能を提供する抽象クラス。 このクラスは、ファイルシステム操作の共通機能を実装し、具体的なディレクトリ操作（コピー、移動、差分比較）の ベースとなる機能を提供する。
+ * ディレクトリ操作の基本機能を提供する抽象クラス。 <br>
+ * <p>
+ * このクラスは、ファイルシステム操作の共通機能を実装し、具体的なディレクトリ操作のベースとなる機能を提供する。
+ * </p>
  * <p>
  * 主な特徴：
  * <ul>
@@ -26,11 +29,9 @@ import java.util.concurrent.TimeUnit;
  *
  * @author kmg
  * @version 1.0
- * @see CopyDirectoryService
- * @see MoveDirectoryService
- * @see DiffDirectoryService
  */
 public abstract class AbstractDirectoryService {
+
     /** 並列処理で使用するスレッド数。システムで利用可能なCPUの論理コア数に基づいて設定されます。 */
     protected static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
@@ -76,7 +77,12 @@ public abstract class AbstractDirectoryService {
     }
 
     /**
-     * ソースとターゲットのパスを検証する。 ソースパスが存在し、ディレクトリであることを確認する。 ターゲットパスが存在する場合、ディレクトリであることを確認する。 ターゲットパスが存在しない場合、ディレクトリを作成する。
+     * ソースとターゲットのパスを検証する。 <br>
+     * <p>
+     * ソースパスが存在し、ディレクトリであることを確認する。<br>
+     * ターゲットパスが存在する場合、ディレクトリであることを確認する。<br>
+     * ターゲットパスが存在しない場合、ディレクトリを作成する。
+     * </p>
      *
      * @param source
      *                    ソースディレクトリのパス
@@ -104,7 +110,10 @@ public abstract class AbstractDirectoryService {
     }
 
     /**
-     * 個々のファイル/ディレクトリに対して具体的な操作を実行する。 サブクラスで実装されるべき抽象メソッド。
+     * 個々のファイル/ディレクトリに対して具体的な操作を実行する。<br>
+     * <p>
+     * このメソッドは、ディレクトリ内の各ファイル/ディレクトリに対して呼び出され、それぞれのファイル/ディレクトリに対して処理を実行する。
+     * </p>
      *
      * @param sourcePath
      *                     処理対象のソースパス
@@ -118,7 +127,10 @@ public abstract class AbstractDirectoryService {
     protected abstract void processPath(Path sourcePath, Path targetPath, Path relativePath) throws IOException;
 
     /**
-     * すべてのファイル処理が完了した後に実行する後処理。 サブクラスで実装されるべき抽象メソッド。 主にリソースの解放や最終的な状態確認などを行う。
+     * すべてのファイル処理が完了した後に実行する後処理。<br>
+     * <p>
+     * 主にリソースの解放や最終的な状態確認などを行う。
+     * </p>
      *
      * @param source
      *                    ソースディレクトリのパス
@@ -130,7 +142,11 @@ public abstract class AbstractDirectoryService {
     protected abstract void postProcess(Path source, Path destination) throws IOException;
 
     /**
-     * 2つのファイルの内容をバイト単位で比較する。 ファイルサイズが異なる場合は即座にfalseを返す。 ファイルサイズが同じ場合、内容が完全に一致する場合にtrueを返す。
+     * 2つのファイルの内容をバイト単位で比較する。<br>
+     * <p>
+     * ファイルサイズが異なる場合は即座にfalseを返す。<br>
+     * ファイルサイズが同じ場合、内容が完全に一致する場合にtrueを返す。
+     * </p>
      *
      * @param file1
      *              比較対象のファイル1
@@ -148,7 +164,10 @@ public abstract class AbstractDirectoryService {
     }
 
     /**
-     * すべての非同期タスクの完了を待機する。 各タスクには30秒のタイムアウトが設定されており、 タイムアウトした場合やタスク内で例外が発生した場合はIOExceptionをスローする。
+     * すべての非同期タスクの完了を待機する。<br>
+     * <p>
+     * 各タスクには30秒のタイムアウトが設定されており、 タイムアウトした場合やタスク内で例外が発生した場合はIOExceptionをスローする。
+     * </p>
      *
      * @param futures
      *                完了を待機するFutureオブジェクトのリスト
