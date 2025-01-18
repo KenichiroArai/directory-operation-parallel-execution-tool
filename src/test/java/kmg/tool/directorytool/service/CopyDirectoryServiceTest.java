@@ -36,14 +36,10 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
         final String expectedFileContent = "test content";
 
         /* 準備 */
-
-        // テストファイルを作成
         final Path testFile = this.sourceDir.resolve("test.txt");
         Files.writeString(testFile, "test content");
 
         /* テスト対象の実行 */
-
-        // コピー操作を実行
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
@@ -67,27 +63,38 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
     @Test
     public void testComplexDirectoryStructureCopy() throws IOException {
 
-        // 複雑なディレクトリ構造を作成
+        /* 期待値の定義 */
+        final String expectedContent1    = "content1";
+        final String expectedContent2    = "content2";
+        final String expectedRootContent = "root content";
+
+        /* 準備 */
         final Path subDir1 = this.sourceDir.resolve("subdir1");
         final Path subDir2 = this.sourceDir.resolve("subdir2");
         Files.createDirectories(subDir1);
         Files.createDirectories(subDir2);
-
         Files.writeString(subDir1.resolve("file1.txt"), "content1");
         Files.writeString(subDir2.resolve("file2.txt"), "content2");
         Files.writeString(this.sourceDir.resolve("root.txt"), "root content");
 
-        // コピー操作を実行
+        /* テスト対象の実行 */
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-        // すべてのファイルとディレクトリが正しくコピーされたことを検証
-        Assertions.assertTrue(Files.exists(this.targetDir.resolve("subdir1/file1.txt")));
-        Assertions.assertTrue(Files.exists(this.targetDir.resolve("subdir2/file2.txt")));
-        Assertions.assertTrue(Files.exists(this.targetDir.resolve("root.txt")));
+        /* 検証の準備 */
+        final boolean actualFile1Exists    = Files.exists(this.targetDir.resolve("subdir1/file1.txt"));
+        final boolean actualFile2Exists    = Files.exists(this.targetDir.resolve("subdir2/file2.txt"));
+        final boolean actualRootFileExists = Files.exists(this.targetDir.resolve("root.txt"));
+        final String  actualContent1       = Files.readString(this.targetDir.resolve("subdir1/file1.txt"));
+        final String  actualContent2       = Files.readString(this.targetDir.resolve("subdir2/file2.txt"));
+        final String  actualRootContent    = Files.readString(this.targetDir.resolve("root.txt"));
 
-        Assertions.assertEquals("content1", Files.readString(this.targetDir.resolve("subdir1/file1.txt")));
-        Assertions.assertEquals("content2", Files.readString(this.targetDir.resolve("subdir2/file2.txt")));
-        Assertions.assertEquals("root content", Files.readString(this.targetDir.resolve("root.txt")));
+        /* 検証の実施 */
+        Assertions.assertTrue(actualFile1Exists, "file1.txtが存在すること");
+        Assertions.assertTrue(actualFile2Exists, "file2.txtが存在すること");
+        Assertions.assertTrue(actualRootFileExists, "root.txtが存在すること");
+        Assertions.assertEquals(expectedContent1, actualContent1, "file1.txtの内容が正しいこと");
+        Assertions.assertEquals(expectedContent2, actualContent2, "file2.txtの内容が正しいこと");
+        Assertions.assertEquals(expectedRootContent, actualRootContent, "root.txtの内容が正しいこと");
     }
 
     /**
@@ -99,20 +106,25 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
     @Test
     public void testOverwriteExistingFile() throws IOException {
 
-        // ソースファイルを作成
-        final Path sourceFile = this.sourceDir.resolve("file.txt");
-        Files.writeString(sourceFile, "new content");
+        /* 期待値の定義 */
+        final String expectedContent = "new content";
 
-        // ターゲットに既存のファイルを作成
+        /* 準備 */
+        final Path sourceFile = this.sourceDir.resolve("file.txt");
         final Path targetFile = this.targetDir.resolve("file.txt");
+        Files.writeString(sourceFile, "new content");
         Files.writeString(targetFile, "old content");
 
-        // コピー操作を実行
+        /* テスト対象の実行 */
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-        // 検証
-        Assertions.assertTrue(Files.exists(targetFile), "ターゲットファイルが存在すること");
-        Assertions.assertEquals("new content", Files.readString(targetFile), "ファイルが正しく上書きされていること");
+        /* 検証の準備 */
+        final boolean actualFileExists = Files.exists(targetFile);
+        final String  actualContent    = Files.readString(targetFile);
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualFileExists, "ターゲットファイルが存在すること");
+        Assertions.assertEquals(expectedContent, actualContent, "ファイルが正しく上書きされていること");
     }
 
     /**
@@ -124,17 +136,21 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
     @Test
     public void testCopyEmptyDirectoryStructure() throws IOException {
 
-        // 空のディレクトリ構造を作成
+        /* 準備 */
         final Path subDir1 = this.sourceDir.resolve("empty1");
         final Path subDir2 = this.sourceDir.resolve("empty2");
         Files.createDirectories(subDir1);
         Files.createDirectories(subDir2);
 
-        // コピー操作を実行
+        /* テスト対象の実行 */
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-        // ディレクトリ構造が正しくコピーされたことを検証
-        Assertions.assertTrue(Files.isDirectory(this.targetDir.resolve("empty1")));
-        Assertions.assertTrue(Files.isDirectory(this.targetDir.resolve("empty2")));
+        /* 検証の準備 */
+        final boolean actualEmpty1Exists = Files.isDirectory(this.targetDir.resolve("empty1"));
+        final boolean actualEmpty2Exists = Files.isDirectory(this.targetDir.resolve("empty2"));
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualEmpty1Exists, "empty1ディレクトリが存在すること");
+        Assertions.assertTrue(actualEmpty2Exists, "empty2ディレクトリが存在すること");
     }
 }
