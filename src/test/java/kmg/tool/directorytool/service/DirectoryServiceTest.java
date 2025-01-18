@@ -2,39 +2,35 @@ package kmg.tool.directorytool.service;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mock;
 
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
  * DirectoryServiceのファサードパターンとしての機能をテストするクラス。 各モードで適切なサービスが選択され、処理が委譲されることを確認する。
  */
+@SpringBootTest
 class DirectoryServiceTest {
 
     /** テスト対象のDirectoryServiceインスタンス */
-    private DirectoryService     directoryService;
+    @Autowired
+    private DirectoryService directoryService;
+
     /** コピー処理を行うサービスのモック */
+    @Mock
     private CopyDirectoryService copyService;
+
     /** 移動処理を行うサービスのモック */
+    @Mock
     private MoveDirectoryService moveService;
+
     /** 差分比較を行うサービスのモック */
+    @Mock
     private DiffDirectoryService diffService;
-
-    /**
-     * 各テストの前に実行される初期化メソッド。 各サービスのモックを作成し、DirectoryServiceに注入する。
-     */
-    @BeforeEach
-    void setUp() {
-        // 各サービスのモックを作成
-        this.copyService = Mockito.mock(CopyDirectoryService.class);
-        this.moveService = Mockito.mock(MoveDirectoryService.class);
-        this.diffService = Mockito.mock(DiffDirectoryService.class);
-
-        // DirectoryServiceにモックを注入
-        this.directoryService = new DirectoryService(this.copyService, this.moveService, this.diffService);
-    }
 
     /**
      * COPYモードで適切なサービスが呼び出されることをテスト。
