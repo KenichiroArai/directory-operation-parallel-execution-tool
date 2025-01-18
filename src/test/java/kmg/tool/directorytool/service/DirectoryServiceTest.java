@@ -4,21 +4,22 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
- * DirectoryServiceのファサードパターンとしての機能をテストするクラス。 各モードで適切なサービスが選択され、処理が委譲されることを確認する。
+ * DirectoryServiceのファサードパターンの機能をテストするクラス。 各操作モードで適切なサービスが選択され、処理が正しく委譲されることを確認します。
  */
 @ExtendWith(MockitoExtension.class)
 class DirectoryServiceTest {
 
     /** テスト対象のDirectoryServiceインスタンス */
+    @Mock
     private DirectoryService directoryService;
 
     /** コピー処理を行うサービスのモック */
@@ -34,18 +35,18 @@ class DirectoryServiceTest {
     private DiffDirectoryService diffService;
 
     /**
-     * テストの前準備を行う。 DirectoryServiceのインスタンスを生成し、必要なモックサービスを注入する。
+     * テストの前準備を行います。 DirectoryServiceのインスタンスを生成し、必要なモックサービスを注入します。
      */
     @BeforeEach
     void setUp() {
-        directoryService = new DirectoryService();
-        ReflectionTestUtils.setField(directoryService, "copyService", copyService);
-        ReflectionTestUtils.setField(directoryService, "moveService", moveService);
-        ReflectionTestUtils.setField(directoryService, "diffService", diffService);
+        this.directoryService = new DirectoryService();
+        ReflectionTestUtils.setField(this.directoryService, "copyService", this.copyService);
+        ReflectionTestUtils.setField(this.directoryService, "moveService", this.moveService);
+        ReflectionTestUtils.setField(this.directoryService, "diffService", this.diffService);
     }
 
     /**
-     * COPYモードで適切なサービスが呼び出されることをテスト。
+     * COPYモードで適切なサービスが呼び出されることを検証します。
      *
      * @throws IOException
      *                     ディレクトリ処理中にI/Oエラーが発生した場合
@@ -63,7 +64,7 @@ class DirectoryServiceTest {
     }
 
     /**
-     * MOVEモードで適切なサービスが呼び出されることをテスト。
+     * MOVEモードで適切なサービスが呼び出されることを検証します。
      *
      * @throws IOException
      *                     ディレクトリ処理中にI/Oエラーが発生した場合
@@ -81,7 +82,7 @@ class DirectoryServiceTest {
     }
 
     /**
-     * DIFFモードで適切なサービスが呼び出されることをテスト。
+     * DIFFモードで適切なサービスが呼び出されることを検証します。
      *
      * @throws IOException
      *                     ディレクトリ処理中にI/Oエラーが発生した場合
@@ -99,7 +100,7 @@ class DirectoryServiceTest {
     }
 
     /**
-     * サービス呼び出し時の例外が適切に伝播することをテスト。
+     * サービス呼び出し時の例外が適切に伝播することを検証します。
      *
      * @throws IOException
      *                     ディレクトリ処理中にI/Oエラーが発生した場合

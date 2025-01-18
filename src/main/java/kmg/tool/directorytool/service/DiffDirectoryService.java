@@ -29,12 +29,12 @@ import org.springframework.stereotype.Service;
  * 出力形式：
  *
  * <pre>
- * Only in source: path/to/file          - ソースのみに存在するファイル
- * Only in destination: path/to/file     - ターゲットのみに存在するファイル
- * Different: path/to/file               - 内容が異なるファイル
- * Different: path/to/file (file vs directory) - タイプが異なるパス
- * Directory only in source: path/to/dir      - ソースのみに存在するディレクトリ
- * Directory only in destination: path/to/dir - ターゲットのみに存在するディレクトリ
+ * ソースのみに存在: path/to/file                        - ソースディレクトリのみに存在するファイル
+ * ターゲットのみに存在: path/to/file                    - ターゲットディレクトリのみに存在するファイル
+ * 差異あり: path/to/file                               - 内容が異なるファイル
+ * 差異あり: path/to/file (ファイル vs ディレクトリ)      - タイプが異なるパス
+ * ソースディレクトリのみに存在するディレクトリ: path/to/dir  - ソースのみに存在するディレクトリ
+ * ターゲットディレクトリのみに存在するディレクトリ: path/to/dir - ターゲットのみに存在するディレクトリ
  * </pre>
  * <p>
  * このサービスはSpring Frameworkのコンポーネントとして実装され、 {@link DirectoryService}クラスによって使用される。
@@ -73,16 +73,16 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         if (Files.isDirectory(sourcePath)) {
             if (!Files.exists(targetPath)) {
-                System.out.println("Directory only in source: " + relativePath);
+                System.out.println("ソースディレクトリのみに存在するディレクトリ: " + relativePath);
             } else if (!Files.isDirectory(targetPath)) {
-                System.out.println("Different: " + relativePath + " (directory vs file)");
+                System.out.println("差異あり: " + relativePath + " (ディレクトリ vs ファイル)");
             }
         } else if (!Files.exists(targetPath)) {
-            System.out.println("Only in source: " + relativePath);
+            System.out.println("ソースのみに存在: " + relativePath);
         } else if (!Files.isRegularFile(targetPath)) {
-            System.out.println("Different: " + relativePath + " (file vs directory)");
+            System.out.println("差異あり: " + relativePath + " (ファイル vs ディレクトリ)");
         } else if (!AbstractDirectoryService.compareFiles(sourcePath, targetPath)) {
-            System.out.println("Different: " + relativePath);
+            System.out.println("差異あり: " + relativePath);
         }
     }
 
@@ -122,9 +122,9 @@ public class DiffDirectoryService extends AbstractDirectoryService {
             final Path sourcePath   = source.resolve(relativePath);
             if (!Files.exists(sourcePath)) {
                 if (Files.isDirectory(path)) {
-                    System.out.println("Directory only in destination: " + relativePath);
+                    System.out.println("ターゲットディレクトリのみに存在するディレクトリ: " + relativePath);
                 } else {
-                    System.out.println("Only in destination: " + relativePath);
+                    System.out.println("ターゲットのみに存在: " + relativePath);
                 }
             }
         }
@@ -148,12 +148,12 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         // ソースディレクトリの存在チェック
         if (!Files.exists(source)) {
-            throw new IOException("Source directory does not exist");
+            throw new IOException("ソースディレクトリが存在しません");
         }
 
         // ターゲットディレクトリの存在チェック
         if (!Files.exists(destination)) {
-            throw new IOException("Target directory does not exist: " + destPath);
+            throw new IOException("ターゲットディレクトリが存在しません: " + destPath);
         }
 
         AbstractDirectoryService.validatePaths(source, destination);
@@ -166,7 +166,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
                     final Path targetPath   = destination.resolve(relativePath);
                     this.processPath(path, targetPath, relativePath);
                 } catch (final IOException e) {
-                    throw new RuntimeException("Failed to process file: " + path, e);
+                    throw new RuntimeException("ファイルの処理に失敗しました: " + path, e);
                 }
             });
         }
