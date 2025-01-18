@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -19,6 +19,7 @@ import kmg.tool.directorytool.model.OperationMode;
 class DirectoryServiceTest {
 
     /** テスト対象のDirectoryServiceインスタンス */
+    @Mock
     private DirectoryService directoryService;
 
     /** コピー処理を行うサービスのモック */
@@ -38,10 +39,10 @@ class DirectoryServiceTest {
      */
     @BeforeEach
     void setUp() {
-        directoryService = new DirectoryService();
-        ReflectionTestUtils.setField(directoryService, "copyService", copyService);
-        ReflectionTestUtils.setField(directoryService, "moveService", moveService);
-        ReflectionTestUtils.setField(directoryService, "diffService", diffService);
+        this.directoryService = new DirectoryService();
+        ReflectionTestUtils.setField(this.directoryService, "copyService", this.copyService);
+        ReflectionTestUtils.setField(this.directoryService, "moveService", this.moveService);
+        ReflectionTestUtils.setField(this.directoryService, "diffService", this.diffService);
     }
 
     /**
