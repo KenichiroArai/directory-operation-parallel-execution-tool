@@ -81,7 +81,7 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
-        Assertions.assertTrue(this.outputStream.toString().contains("Operation completed successfully"));
+        Assertions.assertTrue(this.outputStream.toString().contains("ディレクトリ操作の処理が終了しました。"));
     }
 
     /**
@@ -98,7 +98,7 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
-        Assertions.assertTrue(this.outputStream.toString().contains("Operation completed successfully"));
+        Assertions.assertTrue(this.outputStream.toString().contains("ディレクトリ操作の処理が終了しました。"));
     }
 
     /**
@@ -116,8 +116,8 @@ class DirectoryToolArTest implements AutoCloseable {
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         final String output = this.outputStream.toString();
-        Assertions.assertTrue(output.contains("Usage:"));
-        Assertions.assertTrue(output.contains("Modes: COPY, MOVE, DIFF"));
+        Assertions.assertTrue(output.contains("使用方法:"));
+        Assertions.assertTrue(output.contains("モデルの種類: COPY, MOVE, DIFF"));
     }
 
     /**
@@ -135,7 +135,7 @@ class DirectoryToolArTest implements AutoCloseable {
 
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
-        Assertions.assertTrue(this.outputStream.toString().contains("Invalid mode: INVALID"));
+        Assertions.assertTrue(this.outputStream.toString().contains("無効なモードが選択されています。: [INVALID]"));
     }
 
     /**
@@ -171,7 +171,7 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
-        Assertions.assertTrue(this.outputStream.toString().contains("Operation completed successfully"));
+        Assertions.assertTrue(this.outputStream.toString().contains("ディレクトリ操作の処理が終了しました。"));
     }
 
     /**
