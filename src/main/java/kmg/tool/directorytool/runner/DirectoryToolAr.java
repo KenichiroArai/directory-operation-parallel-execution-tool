@@ -65,7 +65,7 @@ import kmg.tool.directorytool.service.DirectoryService;
 @Component
 public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, ExitCodeExceptionMapper {
 
-    /** ディレクトリ操作サービス。 Spring DIコンテナによって注入される {@link DirectoryService} のインスタンス。 */
+    /** ディレクトリ操作サービス */
     @Autowired
     private DirectoryService directoryService;
 
@@ -73,14 +73,14 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     private int exitCode;
 
     /**
-     * 基本コンストラクタ。 Spring Bootのコンテナによって自動的にインスタンス化される。
+     * デフォルトコンストラクタ。
      */
     public DirectoryToolAr() {
         this.exitCode = 0;      // TODO 2025/01/18 列挙型で定義する
     }
 
     /**
-     * 終了コードを返す。 このメソッドはSpring Bootによって自動的 に呼び出される。
+     * 終了コードを返す。
      */
     @Override
     public int getExitCode() {
@@ -89,7 +89,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     }
 
     /**
-     * 例外を受け取り、終了コードを返す。 このメソッドはSpring Bootによって自動的に呼び出される。
+     * 例外を受け取り、終了コードを返す。
      */
     @Override
     public int getExitCode(final Throwable exception) {
@@ -106,43 +106,50 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
      * @param args
      *             コマンドライン引数。
      *             <ul>
-     *             <li>args[0]: ソースディレクトリパス
-     *             <li>args[1]: ターゲットディレクトリパス
-     *             <li>args[2]: 操作モード (COPY, MOVE, DIFF)
+     *             <li>args[0]: 操作モード (COPY, MOVE, DIFF)
+     *             <li>args[1]: ソースディレクトリパス
+     *             <li>args[2]: ターゲットディレクトリパス
      *             </ul>
-     * @throws Exception
-     *                   ディレクトリ操作中にIO例外が発生した場合、または無効な引数が指定された場合
      */
     @Override
-    public void run(final ApplicationArguments args) throws Exception {
+    public void run(final ApplicationArguments args) {
+
+        /* 引数の変換 */
+
         // 非オプション引数を取得
         final String[] nonOptionArgs = args.getNonOptionArgs().toArray(new String[0]);
 
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
-            System.out.println("Usage: java -jar directory-tool.jar <mode> <src> <dest>");
-            System.out.println("Modes: COPY, MOVE, DIFF");
+            System.out.println("使用方法: <mode> <src> <dest>");
+            System.out.println("モデルの種類: COPY, MOVE, DIFF");
             return;
         }
 
         // 引数をパース
-        final String modeStr = nonOptionArgs[0].toUpperCase();
-        final String src     = nonOptionArgs[1];
-        final String dest    = nonOptionArgs[2];
-
+        // モード
+        final String  modeStr = nonOptionArgs[0];
+        OperationMode mode    = null;
         try {
             // モード文字列をenumに変換
-            final OperationMode mode = OperationMode.valueOf(modeStr);
-
-            // ディレクトリ操作を実行
-            this.directoryService.processDirectory(src, dest, mode);
-            System.out.println("Operation completed successfully");
+            mode = OperationMode.valueOf(modeStr.toUpperCase());
         } catch (final IllegalArgumentException e) {
             // 無効なモードが指定された場合
             this.exitCode = 1;
-            System.out.println("Invalid mode: " + modeStr);
-            System.out.println("Valid modes are: COPY, MOVE, DIFF");
+            System.out.println(String.format("無効なモードが選択されています。: [%s]", modeStr));
+            System.out.println("有効なモードの種類: COPY, MOVE, DIFF");
             e.printStackTrace();
+            return;
+        }
+        // ソースディレクトリパス
+        final String src = nonOptionArgs[1];
+        // ターゲットディレクトリパス
+        final String dest = nonOptionArgs[2];
+
+        /* ディレクトリ操作を実行 */
+        try {
+            this.directoryService.processDirectory(src, dest, mode);
+            System.out.println("ディレクトリ操作の処理が終了しました。");
         } catch (final IOException e) {
             // ディレクトリ操作中にエラーが発生した場合
             this.exitCode = 1;
