@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * ディレクトリ操作の基本機能を提供する抽象クラス。 <br>
@@ -50,29 +51,42 @@ public abstract class AbstractDirectoryService {
      *                     ソースディレクトリが存在しない場合、ターゲットディレクトリの作成に失敗した場合、 またはファイル処理中にエラーが発生した場合。
      */
     public void processDirectory(final String srcPath, final String destPath) throws IOException {
+
+        // ソースとターゲットパスをPathオブジェクトに変換
         final Path source      = Path.of(srcPath);
         final Path destination = Path.of(destPath);
 
+        // パスの有効性を確認
         AbstractDirectoryService.validatePaths(source, destination);
 
+        // 非同期タスクの結果を保持するリストを用意
         final List<Future<?>> futures = new ArrayList<>();
 
-        try (var stream = Files.walk(source)) {
+        // ソースパス内のすべてのファイルとディレクトリを再帰的に処理
+        try (Stream<Path> stream = Files.walk(source)) {
             stream.forEach(path -> {
+                // 非同期タスクを開始してファイルを処理
                 final Future<?> future = this.executorService.submit(() -> {
                     try {
+                        // 相対パスを計算
                         final Path relativePath = source.relativize(path);
-                        final Path targetPath   = destination.resolve(relativePath);
+                        // ターゲットパスを計算
+                        final Path targetPath = destination.resolve(relativePath);
+                        // 個別のファイルやディレクトリを処理
                         this.processPath(path, targetPath, relativePath);
                     } catch (final IOException e) {
-                        throw new RuntimeException("Failed to process file: " + path, e);
+                        // 処理中にエラーが発生した場合はランタイム例外をスロー
+                        throw new RuntimeException(String.format("ファイルの処理に失敗しました。パス=[%s]", path), e);
                     }
                 });
+                // 結果をリストに追加
                 futures.add(future);
             });
         }
 
+        // すべての非同期処理が完了するのを待機
         AbstractDirectoryService.waitForCompletion(futures);
+        // 全体の後処理を実行
         this.postProcess(source, destination);
     }
 
@@ -175,13 +189,13 @@ public abstract class AbstractDirectoryService {
      * @throws IOException
      *                     タスクの実行中にInterruptedException, ExecutionException, TimeoutExceptionが発生した場合。
      */
-    protected static void waitForCompletion(final List<Future<?>> futures) throws IOException {
+    private static void waitForCompletion(final List<Future<?>> futures) throws IOException {
         for (final Future<?> future : futures) {
             try {
-                future.get(30, TimeUnit.SECONDS);
+                future.get(30, TimeUnit.SECONDS);       // TODO 20225/01/18 タイムアウトをパラメータから指定できるようにする。
             } catch (InterruptedException | java.util.concurrent.ExecutionException
                     | java.util.concurrent.TimeoutException e) {
-                throw new IOException("Failed to process directory: " + e.getMessage(), e);
+                throw new IOException("ディレクトリの処理に失敗しました。", e);
             }
         }
     }
