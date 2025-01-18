@@ -76,7 +76,7 @@ class DirectoryToolArTest implements AutoCloseable {
     void testSuccessfulCopyOperation() throws Exception {
         // ApplicationArguments のモック設定
         Mockito.when(this.applicationArguments.getNonOptionArgs())
-                .thenReturn(Arrays.asList("source", "target", "COPY"));
+                .thenReturn(Arrays.asList("COPY", "source", "target"));
 
         this.runner.run(this.applicationArguments);
 
@@ -93,7 +93,7 @@ class DirectoryToolArTest implements AutoCloseable {
     @Test
     void testSuccessfulMoveOperation() throws Exception {
         Mockito.when(this.applicationArguments.getNonOptionArgs())
-                .thenReturn(Arrays.asList("source", "target", "MOVE"));
+                .thenReturn(Arrays.asList("MOVE", "source", "target"));
 
         this.runner.run(this.applicationArguments);
 
@@ -129,7 +129,7 @@ class DirectoryToolArTest implements AutoCloseable {
     @Test
     void testInvalidMode() throws Exception {
         Mockito.when(this.applicationArguments.getNonOptionArgs())
-                .thenReturn(Arrays.asList("source", "target", "INVALID"));
+                .thenReturn(Arrays.asList("INVALID", "source", "target"));
 
         this.runner.run(this.applicationArguments);
 
@@ -147,7 +147,7 @@ class DirectoryToolArTest implements AutoCloseable {
     @Test
     void testIOException() throws Exception {
         Mockito.when(this.applicationArguments.getNonOptionArgs())
-                .thenReturn(Arrays.asList("source", "target", "COPY"));
+                .thenReturn(Arrays.asList("COPY", "source", "target"));
         final String errorMessage = "Test error message";
         Mockito.doThrow(new IOException(errorMessage)).when(this.directoryService)
                 .processDirectory(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -166,7 +166,7 @@ class DirectoryToolArTest implements AutoCloseable {
     @Test
     void testDiffOperation() throws Exception {
         Mockito.when(this.applicationArguments.getNonOptionArgs())
-                .thenReturn(Arrays.asList("source", "target", "DIFF"));
+                .thenReturn(Arrays.asList("DIFF", "source", "target"));
 
         this.runner.run(this.applicationArguments);
 

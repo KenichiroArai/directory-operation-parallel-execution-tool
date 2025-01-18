@@ -18,11 +18,12 @@ import kmg.tool.directorytool.service.DirectoryService;
  * 基本的な使用方法：
  *
  * <pre>
- * java -jar directory-tool.jar <src> <dest> <mode>
+ * java -jar directory-tool.jar <mode> <src> <dest>
  * </pre>
  * <p>
  * パラメータ：
  * <ul>
+ * <li><mode> - 操作モード (COPY, MOVE, DIFF)
  * <li><src> - 操作対象のソースディレクトリパス
  * <li><dest> - 操作対象のターゲットディレクトリパス
  * </ul>
@@ -31,13 +32,13 @@ import kmg.tool.directorytool.service.DirectoryService;
  *
  * <pre>
  * # ディレクトリのコピー
- * java -jar directory-tool.jar /source/dir /target/dir COPY
+ * java -jar directory-tool.jar COPY /source/dir /target/dir
  *
  * # ディレクトリの移動
- * java -jar directory-tool.jar /source/dir /target/dir MOVE
+ * java -jar directory-tool.jar MOVE /source/dir /target/dir
  *
  * # ディレクトリの差分比較
- * java -jar directory-tool.jar /source/dir /target/dir DIFF
+ * java -jar directory-tool.jar DIFF /source/dir /target/dir
  * </pre>
  * <p>
  * エラーハンドリング：
@@ -119,15 +120,15 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
-            System.out.println("Usage: java -jar directory-tool.jar <src> <dest> <mode>");
+            System.out.println("Usage: java -jar directory-tool.jar <mode> <src> <dest>");
             System.out.println("Modes: COPY, MOVE, DIFF");
             return;
         }
 
         // 引数をパース
-        final String src     = nonOptionArgs[0];
-        final String dest    = nonOptionArgs[1];
-        final String modeStr = nonOptionArgs[2].toUpperCase();
+        final String modeStr = nonOptionArgs[0].toUpperCase();
+        final String src     = nonOptionArgs[1];
+        final String dest    = nonOptionArgs[2];
 
         try {
             // モード文字列をenumに変換

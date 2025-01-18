@@ -24,6 +24,6 @@ mvn package -DskipTests
 
 #### 実行例
 
-引数にsrc、dest、モードを指定する。
+引数にモード、src、destを指定する。
 
-java -jar target/directory-tool-1.0.0.jar "C:/dev/wk/src" "C:/dev/wk/dest" DIFF
+java -jar target/directory-tool-1.0.0.jar DIFF "C:/dev/wk/src" "C:/dev/wk/dest"
