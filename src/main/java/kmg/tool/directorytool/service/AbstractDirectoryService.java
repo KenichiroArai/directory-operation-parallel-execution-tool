@@ -76,7 +76,7 @@ public abstract class AbstractDirectoryService {
                         this.processPath(path, targetPath, relativePath);
                     } catch (final IOException e) {
                         // 処理中にエラーが発生した場合はランタイム例外をスロー
-                        throw new RuntimeException(String.format("ファイルの処理に失敗しました。パス=[%s]", path), e);
+                        throw new RuntimeException(String.format("ファイルの処理に失敗しました。パス=[%s], エラー=[%s]", path, e.toString()), e);
                     }
                 });
                 // 結果をリストに追加
