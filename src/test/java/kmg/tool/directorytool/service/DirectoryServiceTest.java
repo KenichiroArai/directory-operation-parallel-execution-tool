@@ -30,15 +30,11 @@ public class DirectoryServiceTest {
     @Mock
     private CopyDirectoryService copyService;
 
-    /**
-     * 移動処理を行うサービスのモック
-     */
+    /** 移動処理を行うサービスのモック */
     @Mock
     private MoveDirectoryService moveService;
 
-    /**
-     * 差分比較を行うサービスのモック
-     */
+    /** 差分比較を行うサービスのモック */
     @Mock
     private DiffDirectoryService diffService;
 

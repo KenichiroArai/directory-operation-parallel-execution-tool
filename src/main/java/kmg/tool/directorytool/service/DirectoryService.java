@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
- * ディレクトリ操作のファサードとして機能するサービスクラス。 操作モードに応じて適切なサービスクラスに処理を委譲する。 Spring Frameworkのサービスレイヤーとして実装され、DIコンテナによって管理される。
+ * ディレクトリ操作のファサードとして機能するサービスクラス。 <br>
+ * <p>
+ * 操作モードに応じて適切なサービスクラスに処理を委譲する。<br>
+ * Spring Frameworkのサービスレイヤーとして実装され、DIコンテナによって管理される。
+ * </p>
  * <p>
  * このクラスは以下の操作をサポートする：
  * <ul>
@@ -53,11 +57,15 @@ public class DirectoryService {
      */
     public void processDirectory(final String srcPath, final String destPath, final OperationMode mode)
             throws IOException {
+
         final AbstractDirectoryService service = switch (mode) {
+
             case COPY -> this.copyService;
             case MOVE -> this.moveService;
             case DIFF -> this.diffService;
+
         };
         service.processDirectory(srcPath, destPath);
+
     }
 }
