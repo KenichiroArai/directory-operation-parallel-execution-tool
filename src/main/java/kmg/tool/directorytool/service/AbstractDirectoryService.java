@@ -172,10 +172,13 @@ public abstract class AbstractDirectoryService {
      *                     ファイルの読み取り中にエラーが発生した場合
      */
     protected static boolean compareFiles(final Path file1, final Path file2) throws IOException {
+        boolean result;
         if (Files.size(file1) != Files.size(file2)) {
-            return false;
+            result = false;
+        } else {
+            result = Files.mismatch(file1, file2) == -1;
         }
-        return Files.mismatch(file1, file2) == -1;
+        return result;
     }
 
     /**
