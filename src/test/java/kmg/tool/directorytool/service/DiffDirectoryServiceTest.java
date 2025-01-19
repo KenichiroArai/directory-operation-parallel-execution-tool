@@ -39,172 +39,180 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
     /**
      * 基本的な差分検出のテスト
      *
-     * @throws IOException
-     *                     ファイル操作時にエラーが発生した場合
+     * @throws IOException ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testBasicDiffOperation() throws IOException {
 
-        // 標準出力をキャプチャするための設定
-        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
-        final PrintStream           originalOut = System.out;
+        /* 期待値の定義 */
+        final String expectedSourceOnlyMessage = "ソースのみに存在: source_only.txt";
+        final String expectedDifferentMessage = "差異あり: different.txt";
+        final String expectedTargetOnlyMessage = "ターゲットのみに存在: target_only.txt";
+
+        /* 準備 */
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        final PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
+        // ソースディレクトリにのみ存在するファイルを作成
+        final Path sourceOnlyFile = this.sourceDir.resolve("source_only.txt");
+        Files.writeString(sourceOnlyFile, "source content");
+
+        // 両方のディレクトリに存在するが内容が異なるファイル
+        final Path sourceFile = this.sourceDir.resolve("different.txt");
+        final Path targetFile = this.targetDir.resolve("different.txt");
+        Files.writeString(sourceFile, "source content");
+        Files.writeString(targetFile, "target content");
+
+        // ターゲットディレクトリにのみ存在するファイル
+        final Path targetOnlyFile = this.targetDir.resolve("target_only.txt");
+        Files.writeString(targetOnlyFile, "target content");
+
         try {
-
-            // ソースディレクトリにのみ存在するファイルを作成
-            final Path sourceOnlyFile = this.sourceDir.resolve("source_only.txt");
-            Files.writeString(sourceOnlyFile, "source content");
-
-            // 両方のディレクトリに存在するが内容が異なるファイル
-            final Path sourceFile = this.sourceDir.resolve("different.txt");
-            final Path targetFile = this.targetDir.resolve("different.txt");
-            Files.writeString(sourceFile, "source content");
-            Files.writeString(targetFile, "target content");
-
-            // ターゲットディレクトリにのみ存在するファイル
-            final Path targetOnlyFile = this.targetDir.resolve("target_only.txt");
-            Files.writeString(targetOnlyFile, "target content");
-
-            // 差分検出を実行
+            /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-            // 出力内容を検証（順序に依存しない方法）
-            final String output = outContent.toString();
+            /* 検証の準備 */
+            final String actualOutput = outContent.toString();
 
-            // 各期待される出力が含まれているか確認
-            Assertions.assertTrue(output.contains("ソースのみに存在: source_only.txt"), "ソースディレクトリにのみ存在するファイルが検出されること");
-            Assertions.assertTrue(output.contains("差異あり: different.txt"), "内容が異なるファイルが検出されること");
-            Assertions.assertTrue(output.contains("ターゲットのみに存在: target_only.txt"), "ターゲットディレクトリにのみ存在するファイルが検出されること");
+            /* 検証の実施 */
+            Assertions.assertTrue(actualOutput.contains(expectedSourceOnlyMessage), "ソースディレクトリにのみ存在するファイルが検出されること");
+            Assertions.assertTrue(actualOutput.contains(expectedDifferentMessage), "内容が異なるファイルが検出されること");
+            Assertions.assertTrue(actualOutput.contains(expectedTargetOnlyMessage), "ターゲットディレクトリにのみ存在するファイルが検出されること");
 
         } finally {
-
             System.setOut(originalOut);
-
         }
-
     }
 
     /**
      * 複雑なディレクトリ構造の差分検出テスト
      *
-     * @throws IOException
-     *                     ファイル操作時にエラーが発生した場合
+     * @throws IOException ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testComplexDirectoryStructureDiff() throws IOException {
 
-        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
-        final PrintStream           originalOut = System.out;
+        /* 期待値の定義 */
+        final String expectedPath1 = "subdir1" + File.separator + "file1.txt";
+        final String expectedPath2 = "subdir2" + File.separator + "file2.txt";
+        final String[] expectedOutputLines = {
+            "ソースディレクトリのみに存在するディレクトリ: subdir1",
+            "ソースのみに存在: " + expectedPath1,
+            "ターゲットディレクトリのみに存在するディレクトリ: subdir2",
+            "ターゲットのみに存在: " + expectedPath2
+        };
+
+        /* 準備 */
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        final PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
+        // ソース側のディレクトリ構造を作成
+        final Path sourceSubDir = this.sourceDir.resolve("subdir1");
+        Files.createDirectories(sourceSubDir);
+        Files.writeString(sourceSubDir.resolve("file1.txt"), "content1");
+
+        // ターゲット側の異なるディレクトリ構造を作成
+        final Path targetSubDir = this.targetDir.resolve("subdir2");
+        Files.createDirectories(targetSubDir);
+        Files.writeString(targetSubDir.resolve("file2.txt"), "content2");
+
         try {
-
-            // ソース側のディレクトリ構造を作成
-            final Path sourceSubDir = this.sourceDir.resolve("subdir1");
-            Files.createDirectories(sourceSubDir);
-            Files.writeString(sourceSubDir.resolve("file1.txt"), "content1");
-
-            // ターゲット側の異なるディレクトリ構造を作成
-            final Path targetSubDir = this.targetDir.resolve("subdir2");
-            Files.createDirectories(targetSubDir);
-            Files.writeString(targetSubDir.resolve("file2.txt"), "content2");
-
-            // 差分検出を実行
+            /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-            // 出力内容を検証
-            final String[] outputLines = outContent.toString().split(System.lineSeparator());
+            /* 検証の準備 */
+            final String[] actualOutputLines = outContent.toString().split(System.lineSeparator());
 
-            // 期待値をプラットフォームの区切り文字で正規化
-            final String expectedPath1 = "subdir1" + File.separator + "file1.txt";
-            final String expectedPath2 = "subdir2" + File.separator + "file2.txt";
-
-            Assertions.assertEquals("ソースディレクトリのみに存在するディレクトリ: subdir1", outputLines[0]);
-            Assertions.assertEquals("ソースのみに存在: " + expectedPath1, outputLines[1]);
-            Assertions.assertEquals("ターゲットディレクトリのみに存在するディレクトリ: subdir2", outputLines[2]);
-            Assertions.assertEquals("ターゲットのみに存在: " + expectedPath2, outputLines[3]);
+            /* 検証の実施 */
+            for (int i = 0; i < expectedOutputLines.length; i++) {
+                Assertions.assertEquals(expectedOutputLines[i], actualOutputLines[i], "出力行" + (i + 1) + "が期待値と一致すること");
+            }
 
         } finally {
-
             System.setOut(originalOut);
-
         }
-
     }
 
     /**
      * 同一内容のファイルの差分検出テスト
      *
-     * @throws IOException
-     *                     ファイル操作時にエラーが発生した場合
+     * @throws IOException ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testIdenticalFiles() throws IOException {
 
-        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
-        final PrintStream           originalOut = System.out;
+        /* 期待値の定義 */
+        final String expectedFileName = "same.txt";
+
+        /* 準備 */
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        final PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
+        // 同じ内容のファイルを両方のディレクトリに作成
+        final String content = "identical content";
+        Files.writeString(this.sourceDir.resolve(expectedFileName), content);
+        Files.writeString(this.targetDir.resolve(expectedFileName), content);
+
         try {
-
-            // 同じ内容のファイルを両方のディレクトリに作成
-            final String content = "identical content";
-            Files.writeString(this.sourceDir.resolve("same.txt"), content);
-            Files.writeString(this.targetDir.resolve("same.txt"), content);
-
-            // 差分検出を実行
+            /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-            // 出力内容を検証（差分が報告されないことを確認）
-            final String output = outContent.toString();
-            Assertions.assertTrue(!output.contains("same.txt"), "同一内容のファイルは差分として報告されないこと");
+            /* 検証の準備 */
+            final String actualOutput = outContent.toString();
+
+            /* 検証の実施 */
+            Assertions.assertFalse(actualOutput.contains(expectedFileName), "同一内容のファイルは差分として報告されないこと");
 
         } finally {
-
             System.setOut(originalOut);
-
         }
-
     }
 
     /**
      * 空のディレクトリ構造の差分検出テスト
      *
-     * @throws IOException
-     *                     ファイル操作時にエラーが発生した場合
+     * @throws IOException ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testEmptyDirectoryDiff() throws IOException {
 
-        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
-        final PrintStream           originalOut = System.out;
+        /* 期待値の定義 */
+        final String[] expectedOutputLines = {
+            "ソースディレクトリのみに存在するディレクトリ: empty_source",
+            "ターゲットディレクトリのみに存在するディレクトリ: empty_target"
+        };
+
+        /* 準備 */
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        final PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
+        // ソース側にのみ空のディレクトリを作成
+        final Path sourceEmptyDir = this.sourceDir.resolve("empty_source");
+        Files.createDirectories(sourceEmptyDir);
+
+        // ターゲット側にのみ空のディレクトリを作成
+        final Path targetEmptyDir = this.targetDir.resolve("empty_target");
+        Files.createDirectories(targetEmptyDir);
+
         try {
-
-            // ソース側にのみ空のディレクトリを作成
-            final Path sourceEmptyDir = this.sourceDir.resolve("empty_source");
-            Files.createDirectories(sourceEmptyDir);
-
-            // ターゲット側にのみ空のディレクトリを作成
-            final Path targetEmptyDir = this.targetDir.resolve("empty_target");
-            Files.createDirectories(targetEmptyDir);
-
-            // 差分検出を実行
+            /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-            // 出力内容を検証
-            final String[] outputLines = outContent.toString().split(System.lineSeparator());
-            Assertions.assertEquals("ソースディレクトリのみに存在するディレクトリ: empty_source", outputLines[0], "ソースの空ディレクトリが検出されること");
-            Assertions.assertEquals("ターゲットディレクトリのみに存在するディレクトリ: empty_target", outputLines[1], "ターゲットの空ディレクトリが検出されること");
+            /* 検証の準備 */
+            final String[] actualOutputLines = outContent.toString().split(System.lineSeparator());
+
+            /* 検証の実施 */
+            for (int i = 0; i < expectedOutputLines.length; i++) {
+                Assertions.assertEquals(expectedOutputLines[i], actualOutputLines[i], "出力行" + (i + 1) + "が期待値と一致すること");
+            }
 
         } finally {
-
             System.setOut(originalOut);
-
         }
-
     }
 
     /**
@@ -213,95 +221,101 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
     @Test
     public void testInvalidPaths() {
 
+        /* 期待値の定義 */
         final Path invalidSourcePath = Path.of("/invalid/source/path");
         final Path invalidTargetPath = Path.of("/invalid/target/path");
+        final String expectedSourceErrorMessage = "ソースディレクトリが存在しません。";
+        final String expectedTargetErrorMessage = "ターゲットディレクトリが存在しません。: " + invalidTargetPath;
 
-        // ソースディレクトリが存在しない場合
-        final Exception sourceException = Assertions.assertThrows(IOException.class, () -> {
+        /* 準備 */
+        // 準備は不要
 
+        /* テスト対象の実行と検証の準備 */
+        final Exception actualSourceException = Assertions.assertThrows(IOException.class, () -> {
             this.service.processDirectory(invalidSourcePath.toString(), this.targetDir.toString());
-
         });
-        Assertions.assertEquals("ソースディレクトリが存在しません。", sourceException.getMessage(),
-                "エラーメッセージに'ソースディレクトリが存在しません。'が含まれること");
 
-        // ターゲットディレクトリが存在しない場合
-        final Exception targetException = Assertions.assertThrows(IOException.class, () -> {
-
+        final Exception actualTargetException = Assertions.assertThrows(IOException.class, () -> {
             this.service.processDirectory(this.sourceDir.toString(), invalidTargetPath.toString());
-
         });
-        Assertions.assertEquals("ターゲットディレクトリが存在しません。: " + invalidTargetPath, targetException.getMessage(),
-                "エラーメッセージに'ターゲットディレクトリが存在しません。'が含まれること");
 
+        /* 検証の実施 */
+        Assertions.assertEquals(expectedSourceErrorMessage, actualSourceException.getMessage(), "ソースディレクトリ不在時のエラーメッセージが一致すること");
+        Assertions.assertEquals(expectedTargetErrorMessage, actualTargetException.getMessage(), "ターゲットディレクトリ不在時のエラーメッセージが一致すること");
     }
 
     /**
      * ファイルとディレクトリの型の違いをテスト
      *
-     * @throws IOException
-     *                     ファイル操作時にエラーが発生した場合
+     * @throws IOException ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testFileVsDirectoryDiff() throws IOException {
 
-        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
-        final PrintStream           originalOut = System.out;
+        /* 期待値の定義 */
+        final Set<String> expectedOutput = Set.of(
+                "差異あり: test (ファイル vs ディレクトリ)",
+                "差異あり: test2 (ディレクトリ vs ファイル)"
+        );
+
+        /* 準備 */
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        final PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
+        // ソースにファイル、ターゲットに同名のディレクトリを作成
+        Files.writeString(this.sourceDir.resolve("test"), "content");
+        Files.createDirectory(this.targetDir.resolve("test"));
+
+        // 逆のケース：ソースにディレクトリ、ターゲットに同名のファイル
+        final Path sourceSubDir = this.sourceDir.resolve("test2");
+        Files.createDirectory(sourceSubDir);
+        Files.writeString(this.targetDir.resolve("test2"), "content");
+
         try {
-
-            // ソースにファイル、ターゲットに同名のディレクトリを作成
-            Files.writeString(this.sourceDir.resolve("test"), "content");
-            Files.createDirectory(this.targetDir.resolve("test"));
-
-            // 逆のケース：ソースにディレクトリ、ターゲットに同名のファイル
-            final Path sourceSubDir = this.sourceDir.resolve("test2");
-            Files.createDirectory(sourceSubDir);
-            Files.writeString(this.targetDir.resolve("test2"), "content");
-
+            /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-            // 出力内容を検証
-            final Set<String> actualOutput   = Arrays.stream(outContent.toString().split(System.lineSeparator()))
+            /* 検証の準備 */
+            final Set<String> actualOutput = Arrays.stream(outContent.toString().split(System.lineSeparator()))
                     .collect(Collectors.toSet());
-            final Set<String> expectedOutput = Set.of("差異あり: test (ファイル vs ディレクトリ)", "差異あり: test2 (ディレクトリ vs ファイル)");
 
+            /* 検証の実施 */
             Assertions.assertEquals(expectedOutput, actualOutput, "ファイルとディレクトリの型の違いが正しく検出されること");
 
         } finally {
-
             System.setOut(originalOut);
-
         }
-
     }
 
     /**
      * ルートディレクトリの処理が除外されることのテスト
      *
-     * @throws IOException
-     *                     ファイル操作時にエラーが発生した場合
+     * @throws IOException ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testRootDirectoryExclusion() throws IOException {
 
-        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
-        final PrintStream           originalOut = System.out;
+        /* 期待値の定義 */
+        final String expectedNotContainPath = this.sourceDir.getFileName().toString();
+
+        /* 準備 */
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        final PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         try {
-
+            /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
-            final String output = outContent.toString();
-            Assertions.assertFalse(output.contains(this.sourceDir.getFileName().toString()),
-                    "ルートディレクトリ自体が差分として報告されないこと");
+
+            /* 検証の準備 */
+            final String actualOutput = outContent.toString();
+
+            /* 検証の実施 */
+            Assertions.assertFalse(actualOutput.contains(expectedNotContainPath), "ルートディレクトリ自体が差分として報告されないこと");
 
         } finally {
-
             System.setOut(originalOut);
-
         }
-
     }
 }
