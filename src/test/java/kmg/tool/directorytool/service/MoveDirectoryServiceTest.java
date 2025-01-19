@@ -19,8 +19,10 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
      */
     @Override
     protected AbstractDirectoryService createService() {
+
         final AbstractDirectoryService result = new MoveDirectoryService();
         return result;
+
     }
 
     /**
@@ -43,15 +45,16 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
-        final Path movedFile = this.targetDir.resolve("test.txt");
+        final Path    movedFile          = this.targetDir.resolve("test.txt");
         final boolean actualTargetExists = Files.exists(movedFile);
         final boolean actualSourceExists = Files.exists(testFile);
-        final String actualContent = Files.readString(movedFile);
+        final String  actualContent      = Files.readString(movedFile);
 
         /* 検証の実施 */
         Assertions.assertTrue(actualTargetExists, "移動先にファイルが存在すること");
         Assertions.assertFalse(actualSourceExists, "元のファイルが削除されていること");
         Assertions.assertEquals(expectedContent, actualContent, "ファイルの内容が正しく移動されていること");
+
     }
 
     /**
@@ -64,8 +67,8 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
     public void testComplexDirectoryStructureMove() throws IOException {
 
         /* 期待値の定義 */
-        final String expectedContent1 = "content1";
-        final String expectedContent2 = "content2";
+        final String expectedContent1    = "content1";
+        final String expectedContent2    = "content2";
         final String expectedRootContent = "root content";
 
         /* 準備 */
@@ -82,12 +85,12 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
-        final boolean actualFile1Exists = Files.exists(this.targetDir.resolve("subdir1/file1.txt"));
-        final boolean actualFile2Exists = Files.exists(this.targetDir.resolve("subdir2/file2.txt"));
-        final boolean actualRootExists = Files.exists(this.targetDir.resolve("root.txt"));
-        final String actualContent1 = Files.readString(this.targetDir.resolve("subdir1/file1.txt"));
-        final String actualContent2 = Files.readString(this.targetDir.resolve("subdir2/file2.txt"));
-        final String actualRootContent = Files.readString(this.targetDir.resolve("root.txt"));
+        final boolean actualFile1Exists  = Files.exists(this.targetDir.resolve("subdir1/file1.txt"));
+        final boolean actualFile2Exists  = Files.exists(this.targetDir.resolve("subdir2/file2.txt"));
+        final boolean actualRootExists   = Files.exists(this.targetDir.resolve("root.txt"));
+        final String  actualContent1     = Files.readString(this.targetDir.resolve("subdir1/file1.txt"));
+        final String  actualContent2     = Files.readString(this.targetDir.resolve("subdir2/file2.txt"));
+        final String  actualRootContent  = Files.readString(this.targetDir.resolve("root.txt"));
         final boolean actualSourceExists = Files.exists(this.sourceDir);
 
         /* 検証の実施 */
@@ -98,6 +101,7 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Assertions.assertEquals(expectedContent2, actualContent2, "file2.txtの内容が正しいこと");
         Assertions.assertEquals(expectedRootContent, actualRootContent, "root.txtの内容が正しいこと");
         Assertions.assertFalse(actualSourceExists, "ソースディレクトリが削除されていること");
+
     }
 
     /**
@@ -124,12 +128,13 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         /* 検証の準備 */
         final boolean actualTargetExists = Files.exists(testTargetFile);
         final boolean actualSourceExists = Files.exists(testSourceFile);
-        final String actualContent = Files.readString(testTargetFile);
+        final String  actualContent      = Files.readString(testTargetFile);
 
         /* 検証の実施 */
         Assertions.assertTrue(actualTargetExists, "ターゲットファイルが存在すること");
         Assertions.assertFalse(actualSourceExists, "ソースファイルが削除されていること");
         Assertions.assertEquals(expectedContent, actualContent, "ファイルが正しく上書きされていること");
+
     }
 
     /**
@@ -151,8 +156,8 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
-        final boolean actualEmpty1Exists = Files.isDirectory(this.targetDir.resolve("empty1"));
-        final boolean actualEmpty2Exists = Files.isDirectory(this.targetDir.resolve("empty2"));
+        final boolean actualEmpty1Exists     = Files.isDirectory(this.targetDir.resolve("empty1"));
+        final boolean actualEmpty2Exists     = Files.isDirectory(this.targetDir.resolve("empty2"));
         final boolean actualSourceDir1Exists = Files.exists(subDir1);
         final boolean actualSourceDir2Exists = Files.exists(subDir2);
 
@@ -161,5 +166,6 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Assertions.assertTrue(actualEmpty2Exists, "empty2ディレクトリが存在すること");
         Assertions.assertFalse(actualSourceDir1Exists, "元の空ディレクトリが削除されていること");
         Assertions.assertFalse(actualSourceDir2Exists, "元の空ディレクトリが削除されていること");
+
     }
 }

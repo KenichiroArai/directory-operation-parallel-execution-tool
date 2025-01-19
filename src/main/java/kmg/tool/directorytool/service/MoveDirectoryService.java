@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 /**
  * ディレクトリの移動操作を実行するサービスクラス。<br>
  * <p>
- *  {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的な移動機能を提供する。
+ * {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的な移動機能を提供する。
  * </p>
  * <p>
  * 主な特徴：
@@ -47,11 +47,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MoveDirectoryService extends AbstractDirectoryService {
+
     /**
      * 個々のファイル/ディレクトリに対して移動操作を実行する。<br>
      * <p>
-     * ソースがディレクトリの場合、ターゲットディレクトリを作成する。
-     * ソースがファイルの場合、親ディレクトリを作成し、ファイルを移動する。 既存のファイルは上書きされる。
+     * ソースがディレクトリの場合、ターゲットディレクトリを作成する。 ソースがファイルの場合、親ディレクトリを作成し、ファイルを移動する。 既存のファイルは上書きされる。
      * </p>
      *
      * @param sourcePath
@@ -68,18 +68,22 @@ public class MoveDirectoryService extends AbstractDirectoryService {
             throws IOException {
 
         if (Files.isDirectory(sourcePath)) {
+
             Files.createDirectories(targetPath);
             return;
+
         }
 
         // ファイル移動前にターゲットディレクトリが存在することを保証
         Files.createDirectories(targetPath.getParent());
         Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
     }
 
     /**
      * 移動操作後の後処理を実行する。 <br>
-     * <p>ソースディレクトリ内の空になったディレクトリを削除する。<br>
+     * <p>
+     * ソースディレクトリ内の空になったディレクトリを削除する。<br>
      * 削除は深い階層から順に行われる。
      * </p>
      * <p>
@@ -103,15 +107,24 @@ public class MoveDirectoryService extends AbstractDirectoryService {
 
         // 空になったディレクトリを削除
         try (var stream = Files.walk(source)) {
+
             stream.sorted((src, dest) -> dest.toString().length() - src.toString().length()).forEach(path -> {
+
                 try {
+
                     Files.deleteIfExists(path);
+
                 } catch (final IOException e) {
+
                     System.err.println(String.format("パス '%s' の削除に失敗しました", path));
                     System.err.println(String.format("エラー詳細: %s", e.getMessage()));
+
                 }
+
             });
+
         }
+
     }
 
 }

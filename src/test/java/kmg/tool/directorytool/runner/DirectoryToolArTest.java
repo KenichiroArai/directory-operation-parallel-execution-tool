@@ -61,9 +61,11 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @BeforeEach
     void setUp() {
+
         this.runner = new DirectoryToolAr();
         ReflectionTestUtils.setField(this.runner, "directoryService", this.directoryService);
         System.setOut(new PrintStream(this.outputStream));
+
     }
 
     /**
@@ -74,6 +76,7 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testSuccessfulCopyOperation() throws Exception {
+
         // ApplicationArguments のモック設定
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("COPY", "source", "target"));
@@ -83,6 +86,7 @@ class DirectoryToolArTest implements AutoCloseable {
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
         Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
                 this.outputStream.toString());
+
     }
 
     /**
@@ -93,6 +97,7 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testSuccessfulMoveOperation() throws Exception {
+
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("MOVE", "source", "target"));
 
@@ -101,6 +106,7 @@ class DirectoryToolArTest implements AutoCloseable {
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
         Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
                 this.outputStream.toString());
+
     }
 
     /**
@@ -111,6 +117,7 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testInsufficientArguments() throws Exception {
+
         Mockito.when(this.applicationArguments.getNonOptionArgs()).thenReturn(Arrays.asList("source", "target"));
 
         this.runner.run(this.applicationArguments);
@@ -120,6 +127,7 @@ class DirectoryToolArTest implements AutoCloseable {
         final String output = this.outputStream.toString();
         Assertions.assertTrue(output.contains("使用方法:"));
         Assertions.assertTrue(output.contains("モデルの種類: COPY, MOVE, DIFF"));
+
     }
 
     /**
@@ -130,6 +138,7 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testInvalidMode() throws Exception {
+
         final String expected = String.format("無効なモードが選択されています。: [INVALID]%s有効なモードの種類: COPY, MOVE, DIFF%s",
                 System.lineSeparator(), System.lineSeparator());
 
@@ -141,6 +150,7 @@ class DirectoryToolArTest implements AutoCloseable {
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         Assertions.assertEquals(expected, this.outputStream.toString());
+
     }
 
     /**
@@ -151,6 +161,7 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testIOException() throws Exception {
+
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("COPY", "source", "target"));
         final String errorMessage = "Test error message";
@@ -160,6 +171,7 @@ class DirectoryToolArTest implements AutoCloseable {
         this.runner.run(this.applicationArguments);
 
         Assertions.assertEquals(1, this.runner.getExitCode());
+
     }
 
     /**
@@ -170,6 +182,7 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Test
     void testDiffOperation() throws Exception {
+
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("DIFF", "source", "target"));
 
@@ -178,6 +191,7 @@ class DirectoryToolArTest implements AutoCloseable {
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
         Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
                 this.outputStream.toString());
+
     }
 
     /**
@@ -188,7 +202,9 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @AfterEach
     void tearDown() throws IOException {
+
         System.setOut(this.originalOut);
+
     }
 
     /**
@@ -199,6 +215,8 @@ class DirectoryToolArTest implements AutoCloseable {
      */
     @Override
     public void close() throws IOException {
+
         this.outputStream.close();
+
     }
 }

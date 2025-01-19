@@ -57,13 +57,16 @@ public class CopyDirectoryService extends AbstractDirectoryService {
             throws IOException {
 
         if (Files.isDirectory(sourcePath)) {
+
             Files.createDirectories(targetPath);
             return;
+
         }
 
         // ターゲットディレクトリが存在することを保証
         Files.createDirectories(targetPath.getParent());
         Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
     }
 
     /**
@@ -79,6 +82,7 @@ public class CopyDirectoryService extends AbstractDirectoryService {
      */
     @Override
     protected void postProcess(final Path source, final Path destination) throws IOException {
+
         // コピー操作では後処理は不要
     }
 }

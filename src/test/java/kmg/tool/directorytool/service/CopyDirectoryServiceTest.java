@@ -19,8 +19,10 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
      */
     @Override
     protected AbstractDirectoryService createService() {
+
         final AbstractDirectoryService result = new CopyDirectoryService();
         return result;
+
     }
 
     /**
@@ -52,6 +54,7 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Assertions.assertTrue(actualCopiedFileExists, "コピーされたファイルが存在すること");
         Assertions.assertTrue(actualTestFileExists, "元のファイルが残っていること");
         Assertions.assertEquals(expectedFileContent, actualCopiedFileContent, "ファイルの内容が正しくコピーされていること");
+
     }
 
     /**
@@ -95,6 +98,7 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Assertions.assertEquals(expectedContent1, actualContent1, "file1.txtの内容が正しいこと");
         Assertions.assertEquals(expectedContent2, actualContent2, "file2.txtの内容が正しいこと");
         Assertions.assertEquals(expectedRootContent, actualRootContent, "root.txtの内容が正しいこと");
+
     }
 
     /**
@@ -125,6 +129,7 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
         /* 検証の実施 */
         Assertions.assertTrue(actualFileExists, "ターゲットファイルが存在すること");
         Assertions.assertEquals(expectedContent, actualContent, "ファイルが正しく上書きされていること");
+
     }
 
     /**
@@ -152,5 +157,6 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
         /* 検証の実施 */
         Assertions.assertTrue(actualEmpty1Exists, "empty1ディレクトリが存在すること");
         Assertions.assertTrue(actualEmpty2Exists, "empty2ディレクトリが存在すること");
+
     }
 }

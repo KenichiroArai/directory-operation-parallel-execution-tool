@@ -13,10 +13,12 @@ class OperationModeTest {
      */
     @Test
     static void testEnumValues() {
+
         Assertions.assertEquals(3, OperationMode.values().length, "列挙型は3つの値を持つこと");
-        Assertions.assertTrue(containsEnumConstant("COPY"), "COPYが定義されていること");
-        Assertions.assertTrue(containsEnumConstant("MOVE"), "MOVEが定義されていること");
-        Assertions.assertTrue(containsEnumConstant("DIFF"), "DIFFが定義されていること");
+        Assertions.assertTrue(OperationModeTest.containsEnumConstant("COPY"), "COPYが定義されていること");
+        Assertions.assertTrue(OperationModeTest.containsEnumConstant("MOVE"), "MOVEが定義されていること");
+        Assertions.assertTrue(OperationModeTest.containsEnumConstant("DIFF"), "DIFFが定義されていること");
+
     }
 
     /**
@@ -24,9 +26,11 @@ class OperationModeTest {
      */
     @Test
     static void testValueOf() {
+
         Assertions.assertEquals(OperationMode.COPY, OperationMode.valueOf("COPY"), "COPYの文字列変換が正しいこと");
         Assertions.assertEquals(OperationMode.MOVE, OperationMode.valueOf("MOVE"), "MOVEの文字列変換が正しいこと");
         Assertions.assertEquals(OperationMode.DIFF, OperationMode.valueOf("DIFF"), "DIFFの文字列変換が正しいこと");
+
     }
 
     /**
@@ -34,9 +38,11 @@ class OperationModeTest {
      */
     @Test
     static void testInvalidValue() {
+
         final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> OperationMode.valueOf("INVALID"), "無効な値でIllegalArgumentExceptionがスローされること");
         Assertions.assertTrue(exception.getMessage().contains("INVALID"), "例外メッセージに無効な値が含まれていること");
+
     }
 
     /**
@@ -47,11 +53,17 @@ class OperationModeTest {
      * @return 定数が存在する場合はtrue
      */
     private static boolean containsEnumConstant(final String name) {
+
         for (final OperationMode mode : OperationMode.values()) {
+
             if (mode.name().equals(name)) {
+
                 return true;
+
             }
+
         }
         return false;
+
     }
 }

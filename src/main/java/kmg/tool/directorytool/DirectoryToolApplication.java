@@ -20,9 +20,13 @@ public class DirectoryToolApplication {
      *             コマンドライン引数の配列
      */
     public static void main(final String[] args) {
+
         try (ConfigurableApplicationContext ctx = SpringApplication.run(DirectoryToolApplication.class, args)) {
+
             System.exit(SpringApplication.exit(ctx));
+
         }
+
     }
 
 }

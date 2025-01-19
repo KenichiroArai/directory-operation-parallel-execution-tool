@@ -39,19 +39,20 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
     /**
      * 基本的な差分検出のテスト
      *
-     * @throws IOException ファイル操作時にエラーが発生した場合
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testBasicDiffOperation() throws IOException {
 
         /* 期待値の定義 */
         final String expectedSourceOnlyMessage = "ソースのみに存在: source_only.txt";
-        final String expectedDifferentMessage = "差異あり: different.txt";
+        final String expectedDifferentMessage  = "差異あり: different.txt";
         final String expectedTargetOnlyMessage = "ターゲットのみに存在: target_only.txt";
 
         /* 準備 */
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        final PrintStream originalOut = System.out;
+        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
+        final PrintStream           originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         // ソースディレクトリにのみ存在するファイルを作成
@@ -69,6 +70,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Files.writeString(targetOnlyFile, "target content");
 
         try {
+
             /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
@@ -81,31 +83,33 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             Assertions.assertTrue(actualOutput.contains(expectedTargetOnlyMessage), "ターゲットディレクトリにのみ存在するファイルが検出されること");
 
         } finally {
+
             System.setOut(originalOut);
+
         }
+
     }
 
     /**
      * 複雑なディレクトリ構造の差分検出テスト
      *
-     * @throws IOException ファイル操作時にエラーが発生した場合
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testComplexDirectoryStructureDiff() throws IOException {
 
         /* 期待値の定義 */
-        final String expectedPath1 = Paths.get("subdir1", "file1.txt").toString();
-        final String expectedPath2 = Paths.get("subdir2", "file2.txt").toString();
+        final String   expectedPath1       = Paths.get("subdir1", "file1.txt").toString();
+        final String   expectedPath2       = Paths.get("subdir2", "file2.txt").toString();
         final String[] expectedOutputLines = {
-            "ソースディレクトリのみに存在するディレクトリ: subdir1",
-            "ソースのみに存在: " + expectedPath1,
-            "ターゲットディレクトリのみに存在するディレクトリ: subdir2",
-            "ターゲットのみに存在: " + expectedPath2
+                "ソースディレクトリのみに存在するディレクトリ: subdir1", "ソースのみに存在: " + expectedPath1, "ターゲットディレクトリのみに存在するディレクトリ: subdir2",
+                "ターゲットのみに存在: " + expectedPath2
         };
 
         /* 準備 */
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        final PrintStream originalOut = System.out;
+        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
+        final PrintStream           originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         // ソース側のディレクトリ構造を作成
@@ -119,6 +123,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Files.writeString(targetSubDir.resolve("file2.txt"), "content2");
 
         try {
+
             /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
@@ -127,18 +132,24 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
             /* 検証の実施 */
             for (int i = 0; i < expectedOutputLines.length; i++) {
+
                 Assertions.assertEquals(expectedOutputLines[i], actualOutputLines[i], "出力行" + (i + 1) + "が期待値と一致すること");
+
             }
 
         } finally {
+
             System.setOut(originalOut);
+
         }
+
     }
 
     /**
      * 同一内容のファイルの差分検出テスト
      *
-     * @throws IOException ファイル操作時にエラーが発生した場合
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testIdenticalFiles() throws IOException {
@@ -147,8 +158,8 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         final String expectedFileName = "same.txt";
 
         /* 準備 */
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        final PrintStream originalOut = System.out;
+        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
+        final PrintStream           originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         // 同じ内容のファイルを両方のディレクトリに作成
@@ -157,6 +168,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Files.writeString(this.targetDir.resolve(expectedFileName), content);
 
         try {
+
             /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
@@ -167,27 +179,30 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             Assertions.assertFalse(actualOutput.contains(expectedFileName), "同一内容のファイルは差分として報告されないこと");
 
         } finally {
+
             System.setOut(originalOut);
+
         }
+
     }
 
     /**
      * 空のディレクトリ構造の差分検出テスト
      *
-     * @throws IOException ファイル操作時にエラーが発生した場合
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testEmptyDirectoryDiff() throws IOException {
 
         /* 期待値の定義 */
         final String[] expectedOutputLines = {
-            "ソースディレクトリのみに存在するディレクトリ: empty_source",
-            "ターゲットディレクトリのみに存在するディレクトリ: empty_target"
+                "ソースディレクトリのみに存在するディレクトリ: empty_source", "ターゲットディレクトリのみに存在するディレクトリ: empty_target"
         };
 
         /* 準備 */
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        final PrintStream originalOut = System.out;
+        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
+        final PrintStream           originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         // ソース側にのみ空のディレクトリを作成
@@ -199,6 +214,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Files.createDirectories(targetEmptyDir);
 
         try {
+
             /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
@@ -207,12 +223,17 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
             /* 検証の実施 */
             for (int i = 0; i < expectedOutputLines.length; i++) {
+
                 Assertions.assertEquals(expectedOutputLines[i], actualOutputLines[i], "出力行" + (i + 1) + "が期待値と一致すること");
+
             }
 
         } finally {
+
             System.setOut(originalOut);
+
         }
+
     }
 
     /**
@@ -222,8 +243,8 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
     public void testInvalidPaths() {
 
         /* 期待値の定義 */
-        final Path invalidSourcePath = Path.of("/invalid/source/path");
-        final Path invalidTargetPath = Path.of("/invalid/target/path");
+        final Path   invalidSourcePath          = Path.of("/invalid/source/path");
+        final Path   invalidTargetPath          = Path.of("/invalid/target/path");
         final String expectedSourceErrorMessage = "ソースディレクトリが存在しません。";
         final String expectedTargetErrorMessage = "ターゲットディレクトリが存在しません。: " + invalidTargetPath;
 
@@ -232,35 +253,40 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
         /* テスト対象の実行と検証の準備 */
         final Exception actualSourceException = Assertions.assertThrows(IOException.class, () -> {
+
             this.service.processDirectory(invalidSourcePath.toString(), this.targetDir.toString());
+
         });
 
         final Exception actualTargetException = Assertions.assertThrows(IOException.class, () -> {
+
             this.service.processDirectory(this.sourceDir.toString(), invalidTargetPath.toString());
+
         });
 
         /* 検証の実施 */
-        Assertions.assertEquals(expectedSourceErrorMessage, actualSourceException.getMessage(), "ソースディレクトリ不在時のエラーメッセージが一致すること");
-        Assertions.assertEquals(expectedTargetErrorMessage, actualTargetException.getMessage(), "ターゲットディレクトリ不在時のエラーメッセージが一致すること");
+        Assertions.assertEquals(expectedSourceErrorMessage, actualSourceException.getMessage(),
+                "ソースディレクトリ不在時のエラーメッセージが一致すること");
+        Assertions.assertEquals(expectedTargetErrorMessage, actualTargetException.getMessage(),
+                "ターゲットディレクトリ不在時のエラーメッセージが一致すること");
+
     }
 
     /**
      * ファイルとディレクトリの型の違いをテスト
      *
-     * @throws IOException ファイル操作時にエラーが発生した場合
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testFileVsDirectoryDiff() throws IOException {
 
         /* 期待値の定義 */
-        final Set<String> expectedOutput = Set.of(
-                "差異あり: test (ファイル vs ディレクトリ)",
-                "差異あり: test2 (ディレクトリ vs ファイル)"
-        );
+        final Set<String> expectedOutput = Set.of("差異あり: test (ファイル vs ディレクトリ)", "差異あり: test2 (ディレクトリ vs ファイル)");
 
         /* 準備 */
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        final PrintStream originalOut = System.out;
+        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
+        final PrintStream           originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         // ソースにファイル、ターゲットに同名のディレクトリを作成
@@ -273,6 +299,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Files.writeString(this.targetDir.resolve("test2"), "content");
 
         try {
+
             /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
@@ -284,14 +311,18 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             Assertions.assertEquals(expectedOutput, actualOutput, "ファイルとディレクトリの型の違いが正しく検出されること");
 
         } finally {
+
             System.setOut(originalOut);
+
         }
+
     }
 
     /**
      * ルートディレクトリの処理が除外されることのテスト
      *
-     * @throws IOException ファイル操作時にエラーが発生した場合
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
      */
     @Test
     public void testRootDirectoryExclusion() throws IOException {
@@ -300,11 +331,12 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         final String expectedNotContainPath = this.sourceDir.getFileName().toString();
 
         /* 準備 */
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        final PrintStream originalOut = System.out;
+        final ByteArrayOutputStream outContent  = new ByteArrayOutputStream();
+        final PrintStream           originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         try {
+
             /* テスト対象の実行 */
             this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
@@ -315,7 +347,10 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
             Assertions.assertFalse(actualOutput.contains(expectedNotContainPath), "ルートディレクトリ自体が差分として報告されないこと");
 
         } finally {
+
             System.setOut(originalOut);
+
         }
+
     }
 }

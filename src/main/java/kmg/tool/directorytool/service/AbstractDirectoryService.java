@@ -64,30 +64,42 @@ public abstract class AbstractDirectoryService {
 
         // ソースパス内のすべてのファイルとディレクトリを再帰的に処理
         try (Stream<Path> stream = Files.walk(source)) {
+
             stream.forEach(path -> {
+
                 // 非同期タスクを開始してファイルを処理
                 final Future<?> future = this.executorService.submit(() -> {
+
                     try {
+
                         // 相対パスを計算
                         final Path relativePath = source.relativize(path);
                         // ターゲットパスを計算
                         final Path targetPath = destination.resolve(relativePath);
                         // 個別のファイルやディレクトリを処理
                         this.processPath(path, targetPath, relativePath);
+
                     } catch (final IOException e) {
+
                         // 処理中にエラーが発生した場合はランタイム例外をスロー
-                        throw new RuntimeException(String.format("ファイルの処理に失敗しました。パス=[%s], エラー=[%s]", path, e.toString()), e);
+                        throw new RuntimeException(
+                                String.format("ファイルの処理に失敗しました。パス=[%s], エラー=[%s]", path, e.toString()), e);
+
                     }
+
                 });
                 // 結果をリストに追加
                 futures.add(future);
+
             });
+
         }
 
         // すべての非同期処理が完了するのを待機
         AbstractDirectoryService.waitForCompletion(futures);
         // 全体の後処理を実行
         this.postProcess(source, destination);
+
     }
 
     /**
@@ -108,20 +120,29 @@ public abstract class AbstractDirectoryService {
     protected static void validatePaths(final Path source, final Path destination) throws IOException {
 
         if (!Files.exists(source)) {
+
             throw new IOException("ソースディレクトリが存在しません。");
+
         }
 
         if (!Files.isDirectory(source)) {
+
             throw new IOException("ソースパスはディレクトリではありません。");
+
         }
 
         if (Files.exists(destination) && !Files.isDirectory(destination)) {
+
             throw new IOException("宛先パスは存在しますが、ディレクトリではありません。");
+
         }
 
         if (!Files.exists(destination)) {
+
             Files.createDirectories(destination);
+
         }
+
     }
 
     /**
@@ -172,13 +193,20 @@ public abstract class AbstractDirectoryService {
      *                     ファイルの読み取り中にエラーが発生した場合
      */
     protected static boolean compareFiles(final Path file1, final Path file2) throws IOException {
+
         boolean result;
+
         if (Files.size(file1) != Files.size(file2)) {
+
             result = false;
+
         } else {
+
             result = Files.mismatch(file1, file2) == -1;
+
         }
         return result;
+
     }
 
     /**
@@ -193,13 +221,21 @@ public abstract class AbstractDirectoryService {
      *                     タスクの実行中にInterruptedException, ExecutionException, TimeoutExceptionが発生した場合。
      */
     private static void waitForCompletion(final List<Future<?>> futures) throws IOException {
+
         for (final Future<?> future : futures) {
+
             try {
+
                 future.get(30, TimeUnit.SECONDS);       // TODO 20225/01/18 タイムアウトをパラメータから指定できるようにする。
+
             } catch (InterruptedException | java.util.concurrent.ExecutionException
                     | java.util.concurrent.TimeoutException e) {
+
                 throw new IOException("ディレクトリの処理に失敗しました。", e);
+
             }
+
         }
+
     }
 }

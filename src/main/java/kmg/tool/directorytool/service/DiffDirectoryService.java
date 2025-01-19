@@ -63,17 +63,21 @@ public class DiffDirectoryService extends AbstractDirectoryService {
     /**
      * ソースディレクトリとターゲットディレクトリのパスを比較し、差分を検出します。
      *
-     * @param sourcePath ソースディレクトリのパス
-     * @param targetPath ターゲットディレクトリのパス
-     * @param relativePath ソースディレクトリからの相対パス
-     * @throws IOException ファイルまたはディレクトリの存在確認中にI/Oエラーが発生した場合。
+     * @param sourcePath
+     *                     ソースディレクトリのパス
+     * @param targetPath
+     *                     ターゲットディレクトリのパス
+     * @param relativePath
+     *                     ソースディレクトリからの相対パス
+     * @throws IOException
+     *                     ファイルまたはディレクトリの存在確認中にI/Oエラーが発生した場合。
      */
     @Override
     protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
             throws IOException {
 
         // ソースパスとターゲットパスの種別を判定
-        final boolean isSourceDir = Files.isDirectory(sourcePath);
+        final boolean isSourceDir  = Files.isDirectory(sourcePath);
         final boolean targetExists = Files.exists(targetPath);
 
         final boolean isTargetDir = targetExists && Files.isDirectory(targetPath);
@@ -89,7 +93,9 @@ public class DiffDirectoryService extends AbstractDirectoryService {
             }
 
             if (!isTargetDir) {
+
                 System.out.println(String.format("差異あり: %s (ディレクトリ vs ファイル)", relativePath));
+
             }
             return;
 
@@ -97,17 +103,23 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         // ファイルの比較
         if (!targetExists) {
+
             System.out.println(String.format("ソースのみに存在: %s", relativePath));
             return;
+
         }
 
         if (isTargetDir) {
+
             System.out.println(String.format("差異あり: %s (ファイル vs ディレクトリ)", relativePath));
             return;
+
         }
 
         if (!AbstractDirectoryService.compareFiles(sourcePath, targetPath)) {
+
             System.out.println(String.format("差異あり: %s", relativePath));
+
         }
 
     }
@@ -115,9 +127,12 @@ public class DiffDirectoryService extends AbstractDirectoryService {
     /**
      * ターゲットディレクトリを走査して、ソースディレクトリに存在しないファイルを検出します。
      *
-     * @param source ソースディレクトリのパス
-     * @param destination ターゲットディレクトリのパス
-     * @throws IOException ディレクトリの走査中にI/Oエラーが発生した場合。
+     * @param source
+     *                    ソースディレクトリのパス
+     * @param destination
+     *                    ターゲットディレクトリのパス
+     * @throws IOException
+     *                     ディレクトリの走査中にI/Oエラーが発生した場合。
      */
     @Override
     protected void postProcess(final Path source, final Path destination) throws IOException {
@@ -139,9 +154,12 @@ public class DiffDirectoryService extends AbstractDirectoryService {
     /**
      * ターゲットディレクトリのパスを処理し、ソースディレクトリに存在しないファイルを検出します。
      *
-     * @param source ソースディレクトリのパス
-     * @param destination ターゲットディレクトリのパス
-     * @param path ターゲットディレクトリ内の現在のパス
+     * @param source
+     *                    ソースディレクトリのパス
+     * @param destination
+     *                    ターゲットディレクトリのパス
+     * @param path
+     *                    ターゲットディレクトリ内の現在のパス
      */
     private static void processDestinationPath(final Path source, final Path destination, final Path path) {
 
@@ -152,7 +170,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         }
 
         final Path relativePath = destination.relativize(path);
-        final Path sourcePath = source.resolve(relativePath);
+        final Path sourcePath   = source.resolve(relativePath);
 
         if (Files.exists(sourcePath)) {
 
@@ -161,25 +179,31 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         }
 
         if (Files.isDirectory(path)) {
+
             System.out.println(String.format("ターゲットディレクトリのみに存在するディレクトリ: %s", relativePath));
+
         } else {
+
             System.out.println(String.format("ターゲットのみに存在: %s", relativePath));
+
         }
 
     }
 
     /**
-     * ソースディレクトリとターゲットディレクトリを比較し、差分を検出します。
-     * このメソッドは親クラスの実装をオーバーライドし、両方のディレクトリが存在することを 確認してから処理を開始します。
+     * ソースディレクトリとターゲットディレクトリを比較し、差分を検出します。 このメソッドは親クラスの実装をオーバーライドし、両方のディレクトリが存在することを 確認してから処理を開始します。
      *
-     * @param srcPath ソースディレクトリのパス
-     * @param destPath ターゲットディレクトリのパス
-     * @throws IOException ソースディレクトリまたはターゲットディレクトリが存在しない場合に発生します。
+     * @param srcPath
+     *                 ソースディレクトリのパス
+     * @param destPath
+     *                 ターゲットディレクトリのパス
+     * @throws IOException
+     *                     ソースディレクトリまたはターゲットディレクトリが存在しない場合に発生します。
      */
     @Override
     public void processDirectory(final String srcPath, final String destPath) throws IOException {
 
-        final Path source = Path.of(srcPath);
+        final Path source      = Path.of(srcPath);
         final Path destination = Path.of(destPath);
 
         // ソースディレクトリの存在チェック
@@ -206,7 +230,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
                 try {
 
                     final Path relativePath = source.relativize(path);
-                    final Path targetPath = destination.resolve(relativePath);
+                    final Path targetPath   = destination.resolve(relativePath);
                     this.processPath(path, targetPath, relativePath);
 
                 } catch (final IOException e) {

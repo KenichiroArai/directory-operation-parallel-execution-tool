@@ -24,6 +24,7 @@ class DirectoryToolApplicationTest {
      */
     @Test
     void contextLoads() {
+
         // Spring Contextが正常にロードされることを確認
     }
 
@@ -37,6 +38,7 @@ class DirectoryToolApplicationTest {
      *                     ディレクトリやファイルの作成に失敗した場合
      */
     private static Path createTestDirectory(@TempDir final Path tempDir) throws IOException {
+
         final Path sourceDir = tempDir.resolve("test-source");
         Files.createDirectories(sourceDir);
 
@@ -49,6 +51,7 @@ class DirectoryToolApplicationTest {
         Files.createFile(subDir.resolve("test3.txt"));
 
         return sourceDir;
+
     }
 
     /**
@@ -61,6 +64,7 @@ class DirectoryToolApplicationTest {
      */
     @Test
     static void mainMethodExecutesSuccessfullyInTestMode(@TempDir final Path tempDir) throws IOException {
+
         // テストデータを作成
         final Path sourceDir = DirectoryToolApplicationTest.createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
@@ -75,6 +79,7 @@ class DirectoryToolApplicationTest {
         Assertions.assertTrue(Files.exists(destDir.resolve("test1.txt")));
         Assertions.assertTrue(Files.exists(destDir.resolve("test2.txt")));
         Assertions.assertTrue(Files.exists(destDir.resolve("subdir/test3.txt")));
+
     }
 
     /**
@@ -107,6 +112,7 @@ class DirectoryToolApplicationTest {
 
         // プロパティをリセット
         System.clearProperty("skipExit");
+
     }
 
     /**
@@ -117,8 +123,10 @@ class DirectoryToolApplicationTest {
      */
     @Test
     static void mainMethodFailsWithInsufficientArguments(final CapturedOutput output) {
+
         DirectoryToolApplication.main(new String[] {});
         Assertions.assertEquals("引数が不足しています。" + System.lineSeparator(), output.getErr());
+
     }
 
     /**
@@ -129,10 +137,12 @@ class DirectoryToolApplicationTest {
      */
     @Test
     static void mainMethodFailsWithInvalidOperationType(final CapturedOutput output) {
+
         DirectoryToolApplication.main(new String[] {
                 "/src", "/dest", "INVALID"
         });
         Assertions.assertEquals("無効なモードです。" + System.lineSeparator(), output.getErr());
+
     }
 
     /**
@@ -143,10 +153,12 @@ class DirectoryToolApplicationTest {
      */
     @Test
     static void mainMethodFailsWithNonExistentSourceDirectory(final CapturedOutput output) {
+
         DirectoryToolApplication.main(new String[] {
                 "/nonexistent", "/dest", "COPY"
         });
         Assertions.assertEquals("ソースディレクトリが存在しません。" + System.lineSeparator(), output.getErr());
+
     }
 
     /**
@@ -169,5 +181,6 @@ class DirectoryToolApplicationTest {
         });
         Assertions.assertTrue(output.toString().contains("ソースディレクトリが存在しません。"),
                 "Should display source directory not found message");
+
     }
 }

@@ -76,7 +76,9 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
      * デフォルトコンストラクタ。
      */
     public DirectoryToolAr() {
+
         this.exitCode = 0;      // TODO 2025/01/18 列挙型で定義する
+
     }
 
     /**
@@ -84,8 +86,10 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
      */
     @Override
     public int getExitCode() {
+
         final int result = this.exitCode;
         return result;
+
     }
 
     /**
@@ -93,8 +97,10 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
      */
     @Override
     public int getExitCode(final Throwable exception) {
+
         final int result = 2;
         return result;
+
     }
 
     /**
@@ -121,25 +127,32 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
+
             System.out.println("使用方法: <mode> <src> <dest>");
             System.out.println("モデルの種類: COPY, MOVE, DIFF");
             return;
+
         }
 
         // 引数をパース
         // モード
         final String  modeStr = nonOptionArgs[0];
         OperationMode mode;
+
         try {
+
             // モード文字列をenumに変換
             mode = OperationMode.valueOf(modeStr.toUpperCase());
+
         } catch (final IllegalArgumentException e) {
+
             // 無効なモードが指定された場合
             this.exitCode = 1;
             System.out.println(String.format("無効なモードが選択されています。: [%s]", modeStr));
             System.out.println("有効なモードの種類: COPY, MOVE, DIFF");
             e.printStackTrace();
             return;
+
         }
         // ソースディレクトリパス
         final String src = nonOptionArgs[1];
@@ -148,12 +161,17 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
         /* ディレクトリ操作を実行 */
         try {
+
             this.directoryService.processDirectory(src, dest, mode);
             System.out.println("ディレクトリ操作の処理が終了しました。");
+
         } catch (final IOException e) {
+
             // ディレクトリ操作中にエラーが発生した場合
             this.exitCode = 1;
             e.printStackTrace();
+
         }
+
     }
 }
