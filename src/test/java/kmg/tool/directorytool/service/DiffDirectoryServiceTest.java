@@ -1,11 +1,11 @@
 package kmg.tool.directorytool.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,8 +94,8 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
     public void testComplexDirectoryStructureDiff() throws IOException {
 
         /* 期待値の定義 */
-        final String expectedPath1 = "subdir1" + File.separator + "file1.txt";
-        final String expectedPath2 = "subdir2" + File.separator + "file2.txt";
+        final String expectedPath1 = Paths.get("subdir1", "file1.txt").toString();
+        final String expectedPath2 = Paths.get("subdir2", "file2.txt").toString();
         final String[] expectedOutputLines = {
             "ソースディレクトリのみに存在するディレクトリ: subdir1",
             "ソースのみに存在: " + expectedPath1,
