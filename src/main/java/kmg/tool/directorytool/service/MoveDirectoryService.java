@@ -8,7 +8,10 @@ import java.nio.file.StandardCopyOption;
 import org.springframework.stereotype.Service;
 
 /**
- * ディレクトリの移動操作を実行するサービスクラス。 {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的な移動機能を提供する。
+ * ディレクトリの移動操作を実行するサービスクラス。<br>
+ * <p>
+ *  {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的な移動機能を提供する。
+ * </p>
  * <p>
  * 主な特徴：
  * <ul>
@@ -45,7 +48,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class MoveDirectoryService extends AbstractDirectoryService {
     /**
-     * 個々のファイル/ディレクトリに対して移動操作を実行する。 ソースがディレクトリの場合、ターゲットディレクトリを作成する。 ソースがファイルの場合、親ディレクトリを作成し、ファイルを移動する。 既存のファイルは上書きされる。
+     * 個々のファイル/ディレクトリに対して移動操作を実行する。<br>
+     * <p>
+     * ソースがディレクトリの場合、ターゲットディレクトリを作成する。
+     * ソースがファイルの場合、親ディレクトリを作成し、ファイルを移動する。 既存のファイルは上書きされる。
+     * </p>
      *
      * @param sourcePath
      *                     移動元のパス
@@ -59,17 +66,22 @@ public class MoveDirectoryService extends AbstractDirectoryService {
     @Override
     protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
             throws IOException {
+
         if (Files.isDirectory(sourcePath)) {
             Files.createDirectories(targetPath);
-        } else {
-            // ファイル移動前にターゲットディレクトリが存在することを保証
-            Files.createDirectories(targetPath.getParent());
-            Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            return;
         }
+
+        // ファイル移動前にターゲットディレクトリが存在することを保証
+        Files.createDirectories(targetPath.getParent());
+        Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     /**
-     * 移動操作後の後処理を実行する。 ソースディレクトリ内の空になったディレクトリを削除する。 削除は深い階層から順に行われる。
+     * 移動操作後の後処理を実行する。 <br>
+     * <p>ソースディレクトリ内の空になったディレクトリを削除する。<br>
+     * 削除は深い階層から順に行われる。
+     * </p>
      * <p>
      * この処理は以下の手順で実行されます：
      * <ol>
@@ -88,16 +100,18 @@ public class MoveDirectoryService extends AbstractDirectoryService {
      */
     @Override
     protected void postProcess(final Path source, final Path destination) throws IOException {
+
         // 空になったディレクトリを削除
         try (var stream = Files.walk(source)) {
-            stream.sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(path -> {
+            stream.sorted((src, dest) -> dest.toString().length() - src.toString().length()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);
                 } catch (final IOException e) {
-                    System.err.println("Failed to delete path: " + path);
-                    System.err.println("Error details: " + e.getMessage());
+                    System.err.println(String.format("パス '%s' の削除に失敗しました", path));
+                    System.err.println(String.format("エラー詳細: %s", e.getMessage()));
                 }
             });
         }
     }
+
 }
