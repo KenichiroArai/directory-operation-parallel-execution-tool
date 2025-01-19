@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>3.2.1</version>
         <relativePath/>
     </parent>
 
@@ -58,7 +58,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
-                    <useJUnitPlatform>true</useJUnitPlatform>
                     <parallel>classes</parallel>
                     <threadCount>8</threadCount>
                     <perCoreThreadCount>true</perCoreThreadCount>
