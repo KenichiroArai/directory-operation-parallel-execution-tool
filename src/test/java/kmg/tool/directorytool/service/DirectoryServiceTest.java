@@ -2,6 +2,7 @@ package kmg.tool.directorytool.service;
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +14,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import kmg.tool.directorytool.model.OperationMode;
 
 /**
- * DirectoryServiceのファサードパターンの機能をテストするクラス。 各操作モードで適切なサービスが選択され、処理が正しく委譲されることを確認します。
+ * DirectoryServiceのファサードパターンの機能をテストするクラス。 <br>
+ * <p>
+ * 各操作モードで適切なサービスが選択され、処理が正しく委譲されることを確認します。
+ * </p>
  */
 @ExtendWith(MockitoExtension.class)
-class DirectoryServiceTest {
+public class DirectoryServiceTest {
 
     /** テスト対象のDirectoryServiceインスタンス */
     @Mock
@@ -26,11 +30,15 @@ class DirectoryServiceTest {
     @Mock
     private CopyDirectoryService copyService;
 
-    /** 移動処理を行うサービスのモック */
+    /**
+     * 移動処理を行うサービスのモック
+     */
     @Mock
     private MoveDirectoryService moveService;
 
-    /** 差分比較を行うサービスのモック */
+    /**
+     * 差分比較を行うサービスのモック
+     */
     @Mock
     private DiffDirectoryService diffService;
 
@@ -38,11 +46,13 @@ class DirectoryServiceTest {
      * テストの前準備を行います。 DirectoryServiceのインスタンスを生成し、必要なモックサービスを注入します。
      */
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+
         this.directoryService = new DirectoryService();
         ReflectionTestUtils.setField(this.directoryService, "copyService", this.copyService);
         ReflectionTestUtils.setField(this.directoryService, "moveService", this.moveService);
         ReflectionTestUtils.setField(this.directoryService, "diffService", this.diffService);
+
     }
 
     /**
@@ -52,15 +62,26 @@ class DirectoryServiceTest {
      *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
-    void testCopyModeCallsCorrectService() throws IOException {
-        final String srcPath  = "source";
-        final String destPath = "target";
+    public void testCopyModeCallsCorrectService() throws IOException {
 
-        this.directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
+        /* 期待値の定義 */
+        final String expectedSrcPath  = "source";
+        final String expectedDestPath = "target";
 
-        Mockito.verify(this.copyService).processDirectory(srcPath, destPath);
+        /* 準備 */
+        // 準備は不要
+
+        /* テスト対象の実行 */
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.COPY);
+
+        /* 検証の準備 */
+        // 検証の準備は不要
+
+        /* 検証の実施 */
+        Mockito.verify(this.copyService).processDirectory(expectedSrcPath, expectedDestPath);
         Mockito.verifyNoInteractions(this.moveService);
         Mockito.verifyNoInteractions(this.diffService);
+
     }
 
     /**
@@ -70,15 +91,26 @@ class DirectoryServiceTest {
      *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
-    void testMoveModeCallsCorrectService() throws IOException {
-        final String srcPath  = "source";
-        final String destPath = "target";
+    public void testMoveModeCallsCorrectService() throws IOException {
 
-        this.directoryService.processDirectory(srcPath, destPath, OperationMode.MOVE);
+        /* 期待値の定義 */
+        final String expectedSrcPath  = "source";
+        final String expectedDestPath = "target";
 
-        Mockito.verify(this.moveService).processDirectory(srcPath, destPath);
+        /* 準備 */
+        // 準備は不要
+
+        /* テスト対象の実行 */
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.MOVE);
+
+        /* 検証の準備 */
+        // 検証の準備は不要
+
+        /* 検証の実施 */
+        Mockito.verify(this.moveService).processDirectory(expectedSrcPath, expectedDestPath);
         Mockito.verifyNoInteractions(this.copyService);
         Mockito.verifyNoInteractions(this.diffService);
+
     }
 
     /**
@@ -88,15 +120,26 @@ class DirectoryServiceTest {
      *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
-    void testDiffModeCallsCorrectService() throws IOException {
-        final String srcPath  = "source";
-        final String destPath = "target";
+    public void testDiffModeCallsCorrectService() throws IOException {
 
-        this.directoryService.processDirectory(srcPath, destPath, OperationMode.DIFF);
+        /* 期待値の定義 */
+        final String expectedSrcPath  = "source";
+        final String expectedDestPath = "target";
 
-        Mockito.verify(this.diffService).processDirectory(srcPath, destPath);
+        /* 準備 */
+        // 準備は不要
+
+        /* テスト対象の実行 */
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.DIFF);
+
+        /* 検証の準備 */
+        // 検証の準備は不要
+
+        /* 検証の実施 */
+        Mockito.verify(this.diffService).processDirectory(expectedSrcPath, expectedDestPath);
         Mockito.verifyNoInteractions(this.copyService);
         Mockito.verifyNoInteractions(this.moveService);
+
     }
 
     /**
@@ -106,17 +149,30 @@ class DirectoryServiceTest {
      *                     ディレクトリ処理中にI/Oエラーが発生した場合
      */
     @Test
-    void testExceptionPropagation() throws IOException {
-        final String      srcPath           = "source";
-        final String      destPath          = "target";
+    public void testExceptionPropagation() throws IOException {
+
+        /* 期待値の定義 */
+        final String      expectedSrcPath   = "source";
+        final String      expectedDestPath  = "target";
         final IOException expectedException = new IOException("Test error");
 
-        Mockito.doThrow(expectedException).when(this.copyService).processDirectory(srcPath, destPath);
+        /* 準備 */
+        Mockito.doThrow(expectedException).when(this.copyService).processDirectory(expectedSrcPath, expectedDestPath);
 
+        /* テスト対象の実行 */
         try {
-            this.directoryService.processDirectory(srcPath, destPath, OperationMode.COPY);
-        } catch (final IOException e) {
-            org.junit.jupiter.api.Assertions.assertEquals(expectedException, e);
+
+            this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.COPY);
+
+        } catch (final IOException actualException) {
+            /* 検証の準備 */
+
+            // 検証の準備は不要
+
+            /* 検証の実施 */
+            Assertions.assertEquals(expectedException, actualException, "期待した例外が発生すること");
+
         }
+
     }
 }
