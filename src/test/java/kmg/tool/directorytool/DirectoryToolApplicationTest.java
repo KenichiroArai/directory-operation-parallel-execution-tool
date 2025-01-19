@@ -13,19 +13,25 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 /**
- * DirectoryToolApplicationのテストクラス。 アプリケーションの主要な機能とエラーハンドリングをテストします。
+ * DirectoryToolApplicationのテストクラス。<br>
+ * <p>
+ * アプリケーションの主要な機能とエラーハンドリングをテストします。
+ * </p>
  */
 @SpringBootTest
 @ExtendWith(OutputCaptureExtension.class)
-class DirectoryToolApplicationTest {
+public class DirectoryToolApplicationTest {
 
     /**
      * Springコンテキストが正常にロードされることを確認するテスト。
      */
+    @SuppressWarnings("static-method")
     @Test
-    void contextLoads() {
+    public void testContextLoads() {
 
-        // Spring Contextが正常にロードされることを確認
+        /* 検証の実施 */
+        Assertions.assertTrue(true, "Spring Contextが正常にロードされること");
+
     }
 
     /**
@@ -50,7 +56,8 @@ class DirectoryToolApplicationTest {
         Files.createDirectories(subDir);
         Files.createFile(subDir.resolve("test3.txt"));
 
-        return sourceDir;
+        final Path result = sourceDir;
+        return result;
 
     }
 
@@ -62,23 +69,35 @@ class DirectoryToolApplicationTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
+    @SuppressWarnings("static-method")
     @Test
-    static void mainMethodExecutesSuccessfullyInTestMode(@TempDir final Path tempDir) throws IOException {
+    public void testMainMethodExecutesSuccessfullyInTestMode(@TempDir final Path tempDir) throws IOException {
 
-        // テストデータを作成
+        /* 期待値の定義 */
         final Path sourceDir = DirectoryToolApplicationTest.createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
 
-        // mainメソッドを実行（テストデータディレクトリを使用）
+        /* 準備 */
         DirectoryToolApplication.main(new String[] {
-                sourceDir.toString(), destDir.toString(), "COPY"
+                "COPY", sourceDir.toString(), destDir.toString()
         });
 
-        // 結果の検証
-        Assertions.assertTrue(Files.exists(destDir));
-        Assertions.assertTrue(Files.exists(destDir.resolve("test1.txt")));
-        Assertions.assertTrue(Files.exists(destDir.resolve("test2.txt")));
-        Assertions.assertTrue(Files.exists(destDir.resolve("subdir/test3.txt")));
+        /* テスト対象の実行 */
+        DirectoryToolApplication.main(new String[] {
+                "COPY", sourceDir.toString(), destDir.toString()
+        });
+
+        /* 検証の準備 */
+        final boolean actualDestDirExists = Files.exists(destDir);
+        final boolean actualTest1Exists   = Files.exists(destDir.resolve("test1.txt"));
+        final boolean actualTest2Exists   = Files.exists(destDir.resolve("test2.txt"));
+        final boolean actualTest3Exists   = Files.exists(destDir.resolve("subdir/test3.txt"));
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualDestDirExists, "destDirが存在すること");
+        Assertions.assertTrue(actualTest1Exists, "test1.txtが存在すること");
+        Assertions.assertTrue(actualTest2Exists, "test2.txtが存在すること");
+        Assertions.assertTrue(actualTest3Exists, "subdir/test3.txtが存在すること");
 
     }
 
@@ -90,28 +109,36 @@ class DirectoryToolApplicationTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
+    @SuppressWarnings("static-method")
     @Test
-    static void mainMethodExecutesSuccessfullyInNonTestMode(@TempDir final Path tempDir) throws IOException {
+    public void testMainMethodExecutesSuccessfullyInNonTestMode(@TempDir final Path tempDir) throws IOException {
 
-        // テストデータを作成
+        /* 期待値の定義 */
         final Path sourceDir = DirectoryToolApplicationTest.createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
 
-        // System.exitを実行しないようにする
+        /* 準備 */
         System.setProperty("skipExit", "true");
-
         DirectoryToolApplication.main(new String[] {
-                sourceDir.toString(), destDir.toString(), "COPY"
+                "COPY", sourceDir.toString(), destDir.toString()
         });
 
-        // 結果の検証
-        Assertions.assertTrue(Files.exists(destDir));
-        Assertions.assertTrue(Files.exists(destDir.resolve("test1.txt")));
-        Assertions.assertTrue(Files.exists(destDir.resolve("test2.txt")));
-        Assertions.assertTrue(Files.exists(destDir.resolve("subdir/test3.txt")));
+        /* テスト対象の実行 */
+        DirectoryToolApplication.main(new String[] {
+                "COPY", sourceDir.toString(), destDir.toString()
+        });
 
-        // プロパティをリセット
-        System.clearProperty("skipExit");
+        /* 検証の準備 */
+        final boolean actualDestDirExists = Files.exists(destDir);
+        final boolean actualTest1Exists   = Files.exists(destDir.resolve("test1.txt"));
+        final boolean actualTest2Exists   = Files.exists(destDir.resolve("test2.txt"));
+        final boolean actualTest3Exists   = Files.exists(destDir.resolve("subdir/test3.txt"));
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualDestDirExists, "destDirが存在すること");
+        Assertions.assertTrue(actualTest1Exists, "test1.txtが存在すること");
+        Assertions.assertTrue(actualTest2Exists, "test2.txtが存在すること");
+        Assertions.assertTrue(actualTest3Exists, "subdir/test3.txt");
 
     }
 
@@ -121,11 +148,21 @@ class DirectoryToolApplicationTest {
      * @param output
      *               テスト出力のキャプチャ
      */
+    @SuppressWarnings("static-method")
     @Test
-    static void mainMethodFailsWithInsufficientArguments(final CapturedOutput output) {
+    public void testMainMethodFailsWithInsufficientArguments(final CapturedOutput output) {
 
+        /* 期待値の定義 */
+        final String expected = "引数が不足しています。" + System.lineSeparator();
+
+        /* 準備 */
         DirectoryToolApplication.main(new String[] {});
-        Assertions.assertEquals("引数が不足しています。" + System.lineSeparator(), output.getErr());
+
+        /* 検証の準備 */
+        final String actual = output.getErr();
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "引数不足のエラーメッセージが期待通りであること");
 
     }
 
@@ -135,13 +172,23 @@ class DirectoryToolApplicationTest {
      * @param output
      *               テスト出力のキャプチャ
      */
+    @SuppressWarnings("static-method")
     @Test
-    static void mainMethodFailsWithInvalidOperationType(final CapturedOutput output) {
+    public void testMainMethodFailsWithInvalidOperationType(final CapturedOutput output) {
 
+        /* 期待値の定義 */
+        final String expected = "無効なモードです。" + System.lineSeparator();
+
+        /* 準備 */
         DirectoryToolApplication.main(new String[] {
-                "/src", "/dest", "INVALID"
+                "INVALID", "/src", "/dest"
         });
-        Assertions.assertEquals("無効なモードです。" + System.lineSeparator(), output.getErr());
+
+        /* 検証の準備 */
+        final String actual = output.getErr();
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "無効な操作タイプのエラーメッセージが期待通りであること");
 
     }
 
@@ -151,13 +198,23 @@ class DirectoryToolApplicationTest {
      * @param output
      *               テスト出力のキャプチャ
      */
+    @SuppressWarnings("static-method")
     @Test
-    static void mainMethodFailsWithNonExistentSourceDirectory(final CapturedOutput output) {
+    public void testMainMethodFailsWithNonExistentSourceDirectory(final CapturedOutput output) {
 
+        /* 期待値の定義 */
+        final String expected = "ソースディレクトリが存在しません。" + System.lineSeparator();
+
+        /* 準備 */
         DirectoryToolApplication.main(new String[] {
-                "/nonexistent", "/dest", "COPY"
+                "COPY", "/nonexistent", "/dest"
         });
-        Assertions.assertEquals("ソースディレクトリが存在しません。" + System.lineSeparator(), output.getErr());
+
+        /* 検証の準備 */
+        final String actual = output.getErr();
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "存在しないソースディレクトリのエラーメッセージが期待通りであること");
 
     }
 
@@ -169,18 +226,26 @@ class DirectoryToolApplicationTest {
      * @param output
      *                テスト出力のキャプチャ
      */
+    @SuppressWarnings("static-method")
     @Test
-    static void mainMethodFailsWithInvalidPaths(@TempDir final Path tempDir, final CapturedOutput output) {
+    public void testMainMethodFailsWithInvalidPaths(@TempDir final Path tempDir, final CapturedOutput output) {
 
-        // 存在しないソースディレクトリ
+        /* 期待値の定義 */
+        final String expected = "ソースディレクトリが存在しません。" + System.lineSeparator();
+
+        /* 準備 */
         final Path nonExistentSource = tempDir.resolve("non-existent");
         final Path destDir           = tempDir.resolve("dest");
 
         DirectoryToolApplication.main(new String[] {
-                nonExistentSource.toString(), destDir.toString(), "COPY"
+                "COPY", nonExistentSource.toString(), destDir.toString()
         });
-        Assertions.assertTrue(output.toString().contains("ソースディレクトリが存在しません。"),
-                "Should display source directory not found message");
+
+        /* 検証の準備 */
+        final String actual = output.getErr();
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "ソースディレクトリが存在しないメッセージが期待通りであること");
 
     }
 }
