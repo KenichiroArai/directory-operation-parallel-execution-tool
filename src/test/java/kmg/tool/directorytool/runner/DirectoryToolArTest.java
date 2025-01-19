@@ -27,40 +27,39 @@ import kmg.tool.directorytool.service.DirectoryService;
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class DirectoryToolArTest implements AutoCloseable {
+public class DirectoryToolArTest implements AutoCloseable {
 
-    /**
-     * テスト対象のDirectoryServiceモック
-     */
+    /** テスト対象のDirectoryServiceモック */
     @Mock
     private DirectoryService directoryService;
 
-    /**
-     * テスト対象のApplicationArgumentsモック
-     */
+    /** テスト対象のApplicationArgumentsモック */
     @Mock
     private ApplicationArguments applicationArguments;
 
-    /**
-     * テスト対象のDirectoryToolArインスタンス
-     */
+    /** テスト対象のDirectoryToolArインスタンス */
     private DirectoryToolAr runner;
 
-    /**
-     * テスト用の出力ストリーム
-     */
-    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    /** テスト用の出力ストリーム */
+    private final ByteArrayOutputStream outputStream;
+
+    /** 標準出力の元のPrintStream */
+    private final PrintStream originalOut = System.out;
 
     /**
-     * 標準出力の元のPrintStream
+     * テスト用の出力ストリームを初期化するコンストラクタ
      */
-    private final PrintStream originalOut = System.out;
+    public DirectoryToolArTest() {
+
+        this.outputStream = new ByteArrayOutputStream();
+
+    }
 
     /**
      * テストの前準備
      */
     @BeforeEach
-    void setUp() {
+    public void setUp() {
 
         this.runner = new DirectoryToolAr();
         ReflectionTestUtils.setField(this.runner, "directoryService", this.directoryService);
@@ -75,17 +74,29 @@ class DirectoryToolArTest implements AutoCloseable {
      *                   テスト実行中に発生する可能性のある例外
      */
     @Test
-    void testSuccessfulCopyOperation() throws Exception {
+    public void testSuccessfulCopyOperation() throws Exception {
 
-        // ApplicationArguments のモック設定
+        // 期待値の定義
+        /* 期待値の定義 */
+        final String expected = String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator());
+
+        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("COPY", "source", "target"));
 
+        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        // 検証の準備
+        /* 検証の準備 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
-        Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
-                this.outputStream.toString());
+        final String actual = this.outputStream.toString();
+
+        // 検証の実施
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "コピー操作の結果が期待通りであること");
 
     }
 
@@ -96,16 +107,29 @@ class DirectoryToolArTest implements AutoCloseable {
      *                   テスト実行中に発生する可能性のある例外
      */
     @Test
-    void testSuccessfulMoveOperation() throws Exception {
+    public void testSuccessfulMoveOperation() throws Exception {
 
+        // 期待値の定義
+        /* 期待値の定義 */
+        final String expected = String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator());
+
+        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("MOVE", "source", "target"));
 
+        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        // 検証の準備
+        /* 検証の準備 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
-        Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
-                this.outputStream.toString());
+        final String actual = this.outputStream.toString();
+
+        // 検証の実施
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "移動操作の結果が期待通りであること");
 
     }
 
@@ -116,17 +140,23 @@ class DirectoryToolArTest implements AutoCloseable {
      *                   テスト実行中に発生する可能性のある例外
      */
     @Test
-    void testInsufficientArguments() throws Exception {
+    public void testInsufficientArguments() throws Exception {
 
+        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs()).thenReturn(Arrays.asList("source", "target"));
 
+        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        // 検証の実施
+        /* 検証の実施 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         final String output = this.outputStream.toString();
-        Assertions.assertTrue(output.contains("使用方法:"));
-        Assertions.assertTrue(output.contains("モデルの種類: COPY, MOVE, DIFF"));
+        Assertions.assertTrue(output.contains("使用方法:"), "使用方法が表示されること");
+        Assertions.assertTrue(output.contains("モデルの種類: COPY, MOVE, DIFF"), "モデルの種類が表示されること");
 
     }
 
@@ -137,19 +167,31 @@ class DirectoryToolArTest implements AutoCloseable {
      *                   テスト実行中に発生する可能性のある例外
      */
     @Test
-    void testInvalidMode() throws Exception {
+    public void testInvalidMode() throws Exception {
 
+        // 期待値の定義
+        /* 期待値の定義 */
         final String expected = String.format("無効なモードが選択されています。: [INVALID]%s有効なモードの種類: COPY, MOVE, DIFF%s",
                 System.lineSeparator(), System.lineSeparator());
 
+        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("INVALID", "source", "target"));
 
+        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        // 検証の準備
+        /* 検証の準備 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
-        Assertions.assertEquals(expected, this.outputStream.toString());
+        final String actual = this.outputStream.toString();
+
+        // 検証の実施
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "無効なモードのエラーメッセージが期待通りであること");
 
     }
 
@@ -160,17 +202,23 @@ class DirectoryToolArTest implements AutoCloseable {
      *                   テスト実行中に発生する可能性のある例外
      */
     @Test
-    void testIOException() throws Exception {
+    public void testIOException() throws Exception {
 
+        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("COPY", "source", "target"));
         final String errorMessage = "Test error message";
         Mockito.doThrow(new IOException(errorMessage)).when(this.directoryService)
                 .processDirectory(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 
+        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
-        Assertions.assertEquals(1, this.runner.getExitCode());
+        // 検証の実施
+        /* 検証の実施 */
+        Assertions.assertEquals(1, this.runner.getExitCode(), "IOException発生時の終了コードが期待通りであること");
 
     }
 
@@ -181,16 +229,29 @@ class DirectoryToolArTest implements AutoCloseable {
      *                   テスト実行中に発生する可能性のある例外
      */
     @Test
-    void testDiffOperation() throws Exception {
+    public void testDiffOperation() throws Exception {
 
+        // 期待値の定義
+        /* 期待値の定義 */
+        final String expected = String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator());
+
+        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("DIFF", "source", "target"));
 
+        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        // 検証の準備
+        /* 検証の準備 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
-        Assertions.assertEquals(String.format("ディレクトリ操作の処理が終了しました。%s", System.lineSeparator()),
-                this.outputStream.toString());
+        final String actual = this.outputStream.toString();
+
+        // 検証の実施
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "DIFF操作の結果が期待通りであること");
 
     }
 
@@ -201,7 +262,7 @@ class DirectoryToolArTest implements AutoCloseable {
      *                     クローズ処理中に発生する可能性のある例外
      */
     @AfterEach
-    void tearDown() throws IOException {
+    public void tearDown() throws IOException {
 
         System.setOut(this.originalOut);
 
