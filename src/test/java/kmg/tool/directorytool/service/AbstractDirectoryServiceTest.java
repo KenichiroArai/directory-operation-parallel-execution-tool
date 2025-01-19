@@ -184,7 +184,7 @@ public abstract class AbstractDirectoryServiceTest {
             protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
                     throws IOException {
 
-                throw new IOException("Simulated error during file processing");
+                throw new IOException("ディレクトリの処理に失敗しました。");
 
             }
 
@@ -198,7 +198,7 @@ public abstract class AbstractDirectoryServiceTest {
         // 処理を実行し、例外が発生することを確認
         final IOException exception = Assertions.assertThrows(IOException.class,
                 () -> errorService.processDirectory(this.sourceDir.toString(), this.targetDir.toString()));
-        Assertions.assertEquals("Simulated error during file processing", exception.getMessage());
+        Assertions.assertEquals("ディレクトリの処理に失敗しました。", exception.getMessage());
 
     }
 
