@@ -23,8 +23,7 @@ public class DirectoryToolApplication {
 
         try (ConfigurableApplicationContext ctx = SpringApplication.run(DirectoryToolApplication.class, args)) {
 
-            System.exit(SpringApplication.exit(ctx));
-
+            // 処理なし
         }
 
     }
