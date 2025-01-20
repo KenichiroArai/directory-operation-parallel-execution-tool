@@ -11,8 +11,9 @@ public class OperationModeTest {
     /**
      * 列挙型の値が正しく定義されているかテスト
      */
+    @SuppressWarnings("static-method")
     @Test
-    public static void testEnumValues() {
+    public void testEnumValues() {
 
         /* 期待値の定義 */
         final int expectedLength = 3;
@@ -36,8 +37,9 @@ public class OperationModeTest {
     /**
      * valueOf操作が正しく機能するかテスト
      */
+    @SuppressWarnings("static-method")
     @Test
-    public static void testValueOf() {
+    public void testValueOf() {
 
         /* 期待値の定義 */
         final OperationMode expectedCopy = OperationMode.COPY;
@@ -64,8 +66,9 @@ public class OperationModeTest {
     /**
      * 無効な値に対する例外処理のテスト
      */
+    @SuppressWarnings("static-method")
     @Test
-    public static void testInvalidValue() {
+    public void testInvalidValue() {
 
         /* 期待値の定義 */
         final String invalidValue = "INVALID";
