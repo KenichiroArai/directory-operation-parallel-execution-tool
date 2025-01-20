@@ -14,9 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.mockito.ArgumentMatchers;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
@@ -371,24 +368,29 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         final Path targetFile = this.targetDir.resolve("testfile.txt");
         Files.writeString(targetFile, "content");
 
-        // Files.walkをモックしてIOExceptionをスローする
-        try (MockedStatic<Files> mockStatic = Mockito.mockStatic(Files.class, Mockito.CALLS_REAL_METHODS)) {
+        // テスト用のサブクラスを作成してprocessPathをオーバーライド
+        final DiffDirectoryService testService = new DiffDirectoryService() {
 
-            mockStatic.when(() -> Files.walk(ArgumentMatchers.any(Path.class)))
-                    .thenThrow(new IOException("Mocked IOException"));
+            @Override
+            protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
+                    throws IOException {
 
-            /* テスト対象の実行と検証の準備 */
-            final Exception actualException = Assertions.assertThrows(RuntimeException.class, () -> {
+                throw new IOException("Test IOException");
 
-                this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
+            }
+        };
 
-            });
+        /* テスト対象の実行と検証の準備 */
+        final Exception actualException = Assertions.assertThrows(RuntimeException.class, () -> {
 
-            /* 検証の実施 */
-            Assertions.assertTrue(actualException.getMessage().contains("ファイルの処理に失敗しました。"),
-                    "RuntimeExceptionが正しくスローされること");
+            // TODO 205/01/21 これ必要？カバレッジ未通過。
+            testService.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-        }
+        });
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualException.getMessage().contains("ファイルの処理に失敗しました。"), "RuntimeExceptionが正しくスローされること");
+        Assertions.assertTrue(actualException.getCause() instanceof IOException, "原因例外がIOExceptionであること");
 
     }
 }
