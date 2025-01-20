@@ -228,7 +228,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         AbstractDirectoryService.validatePaths(source, destination);
 
         // ソースディレクトリの処理
-        try (var stream = Files.walk(source)) {
+        try (Stream<Path> stream = Files.walk(source)) {
 
             stream.forEach(path -> {
 

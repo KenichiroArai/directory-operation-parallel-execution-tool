@@ -14,6 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.mockito.ArgumentMatchers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
@@ -324,6 +327,68 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         /* 検証の実施 */
         Assertions.assertFalse(logMessages.stream().anyMatch(msg -> msg.contains(expectedNotContainPath)),
                 "ルートディレクトリ自体が差分として報告されないこと");
+
+    }
+
+    /**
+     * 宛先ディレクトリが存在しない場合のpostProcessのテスト
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
+     */
+    @Test
+    public void testPostProcessWithNonExistentDestination() throws IOException {
+
+        /* 準備 */
+        // 宛先ディレクトリを削除
+        Files.delete(this.targetDir);
+
+        /* テスト対象の実行 */
+        ((DiffDirectoryService) this.service).postProcess(this.sourceDir, this.targetDir);
+
+        /* 検証の準備 */
+        final List<String> logMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
+                .collect(Collectors.toList());
+
+        /* 検証の実施 */
+        Assertions.assertTrue(logMessages.isEmpty(), "宛先ディレクトリが存在しない場合、ログメッセージが出力されないこと");
+
+    }
+
+    /**
+     * processPathメソッド内でIOExceptionが発生した場合のテスト
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
+     */
+    @Test
+    public void testProcessDirectoryThrowsRuntimeException() throws IOException {
+
+        /* 準備 */
+        final Path sourceFile = this.sourceDir.resolve("testfile.txt");
+        Files.writeString(sourceFile, "content");
+
+        final Path targetFile = this.targetDir.resolve("testfile.txt");
+        Files.writeString(targetFile, "content");
+
+        // Files.walkをモックしてIOExceptionをスローする
+        try (MockedStatic<Files> mockStatic = Mockito.mockStatic(Files.class, Mockito.CALLS_REAL_METHODS)) {
+
+            mockStatic.when(() -> Files.walk(ArgumentMatchers.any(Path.class)))
+                    .thenThrow(new IOException("Mocked IOException"));
+
+            /* テスト対象の実行と検証の準備 */
+            final Exception actualException = Assertions.assertThrows(RuntimeException.class, () -> {
+
+                this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
+
+            });
+
+            /* 検証の実施 */
+            Assertions.assertTrue(actualException.getMessage().contains("ファイルの処理に失敗しました。"),
+                    "RuntimeExceptionが正しくスローされること");
+
+        }
 
     }
 }
