@@ -163,6 +163,7 @@ public class DirectoryToolArTest implements AutoCloseable {
         final String   expectedMsg  = String.join(System.lineSeparator(), expectedMsgs);
 
         /* 準備 */
+        this.listAppender.list.clear();
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("INVALID", "source", "target"));
 
