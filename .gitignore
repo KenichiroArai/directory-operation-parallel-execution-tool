@@ -31,3 +31,6 @@ target/
 
 # Eclipse
 bin/
+
+# logs
+logs/

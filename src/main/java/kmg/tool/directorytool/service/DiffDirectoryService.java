@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,6 +61,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class DiffDirectoryService extends AbstractDirectoryService {
 
+    /** ロガー */
+    private static final Logger logger = LoggerFactory.getLogger(DiffDirectoryService.class);
+
     /**
      * ソースディレクトリとターゲットディレクトリのパスを比較し、差分を検出します。
      *
@@ -87,14 +91,14 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
             if (!targetExists) {
 
-                System.out.println("ソースディレクトリのみに存在するディレクトリ: " + relativePath);
+                logger.info("ソースディレクトリのみに存在するディレクトリ: {}", relativePath);
                 return;
 
             }
 
             if (!isTargetDir) {
 
-                System.out.println(String.format("差異あり: %s (ディレクトリ vs ファイル)", relativePath));
+                logger.info("差異あり: {} (ディレクトリ vs ファイル)", relativePath);
 
             }
             return;
@@ -104,21 +108,21 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         // ファイルの比較
         if (!targetExists) {
 
-            System.out.println(String.format("ソースのみに存在: %s", relativePath));
+            logger.info("ソースのみに存在: {}", relativePath);
             return;
 
         }
 
         if (isTargetDir) {
 
-            System.out.println(String.format("差異あり: %s (ファイル vs ディレクトリ)", relativePath));
+            logger.info("差異あり: {} (ファイル vs ディレクトリ)", relativePath);
             return;
 
         }
 
         if (!AbstractDirectoryService.compareFiles(sourcePath, targetPath)) {
 
-            System.out.println(String.format("差異あり: %s", relativePath));
+            logger.info("差異あり: {}", relativePath);
 
         }
 
@@ -180,11 +184,11 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         if (Files.isDirectory(path)) {
 
-            System.out.println(String.format("ターゲットディレクトリのみに存在するディレクトリ: %s", relativePath));
+            logger.info("ターゲットディレクトリのみに存在するディレクトリ: {}", relativePath);
 
         } else {
 
-            System.out.println(String.format("ターゲットのみに存在: %s", relativePath));
+            logger.info("ターゲットのみに存在: {}", relativePath);
 
         }
 

@@ -1,0 +1,31 @@
+# バナー表示を抑制する
+spring.main.banner-mode: off
+
+# 起動時のログを抑制する
+spring.main.log-startup-info: false
+
+# ログ設定
+## SLF4J + Logback
+logging:
+  # ログファイルの出力先
+  file:
+    name: ./logs/application.log
+
+  # ログレベルの設定
+  level:
+    root: INFO                               # ルートロガーのログレベル
+    '[kmg.tool.directorytool]': DEBUG        # 本アプリケーションのパッケージ
+    '[org.springframework]': WARN            # Springフレームワーク
+
+  # ログのパターン設定
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+  # ログローテーション設定
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB               # 1ファイルの最大サイズ
+      max-history: 30                   # 保持する過去ログファイル数
+      total-size-cap: 3GB               # 全ログファイルの最大サイズ
+      file-name-pattern: ./logs/application-%d{yyyy-MM-dd}.%i.log

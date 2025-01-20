@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="LIST" class="ch.qos.logback.core.read.ListAppender"/>
+
+    <root level="INFO">
+        <appender-ref ref="LIST"/>
+    </root>
+</configuration>

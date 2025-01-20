@@ -2,6 +2,8 @@ package kmg.tool.directorytool.runner;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -64,6 +66,9 @@ import kmg.tool.directorytool.service.DirectoryService;
  */
 @Component
 public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, ExitCodeExceptionMapper {
+
+    /** ロガー */
+    private static final Logger logger = LoggerFactory.getLogger(DirectoryToolAr.class);
 
     /** ディレクトリ操作サービス */
     @Autowired
@@ -128,8 +133,8 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
 
-            System.out.println("使用方法: <mode> <src> <dest>");
-            System.out.println("モデルの種類: COPY, MOVE, DIFF");
+            logger.info("使用方法: <mode> <src> <dest>");
+            logger.info("モデルの種類: COPY, MOVE, DIFF");
             return;
 
         }
@@ -148,9 +153,9 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
             // 無効なモードが指定された場合
             this.exitCode = 1;
-            System.out.println(String.format("無効なモードが選択されています。: [%s]", modeStr));
-            System.out.println("有効なモードの種類: COPY, MOVE, DIFF");
-            e.printStackTrace();
+            logger.error("無効なモードが選択されています。: [{}]", modeStr);
+            logger.info("有効なモードの種類: COPY, MOVE, DIFF");
+            logger.error("モード変換エラー", e);
             return;
 
         }
@@ -163,13 +168,13 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         try {
 
             this.directoryService.processDirectory(src, dest, mode);
-            System.out.println("ディレクトリ操作の処理が終了しました。");
+            logger.info("ディレクトリ操作の処理が終了しました。");
 
         } catch (final IOException e) {
 
             // ディレクトリ操作中にエラーが発生した場合
             this.exitCode = 1;
-            e.printStackTrace();
+            logger.error("ディレクトリ操作エラー", e);
 
         }
 

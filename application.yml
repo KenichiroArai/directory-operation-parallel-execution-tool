@@ -1,9 +1,0 @@
-# バナー表示を抑制する
-spring.main.banner-mode: off
-
-# 起動時のログを抑制する
-spring.main.log-startup-info: false
-
-# ログレベルを変更する
-logging.level:
-  '[org.springframework]': WARN
