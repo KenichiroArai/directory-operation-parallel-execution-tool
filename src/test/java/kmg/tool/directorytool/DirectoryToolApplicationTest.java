@@ -3,14 +3,23 @@ package kmg.tool.directorytool;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
+
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 
 /**
  * DirectoryToolApplicationのテストクラス。<br>
@@ -19,8 +28,39 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
  * </p>
  */
 @SpringBootTest
-@ExtendWith(OutputCaptureExtension.class)
-public class DirectoryToolApplicationTest {
+@Execution(ExecutionMode.SAME_THREAD)
+@ExtendWith(MockitoExtension.class)
+public class DirectoryToolApplicationTest implements AutoCloseable {
+
+    /** Logbackのリストアペンダー */
+    private ListAppender<ILoggingEvent> listAppender;
+
+    /** Loggerインスタンス */
+    private Logger logger;
+
+    /**
+     * テストの前準備
+     */
+    @BeforeEach
+    public void setUp() {
+
+        // Logbackの設定
+        this.logger = (Logger) LoggerFactory.getLogger(DirectoryToolApplication.class);
+        this.listAppender = new ListAppender<>();
+        this.listAppender.start();
+        this.logger.addAppender(this.listAppender);
+
+    }
+
+    /**
+     * テスト後のクリーンアップ
+     */
+    @AfterEach
+    public void tearDown() {
+
+        this.logger.detachAppender(this.listAppender);
+
+    }
 
     /**
      * Springコンテキストが正常にロードされることを確認するテスト。
@@ -69,7 +109,6 @@ public class DirectoryToolApplicationTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @SuppressWarnings("static-method")
     @Test
     public void testMainMethodExecutesSuccessfullyInTestMode(@TempDir final Path tempDir) throws IOException {
 
@@ -78,9 +117,6 @@ public class DirectoryToolApplicationTest {
         final Path destDir   = tempDir.resolve("dest");
 
         /* 準備 */
-        DirectoryToolApplication.main(new String[] {
-                "COPY", sourceDir.toString(), destDir.toString()
-        });
 
         /* テスト対象の実行 */
         DirectoryToolApplication.main(new String[] {
@@ -93,11 +129,15 @@ public class DirectoryToolApplicationTest {
         final boolean actualTest2Exists   = Files.exists(destDir.resolve("test2.txt"));
         final boolean actualTest3Exists   = Files.exists(destDir.resolve("subdir/test3.txt"));
 
+        final String logMessages = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
+
         /* 検証の実施 */
         Assertions.assertTrue(actualDestDirExists, "destDirが存在すること");
         Assertions.assertTrue(actualTest1Exists, "test1.txtが存在すること");
         Assertions.assertTrue(actualTest2Exists, "test2.txtが存在すること");
         Assertions.assertTrue(actualTest3Exists, "subdir/test3.txtが存在すること");
+        Assertions.assertEquals(true, logMessages.contains("処理が終了しました。"), "期待される処理終了メッセージが含まれていません。");
 
     }
 
@@ -109,19 +149,12 @@ public class DirectoryToolApplicationTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @SuppressWarnings("static-method")
     @Test
     public void testMainMethodExecutesSuccessfullyInNonTestMode(@TempDir final Path tempDir) throws IOException {
 
         /* 期待値の定義 */
         final Path sourceDir = DirectoryToolApplicationTest.createTestDirectory(tempDir);
         final Path destDir   = tempDir.resolve("dest");
-
-        /* 準備 */
-        System.setProperty("skipExit", "true");
-        DirectoryToolApplication.main(new String[] {
-                "COPY", sourceDir.toString(), destDir.toString()
-        });
 
         /* テスト対象の実行 */
         DirectoryToolApplication.main(new String[] {
@@ -134,23 +167,23 @@ public class DirectoryToolApplicationTest {
         final boolean actualTest2Exists   = Files.exists(destDir.resolve("test2.txt"));
         final boolean actualTest3Exists   = Files.exists(destDir.resolve("subdir/test3.txt"));
 
+        final String logMessages = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
+
         /* 検証の実施 */
         Assertions.assertTrue(actualDestDirExists, "destDirが存在すること");
         Assertions.assertTrue(actualTest1Exists, "test1.txtが存在すること");
         Assertions.assertTrue(actualTest2Exists, "test2.txtが存在すること");
         Assertions.assertTrue(actualTest3Exists, "subdir/test3.txt");
+        Assertions.assertEquals(true, logMessages.contains("処理が終了しました。"), "期待される処理終了メッセージが含まれていません。");
 
     }
 
     /**
      * 引数不足時のエラーハンドリングをテスト。
-     *
-     * @param output
-     *               テスト出力のキャプチャ
      */
-    @SuppressWarnings("static-method")
     @Test
-    public void testMainMethodFailsWithInsufficientArguments(final CapturedOutput output) {
+    public void testMainMethodFailsWithInsufficientArguments() {
 
         /* 期待値の定義 */
         final String expected = "引数が不足しています。" + System.lineSeparator();
@@ -159,7 +192,9 @@ public class DirectoryToolApplicationTest {
         DirectoryToolApplication.main(new String[] {});
 
         /* 検証の準備 */
-        final String actual = output.getErr();
+        final String actual = this.listAppender.list.stream()
+                .filter(event -> "ERROR".equals(event.getLevel().toString())).map(ILoggingEvent::getMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
 
         /* 検証の実施 */
         Assertions.assertEquals(expected, actual, "引数不足のエラーメッセージが期待通りであること");
@@ -168,24 +203,25 @@ public class DirectoryToolApplicationTest {
 
     /**
      * 無効な操作タイプが指定された場合のエラーハンドリングをテスト。
-     *
-     * @param output
-     *               テスト出力のキャプチャ
      */
-    @SuppressWarnings("static-method")
     @Test
-    public void testMainMethodFailsWithInvalidOperationType(final CapturedOutput output) {
+    public void testMainMethodFailsWithInvalidOperationType() {
 
         /* 期待値の定義 */
         final String expected = "無効なモードです。" + System.lineSeparator();
 
         /* 準備 */
+
+
+        /* テスト対象の実行 */
         DirectoryToolApplication.main(new String[] {
                 "INVALID", "/src", "/dest"
         });
 
         /* 検証の準備 */
-        final String actual = output.getErr();
+        final String actual = this.listAppender.list.stream()
+                .filter(event -> "ERROR".equals(event.getLevel().toString())).map(ILoggingEvent::getMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
 
         /* 検証の実施 */
         Assertions.assertEquals(expected, actual, "無効な操作タイプのエラーメッセージが期待通りであること");
@@ -194,16 +230,13 @@ public class DirectoryToolApplicationTest {
 
     /**
      * 存在しないソースディレクトリが指定された場合のエラーハンドリングをテスト。
-     *
-     * @param output
-     *               テスト出力のキャプチャ
      */
-    @SuppressWarnings("static-method")
     @Test
-    public void testMainMethodFailsWithNonExistentSourceDirectory(final CapturedOutput output) {
+    public void testMainMethodFailsWithNonExistentSourceDirectory() {
 
         /* 期待値の定義 */
         final String expected = "ソースディレクトリが存在しません。" + System.lineSeparator();
+
 
         /* 準備 */
         DirectoryToolApplication.main(new String[] {
@@ -211,7 +244,9 @@ public class DirectoryToolApplicationTest {
         });
 
         /* 検証の準備 */
-        final String actual = output.getErr();
+        final String actual = this.listAppender.list.stream()
+                .filter(event -> "ERROR".equals(event.getLevel().toString())).map(ILoggingEvent::getMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
 
         /* 検証の実施 */
         Assertions.assertEquals(expected, actual, "存在しないソースディレクトリのエラーメッセージが期待通りであること");
@@ -223,15 +258,13 @@ public class DirectoryToolApplicationTest {
      *
      * @param tempDir
      *                テスト用の一時ディレクトリ
-     * @param output
-     *                テスト出力のキャプチャ
      */
-    @SuppressWarnings("static-method")
     @Test
-    public void testMainMethodFailsWithInvalidPaths(@TempDir final Path tempDir, final CapturedOutput output) {
+    public void testMainMethodFailsWithInvalidPaths(@TempDir final Path tempDir) {
 
         /* 期待値の定義 */
         final String expected = "ソースディレクトリが存在しません。" + System.lineSeparator();
+
 
         /* 準備 */
         final Path nonExistentSource = tempDir.resolve("non-existent");
@@ -242,10 +275,25 @@ public class DirectoryToolApplicationTest {
         });
 
         /* 検証の準備 */
-        final String actual = output.getErr();
+        final String actual = this.listAppender.list.stream()
+                .filter(event -> "ERROR".equals(event.getLevel().toString())).map(ILoggingEvent::getMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
 
         /* 検証の実施 */
         Assertions.assertEquals(expected, actual, "ソースディレクトリが存在しないメッセージが期待通りであること");
 
+
+    }
+
+    /**
+     * テスト終了時のリソースクリーンアップ
+     *
+     * @throws IOException
+     *                     クローズ処理中に発生する可能性のある例外
+     */
+    @Override
+    public void close() throws IOException {
+
+        // リソースのクリーンアップが必要な場合はここで実装
     }
 }
