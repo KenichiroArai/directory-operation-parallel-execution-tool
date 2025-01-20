@@ -43,14 +43,10 @@ public class DirectoryToolArTest implements AutoCloseable {
     /** テスト対象のDirectoryToolArインスタンス */
     private DirectoryToolAr runner;
 
-    /**
-     * Logbackのリストアペンダー
-     */
+    /** Logbackのリストアペンダー */
     private ListAppender<ILoggingEvent> listAppender;
 
-    /**
-     * Loggerインスタンス
-     */
+    /** Loggerインスタンス */
     private Logger logger;
 
     /**
