@@ -98,9 +98,10 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
                 .collect(Collectors.toList());
 
         /* 検証の実施 */
-        Assertions.assertTrue(logMessages.contains(expectedSourceOnlyMessage), "ソースディレクトリにのみ存在するファイルが検出されること");
-        Assertions.assertTrue(logMessages.contains(expectedDifferentMessage), "内容が異なるファイルが検出されること");
-        Assertions.assertTrue(logMessages.contains(expectedTargetOnlyMessage), "ターゲットディレクトリにのみ存在するファイルが検出されること");
+        Assertions.assertEquals(true, logMessages.contains(expectedSourceOnlyMessage), "ソースディレクトリにのみ存在するファイルが検出されること");
+        Assertions.assertEquals(true, logMessages.contains(expectedDifferentMessage), "内容が異なるファイルが検出されること");
+        Assertions.assertEquals(true, logMessages.contains(expectedTargetOnlyMessage),
+                "ターゲットディレクトリにのみ存在するファイルが検出されること");
 
     }
 
@@ -142,7 +143,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         /* 検証の実施 */
         for (final String expectedLine : expectedOutputLines) {
 
-            Assertions.assertTrue(logMessages.contains(expectedLine), "出力に「" + expectedLine + "」が含まれること");
+            Assertions.assertEquals(true, logMessages.contains(expectedLine), "出力に「" + expectedLine + "」が含まれること");
 
         }
 
@@ -212,7 +213,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         /* 検証の実施 */
         for (final String expectedLine : expectedOutputLines) {
 
-            Assertions.assertTrue(logMessages.contains(expectedLine), "出力に「" + expectedLine + "」が含まれること");
+            Assertions.assertEquals(true, logMessages.contains(expectedLine), "出力に「" + expectedLine + "」が含まれること");
 
         }
 
@@ -231,7 +232,6 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         final String expectedTargetErrorMessage = "ターゲットディレクトリが存在しません。: " + invalidTargetPath;
 
         /* 準備 */
-        // 準備は不要
 
         /* テスト対象の実行と検証の準備 */
         final Exception actualSourceException = Assertions.assertThrows(IOException.class, () -> {
@@ -301,7 +301,6 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         final String expectedNotContainPath = this.sourceDir.getFileName().toString();
 
         /* 準備 */
-        // 準備は不要
 
         /* テスト対象の実行 */
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());

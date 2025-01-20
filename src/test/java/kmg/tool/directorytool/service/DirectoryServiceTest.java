@@ -65,13 +65,11 @@ public class DirectoryServiceTest {
         final String expectedDestPath = "target";
 
         /* 準備 */
-        // 準備は不要
 
         /* テスト対象の実行 */
         this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.COPY);
 
         /* 検証の準備 */
-        // 検証の準備は不要
 
         /* 検証の実施 */
         Mockito.verify(this.copyService).processDirectory(expectedSrcPath, expectedDestPath);
@@ -94,13 +92,11 @@ public class DirectoryServiceTest {
         final String expectedDestPath = "target";
 
         /* 準備 */
-        // 準備は不要
 
         /* テスト対象の実行 */
         this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.MOVE);
 
         /* 検証の準備 */
-        // 検証の準備は不要
 
         /* 検証の実施 */
         Mockito.verify(this.moveService).processDirectory(expectedSrcPath, expectedDestPath);
@@ -123,13 +119,11 @@ public class DirectoryServiceTest {
         final String expectedDestPath = "target";
 
         /* 準備 */
-        // 準備は不要
 
         /* テスト対象の実行 */
         this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.DIFF);
 
         /* 検証の準備 */
-        // 検証の準備は不要
 
         /* 検証の実施 */
         Mockito.verify(this.diffService).processDirectory(expectedSrcPath, expectedDestPath);
@@ -162,8 +156,6 @@ public class DirectoryServiceTest {
 
         } catch (final IOException actualException) {
             /* 検証の準備 */
-
-            // 検証の準備は不要
 
             /* 検証の実施 */
             Assertions.assertEquals(expectedException, actualException, "期待した例外が発生すること");

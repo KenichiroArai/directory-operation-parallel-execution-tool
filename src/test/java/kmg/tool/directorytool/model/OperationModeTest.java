@@ -24,13 +24,12 @@ public class OperationModeTest {
         final int actualLength = OperationMode.values().length;
 
         /* 検証の準備 */
-        // 検証の準備は不要
 
         /* 検証の実施 */
         Assertions.assertEquals(expectedLength, actualLength, "列挙型は3つの値を持つこと");
-        Assertions.assertTrue(OperationModeTest.containsEnumConstant("COPY"), "COPYが定義されていること");
-        Assertions.assertTrue(OperationModeTest.containsEnumConstant("MOVE"), "MOVEが定義されていること");
-        Assertions.assertTrue(OperationModeTest.containsEnumConstant("DIFF"), "DIFFが定義されていること");
+        Assertions.assertEquals(true, OperationModeTest.containsEnumConstant("COPY"), "COPYが定義されていること");
+        Assertions.assertEquals(true, OperationModeTest.containsEnumConstant("MOVE"), "MOVEが定義されていること");
+        Assertions.assertEquals(true, OperationModeTest.containsEnumConstant("DIFF"), "DIFFが定義されていること");
 
     }
 
@@ -54,7 +53,6 @@ public class OperationModeTest {
         final OperationMode actualDiff = OperationMode.valueOf("DIFF");
 
         /* 検証の準備 */
-        // 検証の準備は不要
 
         /* 検証の実施 */
         Assertions.assertEquals(expectedCopy, actualCopy, "COPYの文字列変換が正しいこと");
@@ -80,10 +78,9 @@ public class OperationModeTest {
                 () -> OperationMode.valueOf(invalidValue), "無効な値でIllegalArgumentExceptionがスローされること");
 
         /* 検証の準備 */
-        // 検証の準備は不要
 
         /* 検証の実施 */
-        Assertions.assertTrue(actualException.getMessage().contains(invalidValue), "例外メッセージに無効な値が含まれていること");
+        Assertions.assertEquals(true, actualException.getMessage().contains(invalidValue), "例外メッセージに無効な値が含まれていること");
 
     }
 

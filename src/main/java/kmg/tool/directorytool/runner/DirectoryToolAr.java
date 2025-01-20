@@ -133,8 +133,8 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
 
-            DirectoryToolAr.logger.info("使用方法: <mode> <src> <dest>");
-            DirectoryToolAr.logger.info("モデルの種類: COPY, MOVE, DIFF");
+            DirectoryToolAr.logger.error("使用方法: <mode> <src> <dest>");
+            DirectoryToolAr.logger.error("モデルの種類: COPY, MOVE, DIFF");
             return;
 
         }
@@ -153,9 +153,12 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
             // 無効なモードが指定された場合
             this.exitCode = 1;
-            DirectoryToolAr.logger.error("無効なモードが選択されています。: [{}]", modeStr);
-            DirectoryToolAr.logger.info("有効なモードの種類: COPY, MOVE, DIFF");
-            DirectoryToolAr.logger.error("モード変換エラー", e);
+
+            final String[] logMsgs = {
+                    String.format("無効なモードが選択されています。: [%s]", modeStr), "有効なモードの種類: COPY, MOVE, DIFF",
+            };
+            final String   logMsg  = String.join(System.lineSeparator(), logMsgs);
+            DirectoryToolAr.logger.error(logMsg, e);
             return;
 
         }

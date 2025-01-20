@@ -133,7 +133,7 @@ public abstract class AbstractDirectoryServiceTest {
         // 操作を実行
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-        // 検証
+        /* 検証 */
         Assertions.assertTrue(Files.exists(this.targetDir), "ターゲットディレクトリが作成されていること");
         Assertions.assertTrue(Files.isDirectory(this.targetDir), "ターゲットパスがディレクトリであること");
 

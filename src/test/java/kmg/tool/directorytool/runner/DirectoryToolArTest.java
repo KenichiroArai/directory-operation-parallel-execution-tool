@@ -3,6 +3,7 @@ package kmg.tool.directorytool.runner;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -75,17 +76,19 @@ public class DirectoryToolArTest implements AutoCloseable {
     @Test
     public void testSuccessfulCopyOperation() throws Exception {
 
-        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("COPY", "source", "target"));
 
-        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
-        // 検証
+        /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
         final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
+        Assertions.assertEquals(true,
+                logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")),
+                "処理終了メッセージが含まれていること");
 
     }
 
@@ -98,17 +101,19 @@ public class DirectoryToolArTest implements AutoCloseable {
     @Test
     public void testSuccessfulMoveOperation() throws Exception {
 
-        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("MOVE", "source", "target"));
 
-        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
-        // 検証
+        /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
         final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
+        Assertions.assertEquals(true,
+                logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")),
+                "処理終了メッセージが含まれていること");
 
     }
 
@@ -121,19 +126,21 @@ public class DirectoryToolArTest implements AutoCloseable {
     @Test
     public void testInsufficientArguments() throws Exception {
 
-        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs()).thenReturn(Arrays.asList("source", "target"));
 
-        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
-        // 検証
+        /* 検証 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("使用方法:")));
-        Assertions.assertTrue(
-                logsList.stream().anyMatch(event -> event.getMessage().contains("モデルの種類: COPY, MOVE, DIFF")));
+        Assertions.assertEquals(true, logsList.stream().anyMatch(event -> event.getMessage().contains("使用方法:")),
+                "使用方法メッセージが含まれていること");
+        Assertions.assertEquals(true,
+                logsList.stream().anyMatch(event -> event.getMessage().contains("モデルの種類: COPY, MOVE, DIFF")),
+                "モデルの種類メッセージが含まれていること");
 
     }
 
@@ -146,19 +153,29 @@ public class DirectoryToolArTest implements AutoCloseable {
     @Test
     public void testInvalidMode() throws Exception {
 
-        // 準備
+        /* 期待値の定義 */
+        final String[] expectedMsgs = {
+                "無効なモードが選択されています。: [INVALID]", "有効なモードの種類: COPY, MOVE, DIFF",
+        };
+        final String   expectedMsg  = String.join(System.lineSeparator(), expectedMsgs);
+
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("INVALID", "source", "target"));
 
-        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
-        // 検証
+        /* 検証の準備 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertTrue(
-                logsList.stream().anyMatch(event -> event.getMessage().contains("無効なモードが選択されています。: [INVALID]")));
+
+        final String actualMsg = logsList.stream().map(ILoggingEvent::getMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        /* 検証 */
+        Assertions.assertEquals(expectedMsg, actualMsg, "エラーメッセージが期待通りであること");
 
     }
 
@@ -171,17 +188,17 @@ public class DirectoryToolArTest implements AutoCloseable {
     @Test
     public void testIOException() throws Exception {
 
-        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("COPY", "source", "target"));
         final String errorMessage = "Test error message";
         Mockito.doThrow(new IOException(errorMessage)).when(this.directoryService)
                 .processDirectory(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 
-        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
-        // 検証
+        /* 検証 */
         Assertions.assertEquals(1, this.runner.getExitCode());
 
     }
@@ -195,17 +212,19 @@ public class DirectoryToolArTest implements AutoCloseable {
     @Test
     public void testDiffOperation() throws Exception {
 
-        // 準備
+        /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("DIFF", "source", "target"));
 
-        // テスト対象の実行
+        /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
-        // 検証
+        /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
         final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
+        Assertions.assertEquals(true,
+                logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")),
+                "処理終了メッセージが含まれていること");
 
     }
 
