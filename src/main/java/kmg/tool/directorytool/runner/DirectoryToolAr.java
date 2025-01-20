@@ -133,8 +133,8 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
 
-            logger.info("使用方法: <mode> <src> <dest>");
-            logger.info("モデルの種類: COPY, MOVE, DIFF");
+            DirectoryToolAr.logger.info("使用方法: <mode> <src> <dest>");
+            DirectoryToolAr.logger.info("モデルの種類: COPY, MOVE, DIFF");
             return;
 
         }
@@ -153,9 +153,9 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
             // 無効なモードが指定された場合
             this.exitCode = 1;
-            logger.error("無効なモードが選択されています。: [{}]", modeStr);
-            logger.info("有効なモードの種類: COPY, MOVE, DIFF");
-            logger.error("モード変換エラー", e);
+            DirectoryToolAr.logger.error("無効なモードが選択されています。: [{}]", modeStr);
+            DirectoryToolAr.logger.info("有効なモードの種類: COPY, MOVE, DIFF");
+            DirectoryToolAr.logger.error("モード変換エラー", e);
             return;
 
         }
@@ -168,13 +168,13 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         try {
 
             this.directoryService.processDirectory(src, dest, mode);
-            logger.info("ディレクトリ操作の処理が終了しました。");
+            DirectoryToolAr.logger.info("ディレクトリ操作の処理が終了しました。");
 
         } catch (final IOException e) {
 
             // ディレクトリ操作中にエラーが発生した場合
             this.exitCode = 1;
-            logger.error("ディレクトリ操作エラー", e);
+            DirectoryToolAr.logger.error("ディレクトリ操作エラー", e);
 
         }
 

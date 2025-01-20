@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -91,14 +92,14 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
             if (!targetExists) {
 
-                logger.info("ソースディレクトリのみに存在するディレクトリ: {}", relativePath);
+                DiffDirectoryService.logger.info("ソースディレクトリのみに存在するディレクトリ: {}", relativePath);
                 return;
 
             }
 
             if (!isTargetDir) {
 
-                logger.info("差異あり: {} (ディレクトリ vs ファイル)", relativePath);
+                DiffDirectoryService.logger.info("差異あり: {} (ディレクトリ vs ファイル)", relativePath);
 
             }
             return;
@@ -108,21 +109,21 @@ public class DiffDirectoryService extends AbstractDirectoryService {
         // ファイルの比較
         if (!targetExists) {
 
-            logger.info("ソースのみに存在: {}", relativePath);
+            DiffDirectoryService.logger.info("ソースのみに存在: {}", relativePath);
             return;
 
         }
 
         if (isTargetDir) {
 
-            logger.info("差異あり: {} (ファイル vs ディレクトリ)", relativePath);
+            DiffDirectoryService.logger.info("差異あり: {} (ファイル vs ディレクトリ)", relativePath);
             return;
 
         }
 
         if (!AbstractDirectoryService.compareFiles(sourcePath, targetPath)) {
 
-            logger.info("差異あり: {}", relativePath);
+            DiffDirectoryService.logger.info("差異あり: {}", relativePath);
 
         }
 
@@ -184,11 +185,11 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         if (Files.isDirectory(path)) {
 
-            logger.info("ターゲットディレクトリのみに存在するディレクトリ: {}", relativePath);
+            DiffDirectoryService.logger.info("ターゲットディレクトリのみに存在するディレクトリ: {}", relativePath);
 
         } else {
 
-            logger.info("ターゲットのみに存在: {}", relativePath);
+            DiffDirectoryService.logger.info("ターゲットのみに存在: {}", relativePath);
 
         }
 

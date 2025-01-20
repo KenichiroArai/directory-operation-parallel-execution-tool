@@ -32,210 +32,206 @@ import kmg.tool.directorytool.service.DirectoryService;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class DirectoryToolArTest implements AutoCloseable {
 
-        /** テスト対象のDirectoryServiceモック */
-        @Mock
-        private DirectoryService directoryService;
+    /** テスト対象のDirectoryServiceモック */
+    @Mock
+    private DirectoryService directoryService;
 
-        /** テスト対象のApplicationArgumentsモック */
-        @Mock
-        private ApplicationArguments applicationArguments;
+    /** テスト対象のApplicationArgumentsモック */
+    @Mock
+    private ApplicationArguments applicationArguments;
 
-        /** テスト対象のDirectoryToolArインスタンス */
-        private DirectoryToolAr runner;
+    /** テスト対象のDirectoryToolArインスタンス */
+    private DirectoryToolAr runner;
 
-        /**
-         * Logbackのリストアペンダー
-         */
-        private ListAppender<ILoggingEvent> listAppender;
+    /**
+     * Logbackのリストアペンダー
+     */
+    private ListAppender<ILoggingEvent> listAppender;
 
-        /**
-         * Loggerインスタンス
-         */
-        private Logger logger;
+    /**
+     * Loggerインスタンス
+     */
+    private Logger logger;
 
-        /**
-         * テストの前準備
-         */
-        @BeforeEach
-        public void setUp() {
+    /**
+     * テストの前準備
+     */
+    @BeforeEach
+    public void setUp() {
 
-                this.runner = new DirectoryToolAr();
-                ReflectionTestUtils.setField(this.runner, "directoryService", this.directoryService);
+        this.runner = new DirectoryToolAr();
+        ReflectionTestUtils.setField(this.runner, "directoryService", this.directoryService);
 
-                // Logbackの設定
-                logger = (Logger) LoggerFactory.getLogger(DirectoryToolAr.class);
-                listAppender = new ListAppender<>();
-                listAppender.start();
-                logger.addAppender(listAppender);
+        // Logbackの設定
+        this.logger = (Logger) LoggerFactory.getLogger(DirectoryToolAr.class);
+        this.listAppender = new ListAppender<>();
+        this.listAppender.start();
+        this.logger.addAppender(this.listAppender);
 
-        }
+    }
 
-        /**
-         * 正常系のコピー操作のテスト
-         *
-         * @throws Exception
-         *                   テスト実行中に発生する可能性のある例外
-         */
-        @Test
-        public void testSuccessfulCopyOperation() throws Exception {
+    /**
+     * 正常系のコピー操作のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testSuccessfulCopyOperation() throws Exception {
 
-                // 準備
-                Mockito.when(this.applicationArguments.getNonOptionArgs())
-                                .thenReturn(Arrays.asList("COPY", "source", "target"));
+        // 準備
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("COPY", "source", "target"));
 
-                // テスト対象の実行
-                this.runner.run(this.applicationArguments);
+        // テスト対象の実行
+        this.runner.run(this.applicationArguments);
 
-                // 検証
-                Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
-                List<ILoggingEvent> logsList = listAppender.list;
-                Assertions.assertTrue(logsList.stream()
-                                .anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
+        // 検証
+        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
+        final List<ILoggingEvent> logsList = this.listAppender.list;
+        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
 
-        }
+    }
 
-        /**
-         * 正常系の移動操作のテスト
-         *
-         * @throws Exception
-         *                   テスト実行中に発生する可能性のある例外
-         */
-        @Test
-        public void testSuccessfulMoveOperation() throws Exception {
+    /**
+     * 正常系の移動操作のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testSuccessfulMoveOperation() throws Exception {
 
-                // 準備
-                Mockito.when(this.applicationArguments.getNonOptionArgs())
-                                .thenReturn(Arrays.asList("MOVE", "source", "target"));
+        // 準備
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("MOVE", "source", "target"));
 
-                // テスト対象の実行
-                this.runner.run(this.applicationArguments);
+        // テスト対象の実行
+        this.runner.run(this.applicationArguments);
 
-                // 検証
-                Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
-                List<ILoggingEvent> logsList = listAppender.list;
-                Assertions.assertTrue(logsList.stream()
-                                .anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
+        // 検証
+        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
+        final List<ILoggingEvent> logsList = this.listAppender.list;
+        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
 
-        }
+    }
 
-        /**
-         * 引数が不足している場合のテスト
-         *
-         * @throws Exception
-         *                   テスト実行中に発生する可能性のある例外
-         */
-        @Test
-        public void testInsufficientArguments() throws Exception {
+    /**
+     * 引数が不足している場合のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testInsufficientArguments() throws Exception {
 
-                // 準備
-                Mockito.when(this.applicationArguments.getNonOptionArgs())
-                                .thenReturn(Arrays.asList("source", "target"));
+        // 準備
+        Mockito.when(this.applicationArguments.getNonOptionArgs()).thenReturn(Arrays.asList("source", "target"));
 
-                // テスト対象の実行
-                this.runner.run(this.applicationArguments);
+        // テスト対象の実行
+        this.runner.run(this.applicationArguments);
 
-                // 検証
-                Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
-                                ArgumentMatchers.any(), ArgumentMatchers.any());
-                List<ILoggingEvent> logsList = listAppender.list;
-                Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("使用方法:")));
-                Assertions.assertTrue(logsList.stream()
-                                .anyMatch(event -> event.getMessage().contains("モデルの種類: COPY, MOVE, DIFF")));
+        // 検証
+        Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
+        final List<ILoggingEvent> logsList = this.listAppender.list;
+        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("使用方法:")));
+        Assertions.assertTrue(
+                logsList.stream().anyMatch(event -> event.getMessage().contains("モデルの種類: COPY, MOVE, DIFF")));
 
-        }
+    }
 
-        /**
-         * 無効な操作モードが指定された場合のテスト
-         *
-         * @throws Exception
-         *                   テスト実行中に発生する可能性のある例外
-         */
-        @Test
-        public void testInvalidMode() throws Exception {
+    /**
+     * 無効な操作モードが指定された場合のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testInvalidMode() throws Exception {
 
-                // 準備
-                Mockito.when(this.applicationArguments.getNonOptionArgs())
-                                .thenReturn(Arrays.asList("INVALID", "source", "target"));
+        // 準備
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("INVALID", "source", "target"));
 
-                // テスト対象の実行
-                this.runner.run(this.applicationArguments);
+        // テスト対象の実行
+        this.runner.run(this.applicationArguments);
 
-                // 検証
-                Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
-                                ArgumentMatchers.any(), ArgumentMatchers.any());
-                List<ILoggingEvent> logsList = listAppender.list;
-                Assertions.assertTrue(logsList.stream()
-                                .anyMatch(event -> event.getMessage().contains("無効なモードが選択されています。: [INVALID]")));
+        // 検証
+        Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
+        final List<ILoggingEvent> logsList = this.listAppender.list;
+        Assertions.assertTrue(
+                logsList.stream().anyMatch(event -> event.getMessage().contains("無効なモードが選択されています。: [INVALID]")));
 
-        }
+    }
 
-        /**
-         * IOExceptionが発生した場合のテスト
-         *
-         * @throws Exception
-         *                   テスト実行中に発生する可能性のある例外
-         */
-        @Test
-        public void testIOException() throws Exception {
+    /**
+     * IOExceptionが発生した場合のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testIOException() throws Exception {
 
-                // 準備
-                Mockito.when(this.applicationArguments.getNonOptionArgs())
-                                .thenReturn(Arrays.asList("COPY", "source", "target"));
-                final String errorMessage = "Test error message";
-                Mockito.doThrow(new IOException(errorMessage)).when(this.directoryService).processDirectory(
-                                ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+        // 準備
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("COPY", "source", "target"));
+        final String errorMessage = "Test error message";
+        Mockito.doThrow(new IOException(errorMessage)).when(this.directoryService)
+                .processDirectory(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
 
-                // テスト対象の実行
-                this.runner.run(this.applicationArguments);
+        // テスト対象の実行
+        this.runner.run(this.applicationArguments);
 
-                // 検証
-                Assertions.assertEquals(1, this.runner.getExitCode());
+        // 検証
+        Assertions.assertEquals(1, this.runner.getExitCode());
 
-        }
+    }
 
-        /**
-         * DIFFモードの操作のテスト
-         *
-         * @throws Exception
-         *                   テスト実行中に発生する可能性のある例外
-         */
-        @Test
-        public void testDiffOperation() throws Exception {
+    /**
+     * DIFFモードの操作のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testDiffOperation() throws Exception {
 
-                // 準備
-                Mockito.when(this.applicationArguments.getNonOptionArgs())
-                                .thenReturn(Arrays.asList("DIFF", "source", "target"));
+        // 準備
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("DIFF", "source", "target"));
 
-                // テスト対象の実行
-                this.runner.run(this.applicationArguments);
+        // テスト対象の実行
+        this.runner.run(this.applicationArguments);
 
-                // 検証
-                Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
-                List<ILoggingEvent> logsList = listAppender.list;
-                Assertions.assertTrue(logsList.stream()
-                                .anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
+        // 検証
+        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
+        final List<ILoggingEvent> logsList = this.listAppender.list;
+        Assertions.assertTrue(logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")));
 
-        }
+    }
 
-        /**
-         * テスト後のクリーンアップ
-         */
-        @AfterEach
-        public void tearDown() {
+    /**
+     * テスト後のクリーンアップ
+     */
+    @AfterEach
+    public void tearDown() {
 
-                logger.detachAppender(listAppender);
+        this.logger.detachAppender(this.listAppender);
 
-        }
+    }
 
-        /**
-         * テスト終了時のリソースクリーンアップ
-         *
-         * @throws IOException
-         *                     クローズ処理中に発生する可能性のある例外
-         */
-        @Override
-        public void close() throws IOException {
+    /**
+     * テスト終了時のリソースクリーンアップ
+     *
+     * @throws IOException
+     *                     クローズ処理中に発生する可能性のある例外
+     */
+    @Override
+    public void close() throws IOException {
 
-                // リソースのクリーンアップが必要な場合はここで実装
-        }
+        // リソースのクリーンアップが必要な場合はここで実装
+    }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -120,8 +121,8 @@ public class MoveDirectoryService extends AbstractDirectoryService {
 
                 } catch (final IOException e) {
 
-                    logger.error("パス '{}' の削除に失敗しました", path);
-                    logger.error("エラー詳細: {}", e.getMessage());
+                    MoveDirectoryService.logger.error("パス '{}' の削除に失敗しました", path);
+                    MoveDirectoryService.logger.error("エラー詳細: {}", e.getMessage());
 
                 }
 
