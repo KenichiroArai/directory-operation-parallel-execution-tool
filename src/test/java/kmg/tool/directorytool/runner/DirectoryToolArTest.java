@@ -31,7 +31,7 @@ import kmg.tool.directorytool.service.DirectoryService;
  */
 @Execution(ExecutionMode.SAME_THREAD)
 @ExtendWith(MockitoExtension.class)
-public class DirectoryToolArTest implements AutoCloseable {
+public class DirectoryToolArTest {
 
     /** テスト対象のDirectoryServiceモック */
     @Mock
@@ -64,6 +64,16 @@ public class DirectoryToolArTest implements AutoCloseable {
         this.listAppender = new ListAppender<>();
         this.listAppender.start();
         this.logger.addAppender(this.listAppender);
+
+    }
+
+    /**
+     * テスト後のクリーンアップ
+     */
+    @AfterEach
+    public void tearDown() {
+
+        this.logger.detachAppender(this.listAppender);
 
     }
 
@@ -227,27 +237,5 @@ public class DirectoryToolArTest implements AutoCloseable {
                 logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")),
                 "処理終了メッセージが含まれていること");
 
-    }
-
-    /**
-     * テスト後のクリーンアップ
-     */
-    @AfterEach
-    public void tearDown() {
-
-        this.logger.detachAppender(this.listAppender);
-
-    }
-
-    /**
-     * テスト終了時のリソースクリーンアップ
-     *
-     * @throws IOException
-     *                     クローズ処理中に発生する可能性のある例外
-     */
-    @Override
-    public void close() throws IOException {
-
-        // リソースのクリーンアップが必要な場合はここで実装
     }
 }

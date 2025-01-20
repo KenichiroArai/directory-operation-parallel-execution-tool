@@ -8,11 +8,14 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * ディレクトリ操作サービスのテストのための基底クラス。 共通のセットアップ、検証、クリーンアップ機能を提供する。
  */
+@SpringBootTest
 public abstract class AbstractDirectoryServiceTest {
 
     /** テスト用の一時ディレクトリ */
@@ -61,7 +64,7 @@ public abstract class AbstractDirectoryServiceTest {
      * 存在しないディレクトリに対して処理を実行した場合、適切な例外がスローされることを確認する。
      * </p>
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testNonExistentSourceDirectory() {
 
         final Path nonExistentDir = this.tempDir.resolve("non-existent");
@@ -82,7 +85,7 @@ public abstract class AbstractDirectoryServiceTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSourcePathNotDirectory() throws IOException {
 
         final Path sourceFile = this.tempDir.resolve("source.txt");
@@ -104,7 +107,7 @@ public abstract class AbstractDirectoryServiceTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testTargetPathExistsAsFile() throws IOException {
 
         Files.createDirectories(this.sourceDir);
@@ -127,7 +130,7 @@ public abstract class AbstractDirectoryServiceTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testEmptyDirectoryOperation() throws IOException {
 
         // 操作を実行
@@ -148,7 +151,7 @@ public abstract class AbstractDirectoryServiceTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testCompareFilesWithDifferentSizes() throws IOException {
 
         // 異なるサイズのファイルを作成
@@ -170,7 +173,7 @@ public abstract class AbstractDirectoryServiceTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testFileProcessingException() throws IOException {
 
         // テスト用のファイルを作成
@@ -211,7 +214,7 @@ public abstract class AbstractDirectoryServiceTest {
      * @throws IOException
      *                     ファイル操作に失敗した場合
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testTaskExecutionTimeout() throws IOException {
 
         // 長時間実行されるタスクを作成

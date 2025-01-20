@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import ch.qos.logback.core.read.ListAppender;
 /**
  * 差分検出操作を実行するサービスのテストクラス。
  */
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /** ロガー */
@@ -58,6 +59,17 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         this.listAppender = new ListAppender<>();
         this.listAppender.start();
         this.logger.addAppender(this.listAppender);
+
+    }
+
+    /**
+     * テスト後のクリーンアップ
+     */
+    @Override
+    @AfterEach
+    public void tearDown() {
+
+        this.logger.detachAppender(this.listAppender);
 
     }
 
