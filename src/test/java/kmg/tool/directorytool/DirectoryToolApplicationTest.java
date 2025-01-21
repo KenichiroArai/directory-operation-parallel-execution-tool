@@ -2,8 +2,10 @@ package kmg.tool.directorytool;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * DirectoryToolApplicationのテストクラス。<br>
@@ -56,6 +58,25 @@ public class DirectoryToolApplicationTest {
             });
 
         }, "引数付きメインメソッドの実行中に例外が発生しました");
+
+    }
+
+    /**
+     * アプリケーションの正常終了を確認するテスト
+     */
+    @Test
+    public void testApplicationShutdown() {
+
+        try (final ConfigurableApplicationContext context = SpringApplication.run(DirectoryToolApplication.class)) {
+
+            Assertions.assertDoesNotThrow(() -> {
+
+                context.close();
+
+            }, "アプリケーションの終了処理中に例外が発生しました");
+            Assertions.assertFalse(context.isActive(), "アプリケーションコンテキストが正しく終了していません");
+
+        }
 
     }
 }

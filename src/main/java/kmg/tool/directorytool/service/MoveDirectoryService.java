@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,13 +112,13 @@ public class MoveDirectoryService extends AbstractDirectoryService {
     protected void postProcess(final Path source, final Path destination) throws IOException {
 
         // 空になったディレクトリを削除
-        try (var stream = Files.walk(source)) {
+        try (Stream<Path> stream = Files.walk(source)) {
 
             stream.sorted((src, dest) -> dest.toString().length() - src.toString().length()).forEach(path -> {
 
                 try {
 
-                    Files.deleteIfExists(path);
+                    MoveDirectoryService.deleteIfExists(path);
 
                 } catch (final IOException e) {
 
@@ -129,6 +130,20 @@ public class MoveDirectoryService extends AbstractDirectoryService {
             });
 
         }
+
+    }
+
+    /**
+     * 指定されたパスが存在する場合に削除する。<br>
+     *
+     * @param path
+     *             ファイルまたはディレクトリのパス
+     * @throws IOException
+     *                     ファイルまたはディレクトリの削除中にエラーが発生した場合
+     */
+    private static void deleteIfExists(final Path path) throws IOException {
+
+        Files.deleteIfExists(path);
 
     }
 

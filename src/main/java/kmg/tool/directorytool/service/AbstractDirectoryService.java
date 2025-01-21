@@ -118,13 +118,13 @@ public abstract class AbstractDirectoryService {
      */
     protected static void validatePaths(final Path source, final Path destination) throws IOException {
 
-        if (!Files.exists(source)) {
+        if (!source.toFile().exists()) {
 
             throw new IOException("ソースディレクトリが存在しません。");
 
         }
 
-        if (!Files.isDirectory(source)) {
+        if (!source.toFile().isDirectory()) {
 
             throw new IOException("ソースパスはディレクトリではありません。");
 

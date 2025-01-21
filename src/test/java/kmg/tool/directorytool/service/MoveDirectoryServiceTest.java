@@ -6,10 +6,17 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 
 /**
  * 移動操作を実行するサービスのテストクラス。
  */
+@ExtendWith(MockitoExtension.class)
 public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     /**
@@ -202,6 +209,51 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Assertions.assertTrue(actualTargetFileExists, "ターゲットファイルが存在すること");
         Assertions.assertFalse(actualSourceFileExists, "読み取り専用ファイルが削除されていること");
         Assertions.assertEquals(expectedContent, actualContent, "移動されたファイルの内容が正しいこと");
+
+    }
+
+    /**
+     * postProcessメソッドのcatchブロックのテスト（ログ出力の検証）
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
+     */
+    @Test
+    public void testPostProcessCatchBlock() throws IOException {
+
+        /* 準備 */
+        // Logbackのテストアペンダーを設定
+        Logger                      logger       = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        final Path testSubDir = this.sourceDir.resolve("subdir");
+        Files.createDirectories(testSubDir);
+        final Path testFile = testSubDir.resolve("test.txt");
+        Files.writeString(testFile, "test content");
+
+        // ファイルを読み取り専用に設定し、削除できないようにする
+        testFile.toFile().setReadOnly();
+        testSubDir.toFile().setReadOnly();
+
+        /* テスト対象の実行 */
+        this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
+
+        /* 検証 */
+        // エラーログが出力されていることを確認
+        Assertions.assertTrue(
+                listAppender.list.stream().anyMatch(
+                        event -> event.getMessage().contains("パス") && event.getMessage().contains("の削除に失敗しました")),
+                "削除失敗のログが出力されていること");
+
+        /* クリーンアップ */
+        // ファイルの権限を元に戻す
+        testFile.toFile().setWritable(true);
+        testSubDir.toFile().setWritable(true);
+        Files.deleteIfExists(testFile);
+        Files.deleteIfExists(testSubDir);
+        logger.detachAppender(listAppender);
 
     }
 }
