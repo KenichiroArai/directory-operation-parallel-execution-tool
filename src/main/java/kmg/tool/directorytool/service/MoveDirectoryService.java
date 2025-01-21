@@ -118,7 +118,7 @@ public class MoveDirectoryService extends AbstractDirectoryService {
 
                 try {
 
-                    MoveDirectoryService.deleteIfExists(path);
+                    this.deleteIfExists(path);
 
                 } catch (final IOException e) {
 
@@ -141,7 +141,8 @@ public class MoveDirectoryService extends AbstractDirectoryService {
      * @throws IOException
      *                     ファイルまたはディレクトリの削除中にエラーが発生した場合
      */
-    private static void deleteIfExists(final Path path) throws IOException {
+    @SuppressWarnings("static-method")
+    protected void deleteIfExists(final Path path) throws IOException {
 
         Files.deleteIfExists(path);
 

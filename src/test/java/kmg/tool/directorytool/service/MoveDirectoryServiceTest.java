@@ -8,10 +8,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
+
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import org.slf4j.LoggerFactory;
 
 /**
  * 移動操作を実行するサービスのテストクラス。
@@ -186,29 +187,50 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
     public void testDeleteFailure() throws IOException {
 
         /* 期待値の定義 */
-        final String expectedContent = "test content";
+        final String expectedErrorMessage = "テスト用のIO例外";
 
         /* 準備 */
-        final Path testSubDir = this.sourceDir.resolve("subdir");
-        Files.createDirectories(testSubDir);
-        final Path testFile = testSubDir.resolve("test.txt");
-        Files.writeString(testFile, expectedContent);
+        // テスト用のサブクラスを作成
+        class TestMoveDirectoryService extends MoveDirectoryService {
 
-        // ファイルを読み取り専用に設定する
-        testFile.toFile().setReadOnly();
+            @Override
+            protected void deleteIfExists(final Path path) throws IOException {
+
+                throw new IOException(expectedErrorMessage);
+
+            }
+        }
+
+        // Logbackのテストアペンダーを設定
+        final Logger                      logger       = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
+        final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        // テスト用のサービスを作成
+        final TestMoveDirectoryService testService = new TestMoveDirectoryService();
+
+        // テストファイルを作成
+        final Path testFile = this.sourceDir.resolve("test.txt");
+        Files.writeString(testFile, "test content");
 
         /* テスト対象の実行 */
-        this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
+        testService.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
-        final boolean actualTargetFileExists = Files.exists(this.targetDir.resolve("subdir/test.txt"));
-        final boolean actualSourceFileExists = Files.exists(testFile);
-        final String  actualContent          = Files.readString(this.targetDir.resolve("subdir/test.txt"));
+        final boolean actualSourceExists = this.sourceDir.toFile().exists();
+        final boolean actualTargetExists = this.targetDir.resolve("test.txt").toFile().exists();
 
         /* 検証の実施 */
-        Assertions.assertTrue(actualTargetFileExists, "ターゲットファイルが存在すること");
-        Assertions.assertFalse(actualSourceFileExists, "読み取り専用ファイルが削除されていること");
-        Assertions.assertEquals(expectedContent, actualContent, "移動されたファイルの内容が正しいこと");
+        Assertions.assertTrue(actualSourceExists, "ソースファイルが削除されずに残っていること");
+        Assertions.assertTrue(actualTargetExists, "ターゲットファイルが正しく作成されていること");
+        Assertions.assertTrue(
+                listAppender.list.stream().anyMatch(
+                        event -> event.getMessage().contains("パス") && event.getMessage().contains("の削除に失敗しました")),
+                "削除失敗のログが出力されていること");
+
+        /* クリーンアップ */
+        logger.detachAppender(listAppender);
 
     }
 
@@ -223,8 +245,8 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
         /* 準備 */
         // Logbackのテストアペンダーを設定
-        Logger                      logger       = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
-        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        final Logger                      logger       = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
+        final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
         listAppender.start();
         logger.addAppender(listAppender);
 
