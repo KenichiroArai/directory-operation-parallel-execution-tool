@@ -238,4 +238,38 @@ public class DirectoryToolArTest {
                 "処理終了メッセージが含まれていること");
 
     }
+
+    /**
+     * 通常のgetExitCodeメソッドのテスト
+     */
+    @Test
+    public void testGetExitCode() {
+
+        /* 準備 */
+        ReflectionTestUtils.setField(this.runner, "exitCode", 1);
+
+        /* テスト対象の実行 */
+        final int result = this.runner.getExitCode();
+
+        /* 検証 */
+        Assertions.assertEquals(1, result, "設定された終了コードが正しく返されること");
+
+    }
+
+    /**
+     * 例外を受け取るgetExitCodeメソッドのテスト
+     */
+    @Test
+    public void testGetExitCodeWithException() {
+
+        /* 準備 */
+        final Exception testException = new RuntimeException("テスト例外");
+
+        /* テスト対象の実行 */
+        final int result = this.runner.getExitCode(testException);
+
+        /* 検証 */
+        Assertions.assertEquals(2, result, "例外発生時の終了コードが2であること");
+
+    }
 }
