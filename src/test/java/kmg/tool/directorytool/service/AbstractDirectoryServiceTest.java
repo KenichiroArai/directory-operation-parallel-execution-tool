@@ -122,6 +122,40 @@ public abstract class AbstractDirectoryServiceTest {
     }
 
     /**
+     * 存在しないターゲットディレクトリに対する操作をテストする。
+     * <p>
+     * 存在しないターゲットディレクトリを指定した場合、ディレクトリが自動的に作成されることを確認する。
+     * </p>
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
+     */
+    @Test
+    public void testNonExistentTargetDirectory() throws IOException {
+
+        /* 期待値の定義 */
+        final boolean expectedTargetExists      = true;
+        final boolean expectedTargetIsDirectory = true;
+
+        /* 準備 */
+        Files.createDirectories(this.sourceDir);
+        final Path nonExistentTarget = this.tempDir.resolve("non_existent_target");
+        Assertions.assertFalse(Files.exists(nonExistentTarget), "テスト前にターゲットディレクトリが存在しないこと");
+
+        /* テスト対象の実行 */
+        this.service.processDirectory(this.sourceDir.toString(), nonExistentTarget.toString());
+
+        /* 検証の準備 */
+        final boolean actualTargetExists      = Files.exists(nonExistentTarget);
+        final boolean actualTargetIsDirectory = Files.isDirectory(nonExistentTarget);
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expectedTargetExists, actualTargetExists, "ターゲットディレクトリが作成されていること");
+        Assertions.assertEquals(expectedTargetIsDirectory, actualTargetIsDirectory, "作成されたパスがディレクトリであること");
+
+    }
+
+    /**
      * 空のディレクトリに対する操作をテストする。
      * <p>
      * 空のディレクトリに対して処理を実行した場合、正常にターゲットディレクトリが作成されることを確認する。

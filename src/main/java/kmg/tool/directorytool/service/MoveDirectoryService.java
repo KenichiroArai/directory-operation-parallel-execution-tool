@@ -121,8 +121,8 @@ public class MoveDirectoryService extends AbstractDirectoryService {
 
                 } catch (final IOException e) {
 
-                    MoveDirectoryService.logger.error("パス '{}' の削除に失敗しました", path);
-                    MoveDirectoryService.logger.error("エラー詳細: {}", e.getMessage());
+                    MoveDirectoryService.logger.error(String.format("パス '%s' の削除に失敗しました", path));
+                    MoveDirectoryService.logger.error(String.format("エラー詳細: %s", e.getMessage()));
 
                 }
 

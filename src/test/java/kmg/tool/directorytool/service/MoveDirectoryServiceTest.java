@@ -168,4 +168,40 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Assertions.assertFalse(actualSourceDir2Exists, "元の空ディレクトリが削除されていること");
 
     }
+
+    /**
+     * ファイル削除失敗時のテスト
+     *
+     * @throws IOException
+     *                     ファイル操作時にエラーが発生した場合
+     */
+    @Test
+    public void testDeleteFailure() throws IOException {
+
+        /* 期待値の定義 */
+        final String expectedContent = "test content";
+
+        /* 準備 */
+        final Path testSubDir = this.sourceDir.resolve("subdir");
+        Files.createDirectories(testSubDir);
+        final Path testFile = testSubDir.resolve("test.txt");
+        Files.writeString(testFile, expectedContent);
+
+        // ファイルを読み取り専用に設定する
+        testFile.toFile().setReadOnly();
+
+        /* テスト対象の実行 */
+        this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
+
+        /* 検証の準備 */
+        final boolean actualTargetFileExists = Files.exists(this.targetDir.resolve("subdir/test.txt"));
+        final boolean actualSourceFileExists = Files.exists(testFile);
+        final String  actualContent          = Files.readString(this.targetDir.resolve("subdir/test.txt"));
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualTargetFileExists, "ターゲットファイルが存在すること");
+        Assertions.assertFalse(actualSourceFileExists, "読み取り専用ファイルが削除されていること");
+        Assertions.assertEquals(expectedContent, actualContent, "移動されたファイルの内容が正しいこと");
+
+    }
 }
