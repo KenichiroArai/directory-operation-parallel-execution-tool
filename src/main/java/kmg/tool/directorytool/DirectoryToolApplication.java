@@ -21,10 +21,9 @@ public class DirectoryToolApplication {
      */
     public static void main(final String[] args) {
 
-        try (ConfigurableApplicationContext ctx = SpringApplication.run(DirectoryToolApplication.class, args)) {
-
-            // 処理なし
-        }
+        @SuppressWarnings("resource")
+        final ConfigurableApplicationContext ctx = SpringApplication.run(DirectoryToolApplication.class, args);
+        ctx.close();
 
     }
 
