@@ -6,7 +6,7 @@
 
 ## ライセンス
 
-[Apache- 2.0 License](LICENSE)の下で公開されています。
+[MIT license](LICENSE)の下で公開されています。
 
 ## 概要
 
