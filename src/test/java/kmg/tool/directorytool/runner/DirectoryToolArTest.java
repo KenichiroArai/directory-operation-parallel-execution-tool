@@ -161,7 +161,7 @@ public class DirectoryToolArTest {
 
         /* 期待値の定義 */
         final String[] expectedMsgs = {
-                "ディレクトリ操作の処理が終了しました。", "使用方法:"
+                "使用方法: <mode> <src> <dest>"
         };
 
         /* 準備 */
@@ -172,7 +172,9 @@ public class DirectoryToolArTest {
 
         /* 検証の準備 */
         final List<ILoggingEvent> logsList   = this.listAppender.list;
-        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+        final String[]            actualMsgs = logsList.stream()
+                .flatMap(event -> Arrays.stream(event.getMessage().split(System.lineSeparator())))
+                .toArray(String[]::new);
 
         /* 検証 */
         // 引数のチェック
@@ -214,7 +216,9 @@ public class DirectoryToolArTest {
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
         final List<ILoggingEvent> logsList   = this.listAppender.list;
-        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+        final String[]            actualMsgs = logsList.stream()
+                .flatMap(event -> Arrays.stream(event.getMessage().split(System.lineSeparator())))
+                .toArray(String[]::new);
 
         /* 検証 */
         // ログのチェック
