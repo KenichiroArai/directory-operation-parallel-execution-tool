@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +22,12 @@ import ch.qos.logback.core.read.ListAppender;
 @ExtendWith(MockitoExtension.class)
 public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
+    /** ロガー */
+    private Logger logger;
+
+    /** ログアペンダー */
+    private ListAppender<ILoggingEvent> listAppender;
+
     /**
      * 移動サービスのインスタンスを生成します。
      *
@@ -30,6 +38,34 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
         final AbstractDirectoryService result = new MoveDirectoryService();
         return result;
+
+    }
+
+    /**
+     * テストの前準備
+     */
+    @BeforeEach
+    @Override
+    public void setUp() throws IOException {
+
+        super.setUp();
+
+        // ロガーとアペンダーの設定
+        this.logger = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
+        this.listAppender = new ListAppender<>();
+        this.listAppender.start();
+        this.logger.addAppender(this.listAppender);
+
+    }
+
+    /**
+     * テスト後のクリーンアップ
+     */
+    @Override
+    @AfterEach
+    public void tearDown() {
+
+        this.logger.detachAppender(this.listAppender);
 
     }
 
@@ -201,12 +237,6 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
             }
         }
 
-        // Logbackのテストアペンダーを設定
-        final Logger                      logger       = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
-        final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-        listAppender.start();
-        logger.addAppender(listAppender);
-
         // テスト用のサービスを作成
         final TestMoveDirectoryService testService = new TestMoveDirectoryService();
 
@@ -225,12 +255,9 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Assertions.assertTrue(actualSourceExists, "ソースファイルが削除されずに残っていること");
         Assertions.assertTrue(actualTargetExists, "ターゲットファイルが正しく作成されていること");
         Assertions.assertTrue(
-                listAppender.list.stream().anyMatch(
+                this.listAppender.list.stream().anyMatch(
                         event -> event.getMessage().contains("パス") && event.getMessage().contains("の削除に失敗しました")),
                 "削除失敗のログが出力されていること");
-
-        /* クリーンアップ */
-        logger.detachAppender(listAppender);
 
     }
 
@@ -244,12 +271,6 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
     public void testPostProcessCatchBlock() throws IOException {
 
         /* 準備 */
-        // Logbackのテストアペンダーを設定
-        final Logger                      logger       = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
-        final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-        listAppender.start();
-        logger.addAppender(listAppender);
-
         final Path testSubDir = this.sourceDir.resolve("subdir");
         Files.createDirectories(testSubDir);
         final Path testFile = testSubDir.resolve("test.txt");
@@ -262,12 +283,12 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         /* テスト対象の実行 */
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
-        /* 検証 */
-        // エラーログが出力されていることを確認
-        Assertions.assertTrue(
-                listAppender.list.stream().anyMatch(
-                        event -> event.getMessage().contains("パス") && event.getMessage().contains("の削除に失敗しました")),
-                "削除失敗のログが出力されていること");
+        /* 検証の準備 */
+        final boolean actualLogExists = this.listAppender.list.stream()
+                .anyMatch(event -> event.getMessage().contains("パス") && event.getMessage().contains("の削除に失敗しました"));
+
+        /* 検証の実施 */
+        Assertions.assertTrue(actualLogExists, "削除失敗のログが出力されていること");
 
         /* クリーンアップ */
         // ファイルの権限を元に戻す
@@ -275,7 +296,6 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         testSubDir.toFile().setWritable(true);
         Files.deleteIfExists(testFile);
         Files.deleteIfExists(testSubDir);
-        logger.detachAppender(listAppender);
 
     }
 }
