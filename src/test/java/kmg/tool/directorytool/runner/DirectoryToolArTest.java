@@ -3,7 +3,6 @@ package kmg.tool.directorytool.runner;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -86,6 +85,11 @@ public class DirectoryToolArTest {
     @Test
     public void testSuccessfulCopyOperation() throws Exception {
 
+        /* 期待値の定義 */
+        final String[] expectedMsgs = {
+                "ディレクトリ操作の処理が終了しました。"
+        };
+
         /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("COPY", "source", "target"));
@@ -93,12 +97,19 @@ public class DirectoryToolArTest {
         /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        /* 検証の準備 */
+        final List<ILoggingEvent> logsList   = this.listAppender.list;
+        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+
         /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
-        final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertEquals(true,
-                logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")),
-                "処理終了メッセージが含まれていること");
+
+        // ログのチェック
+        for (int i = 0; i < expectedMsgs.length; i++) {
+
+            Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
+
+        }
 
     }
 
@@ -111,6 +122,11 @@ public class DirectoryToolArTest {
     @Test
     public void testSuccessfulMoveOperation() throws Exception {
 
+        /* 期待値の定義 */
+        final String[] expectedMsgs = {
+                "ディレクトリ操作の処理が終了しました。"
+        };
+
         /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("MOVE", "source", "target"));
@@ -118,12 +134,19 @@ public class DirectoryToolArTest {
         /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        /* 検証の準備 */
+        final List<ILoggingEvent> logsList   = this.listAppender.list;
+        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+
         /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
-        final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertEquals(true,
-                logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")),
-                "処理終了メッセージが含まれていること");
+
+        // ログのチェック
+        for (int i = 0; i < expectedMsgs.length; i++) {
+
+            Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
+
+        }
 
     }
 
@@ -136,21 +159,32 @@ public class DirectoryToolArTest {
     @Test
     public void testInsufficientArguments() throws Exception {
 
+        /* 期待値の定義 */
+        final String[] expectedMsgs = {
+                "ディレクトリ操作の処理が終了しました。", "使用方法:"
+        };
+
         /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs()).thenReturn(Arrays.asList("source", "target"));
 
         /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        /* 検証の準備 */
+        final List<ILoggingEvent> logsList   = this.listAppender.list;
+        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+
         /* 検証 */
+        // 引数のチェック
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
-        final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertEquals(true, logsList.stream().anyMatch(event -> event.getMessage().contains("使用方法:")),
-                "使用方法メッセージが含まれていること");
-        Assertions.assertEquals(true,
-                logsList.stream().anyMatch(event -> event.getMessage().contains("モデルの種類: COPY, MOVE, DIFF")),
-                "モデルの種類メッセージが含まれていること");
+
+        // ログのチェック
+        for (int i = 0; i < expectedMsgs.length; i++) {
+
+            Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
+
+        }
 
     }
 
@@ -165,9 +199,8 @@ public class DirectoryToolArTest {
 
         /* 期待値の定義 */
         final String[] expectedMsgs = {
-                "無効なモードが選択されています。: [INVALID]", "有効なモードの種類: COPY, MOVE, DIFF",
+                "無効なモードが選択されています。: [INVALID]", "有効なモードの種類: COPY, MOVE, DIFF"
         };
-        final String   expectedMsg  = String.join(System.lineSeparator(), expectedMsgs);
 
         /* 準備 */
         this.listAppender.list.clear();
@@ -180,13 +213,16 @@ public class DirectoryToolArTest {
         /* 検証の準備 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
-        final List<ILoggingEvent> logsList = this.listAppender.list;
-
-        final String actualMsg = logsList.stream().map(ILoggingEvent::getMessage)
-                .collect(Collectors.joining(System.lineSeparator()));
+        final List<ILoggingEvent> logsList   = this.listAppender.list;
+        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
 
         /* 検証 */
-        Assertions.assertEquals(expectedMsg, actualMsg, "エラーメッセージが期待通りであること");
+        // ログのチェック
+        for (int i = 0; i < expectedMsgs.length; i++) {
+
+            Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
+
+        }
 
     }
 
@@ -223,6 +259,11 @@ public class DirectoryToolArTest {
     @Test
     public void testDiffOperation() throws Exception {
 
+        /* 期待値の定義 */
+        final String[] expectedMsgs = {
+                "ディレクトリ操作の処理が終了しました。"
+        };
+
         /* 準備 */
         Mockito.when(this.applicationArguments.getNonOptionArgs())
                 .thenReturn(Arrays.asList("DIFF", "source", "target"));
@@ -230,12 +271,19 @@ public class DirectoryToolArTest {
         /* テスト対象の実行 */
         this.runner.run(this.applicationArguments);
 
+        /* 検証の準備 */
+        final List<ILoggingEvent> logsList   = this.listAppender.list;
+        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+
         /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
-        final List<ILoggingEvent> logsList = this.listAppender.list;
-        Assertions.assertEquals(true,
-                logsList.stream().anyMatch(event -> event.getMessage().contains("ディレクトリ操作の処理が終了しました。")),
-                "処理終了メッセージが含まれていること");
+
+        // ログのチェック
+        for (int i = 0; i < expectedMsgs.length; i++) {
+
+            Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
+
+        }
 
     }
 
