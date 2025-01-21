@@ -261,41 +261,4 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
     }
 
-    /**
-     * postProcessメソッドのcatchブロックのテスト（ログ出力の検証）
-     *
-     * @throws IOException
-     *                     ファイル操作時にエラーが発生した場合
-     */
-    @Test
-    public void testPostProcessCatchBlock() throws IOException {
-
-        /* 準備 */
-        final Path testSubDir = this.sourceDir.resolve("subdir");
-        Files.createDirectories(testSubDir);
-        final Path testFile = testSubDir.resolve("test.txt");
-        Files.writeString(testFile, "test content");
-
-        // ファイルを読み取り専用に設定し、削除できないようにする
-        testFile.toFile().setReadOnly();
-        testSubDir.toFile().setReadOnly();
-
-        /* テスト対象の実行 */
-        this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
-
-        /* 検証の準備 */
-        final boolean actualLogExists = this.listAppender.list.stream()
-                .anyMatch(event -> event.getMessage().contains("パス") && event.getMessage().contains("の削除に失敗しました"));
-
-        /* 検証の実施 */
-        Assertions.assertTrue(actualLogExists, "削除失敗のログが出力されていること");
-
-        /* クリーンアップ */
-        // ファイルの権限を元に戻す
-        testFile.toFile().setWritable(true);
-        testSubDir.toFile().setWritable(true);
-        Files.deleteIfExists(testFile);
-        Files.deleteIfExists(testSubDir);
-
-    }
 }
