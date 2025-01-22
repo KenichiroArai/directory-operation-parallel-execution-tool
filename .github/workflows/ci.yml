@@ -1,3 +1,7 @@
+permissions:
+    contents: write
+    security-events: write
+
 name: Continuous Integration
 
 on:
