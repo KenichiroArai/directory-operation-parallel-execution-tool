@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import kmg.tool.directorytool.service.impl.CopyDirectoryServiceImpl;
+
 /**
  * コピー操作を実行するサービスのテストクラス。
  */
@@ -20,7 +22,7 @@ public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
     @Override
     protected AbstractDirectoryService createService() {
 
-        final AbstractDirectoryService result = new CopyDirectoryService();
+        final AbstractDirectoryService result = new CopyDirectoryServiceImpl();
         return result;
 
     }
