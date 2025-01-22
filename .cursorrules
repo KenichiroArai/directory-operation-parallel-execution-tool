@@ -264,7 +264,7 @@ public boolean someMethod(String input) {
 1. 期待値の定義
 
    - ```/* 期待値の定義 */```のコメントを入れる。
-   - 「expected」で始まる期待値を定義する。
+   - ```expected```で始まる期待値を定義する。
 
 2. 準備
 
@@ -279,18 +279,56 @@ public boolean someMethod(String input) {
 4. 検証の準備
 
     - ```/* 検証の準備 */```のコメントを入れる。
-    - 「actual」で始まる実際の値を定義する。
+    - ```actual```で始まる実際の値を定義する。
 
 5. 検証の実施
 
     - ```/* 検証の実施 */```のコメントを入れる。
-    - 「Assertions.assertTrue」は「actualXXX」と説明を記載する。
-    - 「Assertions.assertEquals」は「actualXXX」と説明を記載する。
-    - 「Assertions.assertEquals」は「expectedXXX」と「actualXXX」と説明を記載する。
+    - ```Assertions.assertTrue```は```actualXXX```と説明を記載する。
+    - ```Assertions.assertEquals```は```actualXXX```と説明を記載する。
+    - ```Assertions.assertEquals```は```expectedXXX```と```actualXXX```と説明を記載する。
 
 ### テストメソッドのアクセス修飾子
 
 - 「testXXX」メソッドのアクセス修飾子を全て「public」にする
+
+### メッセージの検証
+
+- ```Assertions.assertEquals```を使用する
+- 1行1行で検証する
+
+#### メッセージの検証のコード例
+
+```java
+@Test
+public void testMethod() {
+
+    /* 期待値の定義 */
+    final String[] expectedOutputLines = {
+            "メッセージ1",
+            "メッセージ2",
+            "メッセージ3",
+    };
+    /* 準備 */
+
+    /* テスト対象の実行 */
+
+    /* 検証の準備 */
+    final String[] actualLogMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
+            .toArray(String[]::new);
+
+    /* 検証の実施 */
+    Assertions.assertEquals(expectedOutputLines.length, actualLogMessages.length, "ログメッセージの数が正しいこと");
+    for (int i = 0; i < expectedOutputLines.length; i++) {
+
+        final String expectedLine = expectedOutputLines[i];
+        Assertions.assertEquals(expectedLine, actualLogMessages[i],
+                String.format("出力に「%s」が含まれること", expectedLine));
+
+    }
+
+}
+```
 
 ---
 
