@@ -9,16 +9,20 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import kmg.tool.directorytool.service.impl.MoveDirectoryServiceImpl;
 
 /**
  * 移動操作を実行するサービスのテストクラス。
  */
+@Execution(ExecutionMode.SAME_THREAD)
 @ExtendWith(MockitoExtension.class)
 public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
 
@@ -36,7 +40,7 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
     @Override
     protected AbstractDirectoryService createService() {
 
-        final AbstractDirectoryService result = new MoveDirectoryService();
+        final AbstractDirectoryService result = new MoveDirectoryServiceImpl();
         return result;
 
     }
@@ -51,7 +55,7 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         super.setUp();
 
         // ロガーとアペンダーの設定
-        this.logger = (Logger) LoggerFactory.getLogger(MoveDirectoryService.class);
+        this.logger = (Logger) LoggerFactory.getLogger(MoveDirectoryServiceImpl.class);
         this.listAppender = new ListAppender<>();
         this.listAppender.start();
         this.logger.addAppender(this.listAppender);
@@ -223,16 +227,28 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
     public void testDeleteFailure() throws IOException {
 
         /* 期待値の定義 */
-        final String expectedErrorMessage = "テスト用のIO例外";
+        final String expectedErrorMessageFormat = "パス '%s' の削除に失敗しました";
+        final String expectedErrorMessage       = String.format(expectedErrorMessageFormat, this.sourceDir);
+
+        /* 期待値の定義 */
+        final String[] expectedOutputLines = {
+                expectedErrorMessage,
+        };
 
         /* 準備 */
+
+        // テストファイルの作成
+        final Path   testFile    = this.sourceDir.resolve("test.txt");
+        final String testContent = "test content";
+        Files.writeString(testFile, testContent);
+
         // テスト用のサブクラスを作成
-        class TestMoveDirectoryService extends MoveDirectoryService {
+        class TestMoveDirectoryService extends MoveDirectoryServiceImpl {
 
             @Override
             protected void deleteIfExists(final Path path) throws IOException {
 
-                throw new IOException(expectedErrorMessage);
+                throw new IOException(String.format(expectedErrorMessageFormat, path));
 
             }
         }
@@ -240,24 +256,27 @@ public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
         // テスト用のサービスを作成
         final TestMoveDirectoryService testService = new TestMoveDirectoryService();
 
-        // テストファイルを作成
-        final Path testFile = this.sourceDir.resolve("test.txt");
-        Files.writeString(testFile, "test content");
-
         /* テスト対象の実行 */
         testService.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
-        final boolean actualSourceExists = this.sourceDir.toFile().exists();
-        final boolean actualTargetExists = this.targetDir.resolve("test.txt").toFile().exists();
+        final boolean  actualSourceExists = Files.exists(this.sourceDir);
+        final boolean  actualTargetExists = Files.exists(this.targetDir.resolve("test.txt"));
+        final String[] actualLogMessages  = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
+                .toArray(String[]::new);
 
         /* 検証の実施 */
         Assertions.assertTrue(actualSourceExists, "ソースファイルが削除されずに残っていること");
         Assertions.assertTrue(actualTargetExists, "ターゲットファイルが正しく作成されていること");
-        Assertions.assertTrue(
-                this.listAppender.list.stream().anyMatch(
-                        event -> event.getMessage().contains("パス") && event.getMessage().contains("の削除に失敗しました")),
-                "削除失敗のログが出力されていること");
+        Assertions.assertEquals(expectedOutputLines.length, actualLogMessages.length, "ログメッセージの数が正しいこと");
+
+        for (int i = 0; i < expectedOutputLines.length; i++) {
+
+            final String expectedLine = expectedOutputLines[i];
+            Assertions.assertEquals(expectedLine, actualLogMessages[i],
+                    String.format("メッセージ%d: 出力に「%s」が含まれること", i + 1, expectedLine));
+
+        }
 
     }
 

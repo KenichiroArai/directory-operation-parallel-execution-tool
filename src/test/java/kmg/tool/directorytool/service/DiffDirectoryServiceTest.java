@@ -219,13 +219,15 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
-        final List<String> logMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
-                .collect(Collectors.toList());
+        final String[] logMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
+                .toArray(String[]::new);
 
         /* 検証の実施 */
-        for (final String expectedLine : expectedOutputLines) {
+        for (int i = 0; i < expectedOutputLines.length; i++) {
 
-            Assertions.assertEquals(true, logMessages.contains(expectedLine), "出力に「" + expectedLine + "」が含まれること");
+            final String expectedLine = expectedOutputLines[i];
+            Assertions.assertEquals(expectedLine, logMessages[i],
+                    String.format("メッセージ%d: 出力に「%s」が含まれること", i + 1, expectedLine));
 
         }
 
