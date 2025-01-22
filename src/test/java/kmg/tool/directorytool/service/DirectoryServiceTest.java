@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import kmg.tool.directorytool.model.OperationMode;
+import kmg.tool.directorytool.service.impl.DirectoryServiceImpl;
 
 /**
  * DirectoryServiceのファサードパターンの機能をテストするクラス。 <br>
@@ -44,7 +45,7 @@ public class DirectoryServiceTest {
     @BeforeEach
     public void setUp() {
 
-        this.directoryService = new DirectoryService();
+        this.directoryService = new DirectoryServiceImpl();
         ReflectionTestUtils.setField(this.directoryService, "copyService", this.copyService);
         ReflectionTestUtils.setField(this.directoryService, "moveService", this.moveService);
         ReflectionTestUtils.setField(this.directoryService, "diffService", this.diffService);

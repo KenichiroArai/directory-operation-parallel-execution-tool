@@ -1,8 +1,16 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.service.impl;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import kmg.tool.directorytool.model.OperationMode;
+import kmg.tool.directorytool.service.AbstractDirectoryService;
+import kmg.tool.directorytool.service.CopyDirectoryService;
+import kmg.tool.directorytool.service.DiffDirectoryService;
+import kmg.tool.directorytool.service.DirectoryService;
+import kmg.tool.directorytool.service.MoveDirectoryService;
 
 /**
  * ディレクトリ操作のファサードとして機能するサービスクラス。 <br>
@@ -20,8 +28,24 @@ import kmg.tool.directorytool.model.OperationMode;
  *
  * @author kmg
  * @version 1.0
+ * @see CopyDirectoryService
+ * @see MoveDirectoryService
+ * @see DiffDirectoryService
  */
-public interface DirectoryService {
+@Service
+public class DirectoryServiceImpl implements DirectoryService {
+
+    /** ディレクトリのコピー操作を実行するサービス */
+    @Autowired
+    private CopyDirectoryService copyService;
+
+    /** ディレクトリの移動操作を実行するサービス */
+    @Autowired
+    private MoveDirectoryService moveService;
+
+    /** ディレクトリの差分比較操作を実行するサービス */
+    @Autowired
+    private DiffDirectoryService diffService;
 
     /**
      * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。<br>
@@ -40,5 +64,18 @@ public interface DirectoryService {
      *                     ディレクトリの読み書き中にエラーが発生した場合、 またはソースディレクトリが存在しない場合
      * @see OperationMode
      */
-    void processDirectory(final String srcPath, final String destPath, final OperationMode mode) throws IOException;
+    @Override
+    public void processDirectory(final String srcPath, final String destPath, final OperationMode mode)
+            throws IOException {
+
+        final AbstractDirectoryService service = switch (mode) {
+
+            case COPY -> this.copyService;
+            case MOVE -> this.moveService;
+            case DIFF -> this.diffService;
+
+        };
+        service.processDirectory(srcPath, destPath);
+
+    }
 }
