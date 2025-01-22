@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
+
 /**
  * ディレクトリの移動操作を実行するサービスクラス。<br>
  * <p>
@@ -49,7 +51,7 @@ import org.springframework.stereotype.Service;
  * @see DirectoryService
  */
 @Service
-public class MoveDirectoryService extends AbstractDirectoryService {
+public class MoveDirectoryService extends AbstractDirectoryServiceImpl {
 
     /** ロガー */
     private static final Logger logger = LoggerFactory.getLogger(MoveDirectoryService.class);

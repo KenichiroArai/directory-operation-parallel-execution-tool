@@ -7,6 +7,8 @@ import java.nio.file.StandardCopyOption;
 
 import org.springframework.stereotype.Service;
 
+import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
+
 /**
  * ディレクトリのコピー操作を実行するサービスクラス。 <br>
  * <p>
@@ -33,7 +35,7 @@ import org.springframework.stereotype.Service;
  * @see DirectoryService
  */
 @Service
-public class CopyDirectoryService extends AbstractDirectoryService {
+public class CopyDirectoryService extends AbstractDirectoryServiceImpl {
 
     /**
      * 個々のファイル/ディレクトリに対してコピー操作を実行する。 <br>

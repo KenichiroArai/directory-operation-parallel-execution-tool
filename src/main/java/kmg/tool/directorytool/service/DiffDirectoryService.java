@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
+
 /**
  * ディレクトリの差分を検出するサービスクラス。 <br>
  * <p>
@@ -60,7 +62,7 @@ import org.springframework.stereotype.Service;
  * @see DirectoryService
  */
 @Service
-public class DiffDirectoryService extends AbstractDirectoryService {
+public class DiffDirectoryService extends AbstractDirectoryServiceImpl {
 
     /** ロガー */
     private static final Logger logger = LoggerFactory.getLogger(DiffDirectoryService.class);
@@ -121,7 +123,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         }
 
-        if (!AbstractDirectoryService.compareFiles(sourcePath, targetPath)) {
+        if (!AbstractDirectoryServiceImpl.compareFiles(sourcePath, targetPath)) {
 
             DiffDirectoryService.logger.info("差異あり: {}", relativePath);
 
@@ -225,7 +227,7 @@ public class DiffDirectoryService extends AbstractDirectoryService {
 
         }
 
-        AbstractDirectoryService.validatePaths(source, destination);
+        AbstractDirectoryServiceImpl.validatePaths(source, destination);
 
         // ソースディレクトリの処理
         try (Stream<Path> stream = Files.walk(source)) {
