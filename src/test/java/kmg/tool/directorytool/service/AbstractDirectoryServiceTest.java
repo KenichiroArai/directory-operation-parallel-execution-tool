@@ -117,7 +117,7 @@ public abstract class AbstractDirectoryServiceTest {
         final IOException exception = Assertions.assertThrows(IOException.class,
                 () -> this.service.processDirectory(this.sourceDir.toString(), targetFile.toString()));
 
-        Assertions.assertEquals("宛先パスは存在しますが、ディレクトリではありません。", exception.getMessage());
+        Assertions.assertEquals("ターゲットパスはディレクトリではありません。", exception.getMessage());
 
     }
 

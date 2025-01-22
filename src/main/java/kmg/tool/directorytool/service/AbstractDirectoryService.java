@@ -106,7 +106,7 @@ public abstract class AbstractDirectoryService {
      * ソースとターゲットのパスを検証する。 <br>
      * <p>
      * ソースパスが存在し、ディレクトリであることを確認する。<br>
-     * ターゲットパスが存在する場合、ディレクトリであることを確認する。<br>
+     * ターゲットパスがディレクトリであることを確認する。<br>
      * </p>
      *
      * @param source
@@ -114,7 +114,7 @@ public abstract class AbstractDirectoryService {
      * @param destination
      *                    ターゲットディレクトリのパス
      * @throws IOException
-     *                     ソースパスが存在しない、またはディレクトリでない場合、 ターゲットパスが存在するがディレクトリでない場合
+     *                     ソースパスが存在しない、またはディレクトリでない場合、 ターゲットパスがディレクトリでない場合
      */
     protected static void validatePaths(final Path source, final Path destination) throws IOException {
 
@@ -130,9 +130,9 @@ public abstract class AbstractDirectoryService {
 
         }
 
-        if (Files.exists(destination) && !Files.isDirectory(destination)) {
+        if (!Files.isDirectory(destination)) {
 
-            throw new IOException("宛先パスは存在しますが、ディレクトリではありません。");
+            throw new IOException("ターゲットパスはディレクトリではありません。");
 
         }
 
