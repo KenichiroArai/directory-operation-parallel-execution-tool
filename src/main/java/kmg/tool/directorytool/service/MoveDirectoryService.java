@@ -1,13 +1,5 @@
 package kmg.tool.directorytool.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,7 +30,7 @@ import org.springframework.stereotype.Service;
  * 使用例：
  *
  * <pre>
- * MoveDirectoryService service = new MoveDirectoryService();
+ * MoveDirectoryService service = new MoveDirectoryServiceImpl();
  * service.processDirectory("/source/dir", "/target/dir");
  * // 移動完了後、/source/dirは自動的に削除される
  * </pre>
@@ -49,103 +41,6 @@ import org.springframework.stereotype.Service;
  * @see DirectoryService
  */
 @Service
-public class MoveDirectoryService extends AbstractDirectoryService {
-
-    /** ロガー */
-    private static final Logger logger = LoggerFactory.getLogger(MoveDirectoryService.class);
-
-    /**
-     * 個々のファイル/ディレクトリに対して移動操作を実行する。<br>
-     * <p>
-     * ソースがディレクトリの場合、ターゲットディレクトリを作成する。 ソースがファイルの場合、親ディレクトリを作成し、ファイルを移動する。 既存のファイルは上書きされる。
-     * </p>
-     *
-     * @param sourcePath
-     *                     移動元のパス
-     * @param targetPath
-     *                     移動先のパス
-     * @param relativePath
-     *                     ソースディレクトリからの相対パス
-     * @throws IOException
-     *                     ディレクトリ作成またはファイル移動中にエラーが発生した場合
-     */
-    @Override
-    protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
-            throws IOException {
-
-        if (Files.isDirectory(sourcePath)) {
-
-            Files.createDirectories(targetPath);
-            return;
-
-        }
-
-        // ファイル移動前にターゲットディレクトリが存在することを保証
-        Files.createDirectories(targetPath.getParent());
-        Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-    }
-
-    /**
-     * 移動操作後の後処理を実行する。 <br>
-     * <p>
-     * ソースディレクトリ内の空になったディレクトリを削除する。<br>
-     * 削除は深い階層から順に行われる。
-     * </p>
-     * <p>
-     * この処理は以下の手順で実行されます：
-     * <ol>
-     * <li>ソースディレクトリ内のすべてのパスを取得
-     * <li>パスをその長さで降順にソート（深い階層から処理するため）
-     * <li>各パスに対して削除を試行
-     * </ol>
-     * 削除に失敗した場合は処理を継続し、可能な限り多くのディレクトリを削除します。
-     *
-     * @param source
-     *                    ソースディレクトリのパス
-     * @param destination
-     *                    ターゲットディレクトリのパス
-     * @throws IOException
-     *                     ディレクトリの削除中にI/Oエラーが発生した場合。例えば、削除権限がない場合など。
-     */
-    @Override
-    protected void postProcess(final Path source, final Path destination) throws IOException {
-
-        // 空になったディレクトリを削除
-        try (Stream<Path> stream = Files.walk(source)) {
-
-            stream.sorted((src, dest) -> dest.toString().length() - src.toString().length()).forEach(path -> {
-
-                try {
-
-                    this.deleteIfExists(path);
-
-                } catch (final IOException e) {
-
-                    MoveDirectoryService.logger.error(String.format("パス '%s' の削除に失敗しました", path));
-                    MoveDirectoryService.logger.error(String.format("エラー詳細: %s", e.getMessage()));
-
-                }
-
-            });
-
-        }
-
-    }
-
-    /**
-     * 指定されたパスが存在する場合に削除する。<br>
-     *
-     * @param path
-     *             ファイルまたはディレクトリのパス
-     * @throws IOException
-     *                     ファイルまたはディレクトリの削除中にエラーが発生した場合
-     */
-    @SuppressWarnings("static-method")
-    protected void deleteIfExists(final Path path) throws IOException {
-
-        Files.deleteIfExists(path);
-
-    }
-
+public interface MoveDirectoryService extends AbstractDirectoryService {
+    // 処理なし
 }

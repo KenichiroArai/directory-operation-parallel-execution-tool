@@ -12,11 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
+
 /**
- * ディレクトリ操作サービスのテストのための基底クラス。 共通のセットアップ、検証、クリーンアップ機能を提供する。
+ * ディレクトリ操作サービスのテストのための基底クラス。<br>
+ * <p>
+ * 共通のセットアップ、検証、クリーンアップ機能を提供する。
+ * </p>
  */
 @SpringBootTest
-public abstract class AbstractDirectoryServiceTest {
+public abstract class AbstractDirectoryServiceImplTest {
 
     /** テスト用の一時ディレクトリ */
     @TempDir
@@ -29,14 +34,14 @@ public abstract class AbstractDirectoryServiceTest {
     protected Path targetDir;
 
     /** テスト対象のディレクトリ操作サービス */
-    protected AbstractDirectoryService service;
+    protected AbstractDirectoryServiceImpl service;
 
     /**
      * テスト対象のサービスを作成する
      *
      * @return テスト対象のサービスインスタンス
      */
-    protected abstract AbstractDirectoryService createService();
+    protected abstract AbstractDirectoryServiceImpl createService();
 
     /**
      * テストの前準備
@@ -160,7 +165,7 @@ public abstract class AbstractDirectoryServiceTest {
         Files.writeString(file1, "content1");
         Files.writeString(file2, "different content");
 
-        Assertions.assertFalse(AbstractDirectoryService.compareFiles(file1, file2), "異なるサイズのファイルは不一致となるべき");
+        Assertions.assertFalse(AbstractDirectoryServiceImpl.compareFiles(file1, file2), "異なるサイズのファイルは不一致となるべき");
 
     }
 
@@ -181,7 +186,7 @@ public abstract class AbstractDirectoryServiceTest {
         Files.writeString(sourceFile, "test content");
 
         // サービスをオーバーライドして例外をシミュレート
-        final AbstractDirectoryService errorService = new AbstractDirectoryService() {
+        final AbstractDirectoryService errorService = new AbstractDirectoryServiceImpl() {
 
             @Override
             protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
@@ -222,7 +227,7 @@ public abstract class AbstractDirectoryServiceTest {
         Files.writeString(sourceFile, "test content");
 
         // サービスをオーバーライドして長時間のタスクをシミュレート
-        final AbstractDirectoryService slowService = new AbstractDirectoryService() {
+        final AbstractDirectoryService slowService = new AbstractDirectoryServiceImpl() {
 
             @Override
             protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)

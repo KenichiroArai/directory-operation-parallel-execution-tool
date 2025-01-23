@@ -19,12 +19,14 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
+import kmg.tool.directorytool.service.impl.DiffDirectoryServiceImpl;
 
 /**
  * 差分検出操作を実行するサービスのテストクラス。
  */
 @Execution(ExecutionMode.SAME_THREAD)
-public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
+public class DiffDirectoryServiceImplTest extends AbstractDirectoryServiceImplTest {
 
     /** ロガー */
     private Logger logger;
@@ -38,9 +40,9 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
      * @return 差分検出サービスのインスタンス
      */
     @Override
-    protected AbstractDirectoryService createService() {
+    protected AbstractDirectoryServiceImpl createService() {
 
-        final AbstractDirectoryService result = new DiffDirectoryService();
+        final AbstractDirectoryServiceImpl result = new DiffDirectoryServiceImpl();
         return result;
 
     }
@@ -55,7 +57,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         super.setUp();
 
         // ロガーとアペンダーの設定
-        this.logger = (Logger) LoggerFactory.getLogger(DiffDirectoryService.class);
+        this.logger = (Logger) LoggerFactory.getLogger(DiffDirectoryServiceImpl.class);
         this.listAppender = new ListAppender<>();
         this.listAppender.start();
         this.logger.addAppender(this.listAppender);
@@ -219,13 +221,15 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString());
 
         /* 検証の準備 */
-        final List<String> logMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
-                .collect(Collectors.toList());
+        final String[] logMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
+                .toArray(String[]::new);
 
         /* 検証の実施 */
-        for (final String expectedLine : expectedOutputLines) {
+        for (int i = 0; i < expectedOutputLines.length; i++) {
 
-            Assertions.assertEquals(true, logMessages.contains(expectedLine), "出力に「" + expectedLine + "」が含まれること");
+            final String expectedLine = expectedOutputLines[i];
+            Assertions.assertEquals(expectedLine, logMessages[i],
+                    String.format("メッセージ%d: 出力に「%s」が含まれること", i + 1, expectedLine));
 
         }
 
@@ -336,12 +340,26 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
     @Test
     public void testPostProcessWithNonExistentDestination() throws IOException {
 
+        /* 期待値の定義 */
+
         /* 準備 */
         // 宛先ディレクトリを削除
         Files.delete(this.targetDir);
 
+        // テスト用のサブクラスを作成してprocessPathをオーバーライド
+        class TestDiffDirectoryService extends DiffDirectoryServiceImpl {
+
+            @Override
+            public void postProcess(final Path source, final Path destination) throws IOException {
+
+                super.postProcess(source, destination);
+
+            }
+        }
+        final TestDiffDirectoryService testService = new TestDiffDirectoryService();
+
         /* テスト対象の実行 */
-        ((DiffDirectoryService) this.service).postProcess(this.sourceDir, this.targetDir);
+        testService.postProcess(this.sourceDir, this.targetDir);
 
         /* 検証の準備 */
         final List<String> logMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
@@ -369,7 +387,7 @@ public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
         Files.writeString(targetFile, "content");
 
         // テスト用のサブクラスを作成してprocessPathをオーバーライド
-        final DiffDirectoryService testService = new DiffDirectoryService() {
+        final DiffDirectoryService testService = new DiffDirectoryServiceImpl() {
 
             @Override
             protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
