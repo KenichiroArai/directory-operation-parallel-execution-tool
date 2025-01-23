@@ -13,7 +13,7 @@ import kmg.tool.directorytool.service.impl.CopyDirectoryServiceImpl;
 /**
  * コピー操作を実行するサービスのテストクラス。
  */
-public class CopyDirectoryServiceTest extends AbstractDirectoryServiceTest {
+public class CopyDirectoryServiceImplTest extends AbstractDirectoryServiceImplTest {
 
     /**
      * コピーサービスのインスタンスを生成します。

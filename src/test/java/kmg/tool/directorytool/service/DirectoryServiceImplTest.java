@@ -21,7 +21,7 @@ import kmg.tool.directorytool.service.impl.DirectoryServiceImpl;
  * </p>
  */
 @ExtendWith(MockitoExtension.class)
-public class DirectoryServiceTest {
+public class DirectoryServiceImplTest {
 
     /** テスト対象のDirectoryServiceインスタンス */
     @Mock

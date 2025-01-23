@@ -26,7 +26,7 @@ import kmg.tool.directorytool.service.impl.DiffDirectoryServiceImpl;
  * 差分検出操作を実行するサービスのテストクラス。
  */
 @Execution(ExecutionMode.SAME_THREAD)
-public class DiffDirectoryServiceTest extends AbstractDirectoryServiceTest {
+public class DiffDirectoryServiceImplTest extends AbstractDirectoryServiceImplTest {
 
     /** ロガー */
     private Logger logger;

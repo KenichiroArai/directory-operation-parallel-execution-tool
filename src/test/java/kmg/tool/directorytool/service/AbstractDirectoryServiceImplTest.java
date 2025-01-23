@@ -15,10 +15,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
 
 /**
- * ディレクトリ操作サービスのテストのための基底クラス。 共通のセットアップ、検証、クリーンアップ機能を提供する。
+ * ディレクトリ操作サービスのテストのための基底クラス。<br>
+ * <p>
+ * 共通のセットアップ、検証、クリーンアップ機能を提供する。
+ * </p>
  */
 @SpringBootTest
-public abstract class AbstractDirectoryServiceTest {
+public abstract class AbstractDirectoryServiceImplTest {
 
     /** テスト用の一時ディレクトリ */
     @TempDir

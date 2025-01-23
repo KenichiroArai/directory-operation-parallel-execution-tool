@@ -25,7 +25,7 @@ import kmg.tool.directorytool.service.impl.MoveDirectoryServiceImpl;
  */
 @Execution(ExecutionMode.SAME_THREAD)
 @ExtendWith(MockitoExtension.class)
-public class MoveDirectoryServiceTest extends AbstractDirectoryServiceTest {
+public class MoveDirectoryServiceImplTest extends AbstractDirectoryServiceImplTest {
 
     /** ロガー */
     private Logger logger;
