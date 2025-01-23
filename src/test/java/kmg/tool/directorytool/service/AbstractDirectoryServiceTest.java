@@ -31,14 +31,14 @@ public abstract class AbstractDirectoryServiceTest {
     protected Path targetDir;
 
     /** テスト対象のディレクトリ操作サービス */
-    protected AbstractDirectoryService service;
+    protected AbstractDirectoryServiceImpl service;
 
     /**
      * テスト対象のサービスを作成する
      *
      * @return テスト対象のサービスインスタンス
      */
-    protected abstract AbstractDirectoryService createService();
+    protected abstract AbstractDirectoryServiceImpl createService();
 
     /**
      * テストの前準備

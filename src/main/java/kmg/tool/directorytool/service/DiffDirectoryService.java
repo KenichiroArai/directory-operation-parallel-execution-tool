@@ -1,18 +1,9 @@
 package kmg.tool.directorytool.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
-
 /**
- * ディレクトリの差分を検出するサービスクラス。 <br>
+ * ディレクトリの差分を検出するインタフェース。 <br>
  * <p>
  * {@link AbstractDirectoryService}を継承し、2つのディレクトリ間の差分を検出・報告する機能を提供する。
  * </p>
@@ -51,7 +42,7 @@ import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
  * 使用例：
  *
  * <pre>
- * DiffDirectoryService service = new DiffDirectoryService();
+ * DiffDirectoryService service = new DiffDirectoryServiceImpl();
  * service.processDirectory("/source/dir", "/target/dir");
  * // 差分が標準出力に表示される
  * </pre>
@@ -62,196 +53,6 @@ import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
  * @see DirectoryService
  */
 @Service
-public class DiffDirectoryService extends AbstractDirectoryServiceImpl {
-
-    /** ロガー */
-    private static final Logger logger = LoggerFactory.getLogger(DiffDirectoryService.class);
-
-    /**
-     * ソースディレクトリとターゲットディレクトリのパスを比較し、差分を検出します。
-     *
-     * @param sourcePath
-     *                     ソースディレクトリのパス
-     * @param targetPath
-     *                     ターゲットディレクトリのパス
-     * @param relativePath
-     *                     ソースディレクトリからの相対パス
-     * @throws IOException
-     *                     ファイルまたはディレクトリの存在確認中にI/Oエラーが発生した場合。
-     */
-    @Override
-    protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
-            throws IOException {
-
-        // ソースパスとターゲットパスの種別を判定
-        final boolean isSourceDir  = Files.isDirectory(sourcePath);
-        final boolean targetExists = Files.exists(targetPath);
-
-        final boolean isTargetDir = targetExists && Files.isDirectory(targetPath);
-
-        // ディレクトリの比較
-        if (isSourceDir) {
-
-            if (!targetExists) {
-
-                DiffDirectoryService.logger.info("ソースディレクトリのみに存在するディレクトリ: {}", relativePath);
-                return;
-
-            }
-
-            if (!isTargetDir) {
-
-                DiffDirectoryService.logger.info("差異あり: {} (ディレクトリ vs ファイル)", relativePath);
-
-            }
-            return;
-
-        }
-
-        // ファイルの比較
-        if (!targetExists) {
-
-            DiffDirectoryService.logger.info("ソースのみに存在: {}", relativePath);
-            return;
-
-        }
-
-        if (isTargetDir) {
-
-            DiffDirectoryService.logger.info("差異あり: {} (ファイル vs ディレクトリ)", relativePath);
-            return;
-
-        }
-
-        if (!AbstractDirectoryServiceImpl.compareFiles(sourcePath, targetPath)) {
-
-            DiffDirectoryService.logger.info("差異あり: {}", relativePath);
-
-        }
-
-    }
-
-    /**
-     * ターゲットディレクトリを走査して、ソースディレクトリに存在しないファイルを検出します。
-     *
-     * @param source
-     *                    ソースディレクトリのパス
-     * @param destination
-     *                    ターゲットディレクトリのパス
-     * @throws IOException
-     *                     ディレクトリの走査中にI/Oエラーが発生した場合。
-     */
-    @Override
-    protected void postProcess(final Path source, final Path destination) throws IOException {
-
-        if (!Files.exists(destination)) {
-
-            return;
-
-        }
-
-        try (Stream<Path> stream = Files.walk(destination)) {
-
-            stream.forEach(path -> DiffDirectoryService.processDestinationPath(source, destination, path));
-
-        }
-
-    }
-
-    /**
-     * ターゲットディレクトリのパスを処理し、ソースディレクトリに存在しないファイルを検出します。
-     *
-     * @param source
-     *                    ソースディレクトリのパス
-     * @param destination
-     *                    ターゲットディレクトリのパス
-     * @param path
-     *                    ターゲットディレクトリ内の現在のパス
-     */
-    private static void processDestinationPath(final Path source, final Path destination, final Path path) {
-
-        if (path.equals(destination)) {
-
-            return;
-
-        }
-
-        final Path relativePath = destination.relativize(path);
-        final Path sourcePath   = source.resolve(relativePath);
-
-        if (Files.exists(sourcePath)) {
-
-            return;
-
-        }
-
-        if (Files.isDirectory(path)) {
-
-            DiffDirectoryService.logger.info("ターゲットディレクトリのみに存在するディレクトリ: {}", relativePath);
-
-        } else {
-
-            DiffDirectoryService.logger.info("ターゲットのみに存在: {}", relativePath);
-
-        }
-
-    }
-
-    /**
-     * ソースディレクトリとターゲットディレクトリを比較し、差分を検出します。 このメソッドは親クラスの実装をオーバーライドし、両方のディレクトリが存在することを 確認してから処理を開始します。
-     *
-     * @param srcPath
-     *                 ソースディレクトリのパス
-     * @param destPath
-     *                 ターゲットディレクトリのパス
-     * @throws IOException
-     *                     ソースディレクトリまたはターゲットディレクトリが存在しない場合に発生します。
-     */
-    @Override
-    public void processDirectory(final String srcPath, final String destPath) throws IOException {
-
-        final Path source      = Path.of(srcPath);
-        final Path destination = Path.of(destPath);
-
-        // ソースディレクトリの存在チェック
-        if (!Files.exists(source)) {
-
-            throw new IOException("ソースディレクトリが存在しません。");
-
-        }
-
-        // ターゲットディレクトリの存在チェック
-        if (!Files.exists(destination)) {
-
-            throw new IOException(String.format("ターゲットディレクトリが存在しません。: %s", destPath));
-
-        }
-
-        AbstractDirectoryServiceImpl.validatePaths(source, destination);
-
-        // ソースディレクトリの処理
-        try (Stream<Path> stream = Files.walk(source)) {
-
-            stream.forEach(path -> {
-
-                try {
-
-                    final Path relativePath = source.relativize(path);
-                    final Path targetPath   = destination.resolve(relativePath);
-                    this.processPath(path, targetPath, relativePath);
-
-                } catch (final IOException e) {
-
-                    throw new RuntimeException(String.format("ファイルの処理に失敗しました。: %s", path), e);
-
-                }
-
-            });
-
-        }
-
-        // ターゲットディレクトリの処理
-        this.postProcess(source, destination);
-
-    }
+public interface DiffDirectoryService extends AbstractDirectoryService {
+    // 処理なし
 }
