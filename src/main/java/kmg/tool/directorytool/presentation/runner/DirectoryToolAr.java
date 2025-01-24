@@ -12,6 +12,7 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
 import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.infrastructure.types.ExitCodeTypes;
 import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
@@ -72,15 +73,15 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     @Autowired
     private DirectoryService directoryService;
 
-    /** 終了コード */
-    private int exitCode;
+    /** 終了コードの種類 */
+    private ExitCodeTypes exitCode;
 
     /**
      * デフォルトコンストラクタ。
      */
     public DirectoryToolAr() {
 
-        this.exitCode = 0;      // TODO 2025/01/18 列挙型で定義する
+        this.exitCode = ExitCodeTypes.SUCCESS;
 
     }
 
@@ -90,7 +91,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     @Override
     public int getExitCode() {
 
-        final int result = this.exitCode;
+        final int result = this.exitCode.getValue();
         return result;
 
     }
@@ -101,7 +102,8 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     @Override
     public int getExitCode(final Throwable exception) {
 
-        final int result = 2;
+        final int result = ExitCodeTypes.UNEXPECTED_ERROR.getValue();
+        DirectoryToolAr.logger.error("例外を受け取りました。", exception);
         return result;
 
     }
@@ -133,6 +135,9 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
             DirectoryToolAr.logger.error("使用方法: <mode> <src> <dest>");
             DirectoryToolAr.logger.error("モデルの種類: COPY, MOVE, DIFF");
+
+            this.exitCode = ExitCodeTypes.ARGUMENT_ERROR;
+
             return;
 
         }
@@ -150,7 +155,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         } catch (final IllegalArgumentException e) {
 
             // 無効なモードが指定された場合
-            this.exitCode = 1;
+            this.exitCode = ExitCodeTypes.ARGUMENT_ERROR;
 
             final String[] logMsgs = {
                     String.format("無効なモードが選択されています。: [%s]", modeStr), "有効なモードの種類: COPY, MOVE, DIFF",
@@ -174,7 +179,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         } catch (final IOException e) {
 
             // ディレクトリ操作中にエラーが発生した場合
-            this.exitCode = 1;
+            this.exitCode = ExitCodeTypes.EXPECTED_ERROR;
             DirectoryToolAr.logger.error("ディレクトリ操作エラー", e);
 
         }

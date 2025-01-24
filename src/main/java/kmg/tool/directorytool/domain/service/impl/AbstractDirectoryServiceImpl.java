@@ -36,10 +36,10 @@ import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
 public abstract class AbstractDirectoryServiceImpl implements AbstractDirectoryService {
 
     /** 並列処理で使用するスレッド数。システムで利用可能なCPUの論理コア数に基づいて設定されます。 */
-    protected static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
     /** 並列処理用のスレッドプール。タスクの実行を管理し、スレッドの再利用を可能にします。 */
-    protected final ExecutorService executorService = Executors
+    private final ExecutorService executorService = Executors
             .newFixedThreadPool(AbstractDirectoryServiceImpl.THREAD_POOL_SIZE);
 
     /**
