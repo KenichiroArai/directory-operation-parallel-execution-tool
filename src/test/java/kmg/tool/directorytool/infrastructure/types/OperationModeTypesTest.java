@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.model;
+package kmg.tool.directorytool.infrastructure.types;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

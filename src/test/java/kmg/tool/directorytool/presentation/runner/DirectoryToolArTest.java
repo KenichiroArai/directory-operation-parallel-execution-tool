@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.runner;
+package kmg.tool.directorytool.presentation.runner;
 
 import java.io.IOException;
 import java.util.Arrays;
