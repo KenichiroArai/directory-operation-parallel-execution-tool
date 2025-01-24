@@ -3,12 +3,12 @@ package kmg.tool.directorytool.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import kmg.tool.directorytool.domain.model.OperationMode;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
- * OperationModeの列挙型のテストクラス
+ * OperationModeTypesの列挙型のテストクラス
  */
-public class OperationModeTest {
+public class OperationModeTypesTest {
 
     /**
      * 列挙型の値が正しく定義されているかテスト
@@ -24,15 +24,15 @@ public class OperationModeTest {
         // 期待値の定義は不要
 
         /* テスト対象の実行 */
-        final int actualLength = OperationMode.values().length;
+        final int actualLength = OperationModeTypes.values().length;
 
         /* 検証の準備 */
 
         /* 検証の実施 */
         Assertions.assertEquals(expectedLength, actualLength, "列挙型は3つの値を持つこと");
-        Assertions.assertEquals(true, OperationModeTest.containsEnumConstant("COPY"), "COPYが定義されていること");
-        Assertions.assertEquals(true, OperationModeTest.containsEnumConstant("MOVE"), "MOVEが定義されていること");
-        Assertions.assertEquals(true, OperationModeTest.containsEnumConstant("DIFF"), "DIFFが定義されていること");
+        Assertions.assertEquals(true, OperationModeTypesTest.containsEnumConstant("COPY"), "COPYが定義されていること");
+        Assertions.assertEquals(true, OperationModeTypesTest.containsEnumConstant("MOVE"), "MOVEが定義されていること");
+        Assertions.assertEquals(true, OperationModeTypesTest.containsEnumConstant("DIFF"), "DIFFが定義されていること");
 
     }
 
@@ -44,17 +44,17 @@ public class OperationModeTest {
     public void testValueOf() {
 
         /* 期待値の定義 */
-        final OperationMode expectedCopy = OperationMode.COPY;
-        final OperationMode expectedMove = OperationMode.MOVE;
-        final OperationMode expectedDiff = OperationMode.DIFF;
+        final OperationModeTypes expectedCopy = OperationModeTypes.COPY;
+        final OperationModeTypes expectedMove = OperationModeTypes.MOVE;
+        final OperationModeTypes expectedDiff = OperationModeTypes.DIFF;
 
         /* 準備 */
         // 期待値の定義は不要
 
         /* テスト対象の実行 */
-        final OperationMode actualCopy = OperationMode.valueOf("COPY");
-        final OperationMode actualMove = OperationMode.valueOf("MOVE");
-        final OperationMode actualDiff = OperationMode.valueOf("DIFF");
+        final OperationModeTypes actualCopy = OperationModeTypes.valueOf("COPY");
+        final OperationModeTypes actualMove = OperationModeTypes.valueOf("MOVE");
+        final OperationModeTypes actualDiff = OperationModeTypes.valueOf("DIFF");
 
         /* 検証の準備 */
 
@@ -80,7 +80,7 @@ public class OperationModeTest {
 
         /* テスト対象の実行 */
         final IllegalArgumentException actualException = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> OperationMode.valueOf(invalidValue), "無効な値でIllegalArgumentExceptionがスローされること");
+                () -> OperationModeTypes.valueOf(invalidValue), "無効な値でIllegalArgumentExceptionがスローされること");
 
         /* 検証の準備 */
 
@@ -100,9 +100,9 @@ public class OperationModeTest {
 
         boolean result = false;
 
-        for (final OperationMode mode : OperationMode.values()) {
+        for (final OperationModeTypes operationModeTypes : OperationModeTypes.values()) {
 
-            if (mode.name().equals(name)) {
+            if (operationModeTypes.name().equals(name)) {
 
                 result = true;
                 break;

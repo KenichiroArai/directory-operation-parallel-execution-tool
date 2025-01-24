@@ -11,12 +11,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import kmg.tool.directorytool.domain.model.OperationMode;
 import kmg.tool.directorytool.domain.service.CopyDirectoryService;
 import kmg.tool.directorytool.domain.service.DiffDirectoryService;
 import kmg.tool.directorytool.domain.service.DirectoryService;
 import kmg.tool.directorytool.domain.service.MoveDirectoryService;
 import kmg.tool.directorytool.domain.service.impl.DirectoryServiceImpl;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
  * DirectoryServiceのファサードパターンの機能をテストするクラス。 <br>
@@ -72,7 +72,7 @@ public class DirectoryServiceImplTest {
         /* 準備 */
 
         /* テスト対象の実行 */
-        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.COPY);
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.COPY);
 
         /* 検証の準備 */
 
@@ -99,7 +99,7 @@ public class DirectoryServiceImplTest {
         /* 準備 */
 
         /* テスト対象の実行 */
-        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.MOVE);
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.MOVE);
 
         /* 検証の準備 */
 
@@ -126,7 +126,7 @@ public class DirectoryServiceImplTest {
         /* 準備 */
 
         /* テスト対象の実行 */
-        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.DIFF);
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.DIFF);
 
         /* 検証の準備 */
 
@@ -157,7 +157,7 @@ public class DirectoryServiceImplTest {
         /* テスト対象の実行 */
         try {
 
-            this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.COPY);
+            this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.COPY);
 
         } catch (final IOException actualException) {
             /* 検証の準備 */

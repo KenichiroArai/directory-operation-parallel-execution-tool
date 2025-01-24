@@ -5,12 +5,13 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import kmg.tool.directorytool.domain.model.OperationMode;
+import kmg.core.infrastructure.type.KmgString;
 import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
 import kmg.tool.directorytool.domain.service.CopyDirectoryService;
 import kmg.tool.directorytool.domain.service.DiffDirectoryService;
 import kmg.tool.directorytool.domain.service.DirectoryService;
 import kmg.tool.directorytool.domain.service.MoveDirectoryService;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
  * ディレクトリ操作のファサードとして機能するサービスクラス。 <br>
@@ -55,24 +56,27 @@ public class DirectoryServiceImpl implements DirectoryService {
      * </p>
      *
      * @param srcPath
-     *                 ソースディレクトリのパス（存在するディレクトリである必要がある）
+     *                           ソースディレクトリのパス（存在するディレクトリである必要がある）
      * @param destPath
-     *                 ターゲットディレクトリのパス
-     * @param mode
-     *                 操作モード（COPY、MOVE、またはDIFF）
+     *                           ターゲットディレクトリのパス
+     * @param operationModeTypes
+     *                           操作モードの種類
      * @throws IOException
      *                     ディレクトリの読み書き中にエラーが発生した場合、 またはソースディレクトリが存在しない場合
-     * @see OperationMode
      */
     @Override
-    public void processDirectory(final String srcPath, final String destPath, final OperationMode mode)
-            throws IOException {
+    public void processDirectory(final String srcPath, final String destPath,
+            final OperationModeTypes operationModeTypes) throws IOException {
 
-        final AbstractDirectoryService service = switch (mode) {
+        final AbstractDirectoryService service = switch (operationModeTypes) {
 
             case COPY -> this.copyService;
             case MOVE -> this.moveService;
             case DIFF -> this.diffService;
+            case NONE -> throw new IllegalArgumentException(
+                    KmgString.concat("Unexpected value: ", operationModeTypes.getName()));
+            default   -> throw new IllegalArgumentException(
+                    KmgString.concat("Unexpected value: ", operationModeTypes.getName()));
 
         };
         service.processDirectory(srcPath, destPath);

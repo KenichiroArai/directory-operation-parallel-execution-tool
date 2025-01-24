@@ -22,8 +22,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import kmg.tool.directorytool.domain.model.OperationMode;
 import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 import kmg.tool.directorytool.presentation.runner.DirectoryToolAr;
 
 /**
@@ -103,7 +103,7 @@ public class DirectoryToolArTest {
         final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
 
         /* 検証 */
-        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.COPY);
+        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.COPY);
 
         // ログのチェック
         for (int i = 0; i < expectedMsgs.length; i++) {
@@ -140,7 +140,7 @@ public class DirectoryToolArTest {
         final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
 
         /* 検証 */
-        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.MOVE);
+        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.MOVE);
 
         // ログのチェック
         for (int i = 0; i < expectedMsgs.length; i++) {
@@ -281,7 +281,7 @@ public class DirectoryToolArTest {
         final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
 
         /* 検証 */
-        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationMode.DIFF);
+        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.DIFF);
 
         // ログのチェック
         for (int i = 0; i < expectedMsgs.length; i++) {

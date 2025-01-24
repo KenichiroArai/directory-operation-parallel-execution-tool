@@ -11,8 +11,8 @@ import org.springframework.boot.ExitCodeExceptionMapper;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
-import kmg.tool.directorytool.domain.model.OperationMode;
 import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
  * コマンドラインインターフェースを提供するクラス。 Spring Bootのコマンドラインランナーとして実装され、アプリケーションの起動時に コマンドライン引数を処理し、適切なディレクトリ操作を実行する。
@@ -61,8 +61,6 @@ import kmg.tool.directorytool.domain.service.DirectoryService;
  *
  * @author kmg
  * @version 1.0
- * @see kmg.tool.directorytool.domain.service.DirectoryService
- * @see kmg.tool.directorytool.domain.model.OperationMode
  */
 @Component
 public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, ExitCodeExceptionMapper {
@@ -141,13 +139,13 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
         // 引数をパース
         // モード
-        final String  modeStr = nonOptionArgs[0];
-        OperationMode mode;
+        final String       modeStr = nonOptionArgs[0];
+        OperationModeTypes operationModeTypes;
 
         try {
 
             // モード文字列をenumに変換
-            mode = OperationMode.valueOf(modeStr.toUpperCase());
+            operationModeTypes = OperationModeTypes.valueOf(modeStr.toUpperCase());
 
         } catch (final IllegalArgumentException e) {
 
@@ -170,7 +168,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         /* ディレクトリ操作を実行 */
         try {
 
-            this.directoryService.processDirectory(src, dest, mode);
+            this.directoryService.processDirectory(src, dest, operationModeTypes);
             DirectoryToolAr.logger.info("ディレクトリ操作の処理が終了しました。");
 
         } catch (final IOException e) {

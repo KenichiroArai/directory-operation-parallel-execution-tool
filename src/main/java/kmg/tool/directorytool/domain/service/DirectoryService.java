@@ -2,7 +2,7 @@ package kmg.tool.directorytool.domain.service;
 
 import java.io.IOException;
 
-import kmg.tool.directorytool.domain.model.OperationMode;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
  * ディレクトリ操作のファサードとして機能するサービスクラス。 <br>
@@ -31,14 +31,14 @@ public interface DirectoryService {
      * </p>
      *
      * @param srcPath
-     *                 ソースディレクトリのパス（存在するディレクトリである必要がある）
+     *                           ソースディレクトリのパス（存在するディレクトリである必要がある）
      * @param destPath
-     *                 ターゲットディレクトリのパス
-     * @param mode
-     *                 操作モード（COPY、MOVE、またはDIFF）
+     *                           ターゲットディレクトリのパス
+     * @param operationModeTypes
+     *                           操作モードの種類
      * @throws IOException
      *                     ディレクトリの読み書き中にエラーが発生した場合、 またはソースディレクトリが存在しない場合
-     * @see OperationMode
      */
-    void processDirectory(final String srcPath, final String destPath, final OperationMode mode) throws IOException;
+    void processDirectory(final String srcPath, final String destPath, final OperationModeTypes operationModeTypes)
+            throws IOException;
 }
