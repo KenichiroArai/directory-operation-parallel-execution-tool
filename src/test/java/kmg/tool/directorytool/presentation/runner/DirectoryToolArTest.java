@@ -322,7 +322,7 @@ public class DirectoryToolArTest {
         final int result = this.runner.getExitCode(testException);
 
         /* 検証 */
-        Assertions.assertEquals(2, result, "例外発生時の終了コードが2であること");
+        Assertions.assertEquals(3, result, "例外発生時の終了コードが3であること");
 
     }
 }
