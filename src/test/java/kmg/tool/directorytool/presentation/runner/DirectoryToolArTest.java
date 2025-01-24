@@ -23,6 +23,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.infrastructure.types.ExitCodeTypes;
 import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
@@ -298,7 +299,7 @@ public class DirectoryToolArTest {
     public void testGetExitCode() {
 
         /* 準備 */
-        ReflectionTestUtils.setField(this.runner, "exitCode", 1);
+        ReflectionTestUtils.setField(this.runner, "exitCode", ExitCodeTypes.ARGUMENT_ERROR);
 
         /* テスト対象の実行 */
         final int result = this.runner.getExitCode();
