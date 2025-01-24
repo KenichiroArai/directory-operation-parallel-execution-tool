@@ -7,9 +7,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import kmg.tool.directorytool.domain.service.impl.AbstractDirectoryServiceImpl;
-import kmg.tool.directorytool.domain.service.impl.CopyDirectoryServiceImpl;
-
 /**
  * コピー操作を実行するサービスのテストクラス。
  */

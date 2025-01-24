@@ -21,8 +21,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import kmg.core.infrastructure.type.KmgString;
 import kmg.tool.directorytool.domain.service.DiffDirectoryService;
-import kmg.tool.directorytool.domain.service.impl.AbstractDirectoryServiceImpl;
-import kmg.tool.directorytool.domain.service.impl.DiffDirectoryServiceImpl;
 
 /**
  * 差分検出操作を実行するサービスのテストクラス。

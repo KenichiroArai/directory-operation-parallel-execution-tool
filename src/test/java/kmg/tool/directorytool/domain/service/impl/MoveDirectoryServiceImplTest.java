@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import kmg.tool.directorytool.domain.service.impl.AbstractDirectoryServiceImpl;
-import kmg.tool.directorytool.domain.service.impl.MoveDirectoryServiceImpl;
 
 /**
  * 移動操作を実行するサービスのテストクラス。
