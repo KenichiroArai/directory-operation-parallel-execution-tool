@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service.impl;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import kmg.tool.directorytool.service.AbstractDirectoryService;
+import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
 
 /**
  * ディレクトリ操作の基本機能を提供する抽象クラス。 <br>

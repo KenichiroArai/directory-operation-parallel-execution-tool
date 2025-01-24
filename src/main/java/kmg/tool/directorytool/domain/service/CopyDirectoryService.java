@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.domain.service;
 
 import org.springframework.stereotype.Service;
 

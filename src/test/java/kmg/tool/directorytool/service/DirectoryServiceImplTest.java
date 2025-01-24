@@ -11,8 +11,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import kmg.tool.directorytool.model.OperationMode;
-import kmg.tool.directorytool.service.impl.DirectoryServiceImpl;
+import kmg.tool.directorytool.domain.model.OperationMode;
+import kmg.tool.directorytool.domain.service.CopyDirectoryService;
+import kmg.tool.directorytool.domain.service.DiffDirectoryService;
+import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.domain.service.MoveDirectoryService;
+import kmg.tool.directorytool.domain.service.impl.DirectoryServiceImpl;
 
 /**
  * DirectoryServiceのファサードパターンの機能をテストするクラス。 <br>

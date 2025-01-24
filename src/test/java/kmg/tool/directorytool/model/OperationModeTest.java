@@ -3,6 +3,8 @@ package kmg.tool.directorytool.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import kmg.tool.directorytool.domain.model.OperationMode;
+
 /**
  * OperationModeの列挙型のテストクラス
  */

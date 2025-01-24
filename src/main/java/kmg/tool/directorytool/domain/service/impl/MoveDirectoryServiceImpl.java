@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service.impl;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import kmg.tool.directorytool.service.AbstractDirectoryService;
-import kmg.tool.directorytool.service.DirectoryService;
-import kmg.tool.directorytool.service.MoveDirectoryService;
+import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
+import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.domain.service.MoveDirectoryService;
 
 /**
  * ディレクトリの移動操作を実行するサービスクラス。<br>

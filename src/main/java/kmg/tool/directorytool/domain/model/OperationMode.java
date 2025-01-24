@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.model;
+package kmg.tool.directorytool.domain.model;
 
 /**
  * ディレクトリ操作ツールの操作モードを表す列挙型。<br>

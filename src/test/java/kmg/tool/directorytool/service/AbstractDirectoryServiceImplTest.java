@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
+import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
+import kmg.tool.directorytool.domain.service.impl.AbstractDirectoryServiceImpl;
 
 /**
  * ディレクトリ操作サービスのテストのための基底クラス。<br>

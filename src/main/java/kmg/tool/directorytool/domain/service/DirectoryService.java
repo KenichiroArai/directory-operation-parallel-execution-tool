@@ -1,8 +1,8 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.domain.service;
 
 import java.io.IOException;
 
-import kmg.tool.directorytool.model.OperationMode;
+import kmg.tool.directorytool.domain.model.OperationMode;
 
 /**
  * ディレクトリ操作のファサードとして機能するサービスクラス。 <br>

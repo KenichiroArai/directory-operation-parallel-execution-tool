@@ -22,8 +22,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import kmg.tool.directorytool.model.OperationMode;
-import kmg.tool.directorytool.service.DirectoryService;
+import kmg.tool.directorytool.domain.model.OperationMode;
+import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.presentation.runner.DirectoryToolAr;
 
 /**
  * DirectoryToolArのテストクラス

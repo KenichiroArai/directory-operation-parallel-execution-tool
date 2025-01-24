@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.runner;
+package kmg.tool.directorytool.presentation.runner;
 
 import java.io.IOException;
 
@@ -11,8 +11,8 @@ import org.springframework.boot.ExitCodeExceptionMapper;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
-import kmg.tool.directorytool.model.OperationMode;
-import kmg.tool.directorytool.service.DirectoryService;
+import kmg.tool.directorytool.domain.model.OperationMode;
+import kmg.tool.directorytool.domain.service.DirectoryService;
 
 /**
  * コマンドラインインターフェースを提供するクラス。 Spring Bootのコマンドラインランナーとして実装され、アプリケーションの起動時に コマンドライン引数を処理し、適切なディレクトリ操作を実行する。
@@ -61,8 +61,8 @@ import kmg.tool.directorytool.service.DirectoryService;
  *
  * @author kmg
  * @version 1.0
- * @see kmg.tool.directorytool.service.DirectoryService
- * @see kmg.tool.directorytool.model.OperationMode
+ * @see kmg.tool.directorytool.domain.service.DirectoryService
+ * @see kmg.tool.directorytool.domain.model.OperationMode
  */
 @Component
 public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, ExitCodeExceptionMapper {
