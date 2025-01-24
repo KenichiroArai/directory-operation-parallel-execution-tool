@@ -75,8 +75,6 @@ public class DirectoryServiceImpl implements DirectoryService {
             case COPY -> this.copyService;
             case MOVE -> this.moveService;
             case DIFF -> this.diffService;
-            default   -> throw new IllegalArgumentException(
-                    KmgString.concat("Unexpected value: ", operationModeTypes.getName()));
 
         };
         service.processDirectory(srcPath, destPath);

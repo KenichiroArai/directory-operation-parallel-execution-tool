@@ -208,25 +208,4 @@ public class DirectoryServiceImplTest {
         Assertions.assertEquals(expectedMessage, exception.getMessage(), "期待したエラーメッセージが返されること");
 
     }
-
-    /**
-     * デフォルトケースで適切な例外が発生することを検証します。
-     */
-    @Test
-    public void testDefaultCaseThrowsException() {
-
-        /* 期待値の定義 */
-        final String expectedSrcPath  = "source";
-        final String expectedDestPath = "target";
-        final String expectedMessage  = "Unexpected value: 指定無し";
-
-        /* テスト対象の実行と検証 */
-        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> this.directoryService.processDirectory(expectedSrcPath, expectedDestPath,
-                        OperationModeTypes.NONE));
-
-        /* 検証の実施 */
-        Assertions.assertEquals(expectedMessage, exception.getMessage(), "期待したエラーメッセージが返されること");
-
-    }
 }
