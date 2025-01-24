@@ -3,7 +3,7 @@ package kmg.tool.directorytool.domain.service;
 import org.springframework.stereotype.Service;
 
 /**
- * ディレクトリのコピー操作を実行するサービスクラス。 <br>
+ * ディレクトリのコピー操作を実行するインタフェース。 <br>
  * <p>
  * {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的なコピー機能を提供する。
  * </p>

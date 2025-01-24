@@ -3,7 +3,7 @@ package kmg.tool.directorytool.domain.service;
 import org.springframework.stereotype.Service;
 
 /**
- * ディレクトリの移動操作を実行するサービスクラス。<br>
+ * ディレクトリの移動操作を実行するサービスインタフェース。<br>
  * <p>
  * {@link AbstractDirectoryService}を継承し、ディレクトリとその内容の再帰的な移動機能を提供する。
  * </p>

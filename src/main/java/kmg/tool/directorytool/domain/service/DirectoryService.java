@@ -5,7 +5,7 @@ import java.io.IOException;
 import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
- * ディレクトリ操作のファサードとして機能するサービスクラス。 <br>
+ * ディレクトリ操作のファサードとして機能するサービスインタフェース。 <br>
  * <p>
  * 操作モードに応じて適切なサービスクラスに処理を委譲する。<br>
  * Spring Frameworkのサービスレイヤーとして実装され、DIコンテナによって管理される。
