@@ -15,7 +15,6 @@ import kmg.tool.directorytool.domain.service.CopyDirectoryService;
 import kmg.tool.directorytool.domain.service.DiffDirectoryService;
 import kmg.tool.directorytool.domain.service.DirectoryService;
 import kmg.tool.directorytool.domain.service.MoveDirectoryService;
-import kmg.tool.directorytool.domain.service.impl.DirectoryServiceImpl;
 import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
@@ -178,12 +177,32 @@ public class DirectoryServiceImplTest {
         /* 期待値の定義 */
         final String expectedSrcPath  = "source";
         final String expectedDestPath = "target";
-        final String expectedMessage  = "Unexpected value: NONE";
+        final String expectedMessage  = "Unexpected value: 指定無し";
 
         /* テスト対象の実行と検証 */
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> this.directoryService.processDirectory(expectedSrcPath, expectedDestPath,
                         OperationModeTypes.NONE));
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expectedMessage, exception.getMessage(), "期待したエラーメッセージが返されること");
+
+    }
+
+    /**
+     * 操作モードにnullが指定された場合に適切な例外が発生することを検証します。
+     */
+    @Test
+    public void testNullOperationModeThrowsException() {
+
+        /* 期待値の定義 */
+        final String expectedSrcPath  = "source";
+        final String expectedDestPath = "target";
+        final String expectedMessage  = "Cannot invoke \"kmg.tool.directorytool.infrastructure.types.OperationModeTypes.ordinal()\" because \"operationModeTypes\" is null";
+
+        /* テスト対象の実行と検証 */
+        final NullPointerException exception = Assertions.assertThrows(NullPointerException.class,
+                () -> this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, null));
 
         /* 検証の実施 */
         Assertions.assertEquals(expectedMessage, exception.getMessage(), "期待したエラーメッセージが返されること");
