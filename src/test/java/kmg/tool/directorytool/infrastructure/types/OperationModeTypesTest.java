@@ -112,4 +112,83 @@ public class OperationModeTypesTest {
         return result;
 
     }
+
+    /**
+     * getEnumメソッドのテスト
+     */
+    @SuppressWarnings("static-method")
+    @Test
+    public void testGetEnum() {
+
+        /* 期待値の定義 */
+        final OperationModeTypes expectedCopy = OperationModeTypes.COPY;
+        final OperationModeTypes expectedNone = OperationModeTypes.NONE;
+
+        /* テスト対象の実行 */
+        final OperationModeTypes actualCopy    = OperationModeTypes.getEnum("COPY");
+        final OperationModeTypes actualInvalid = OperationModeTypes.getEnum("INVALID");
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expectedCopy, actualCopy, "有効な値でCOPYが返されること");
+        Assertions.assertEquals(expectedNone, actualInvalid, "無効な値でNONEが返されること");
+
+    }
+
+    /**
+     * getInitValueメソッドのテスト
+     */
+    @SuppressWarnings("static-method")
+    @Test
+    public void testGetInitValue() {
+
+        /* 期待値の定義 */
+        final OperationModeTypes expected = OperationModeTypes.NONE;
+
+        /* テスト対象の実行 */
+        final OperationModeTypes actual = OperationModeTypes.getInitValue();
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "初期値としてNONEが返されること");
+
+    }
+
+    /**
+     * getDefaultメソッドのテスト
+     */
+    @SuppressWarnings("static-method")
+    @Test
+    public void testGetDefault() {
+
+        /* 期待値の定義 */
+        final OperationModeTypes expected = OperationModeTypes.NONE;
+
+        /* テスト対象の実行 */
+        final OperationModeTypes actual = OperationModeTypes.getDefault();
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expected, actual, "デフォルト値としてNONEが返されること");
+
+    }
+
+    /**
+     * getName、getValue、getメソッドのテスト
+     */
+    @SuppressWarnings("static-method")
+    @Test
+    public void testGetters() {
+
+        /* 期待値の定義 */
+        final String expectedCopyName  = "コピー";
+        final String expectedCopyValue = "COPY";
+
+        /* テスト対象の実行 */
+        final OperationModeTypes copy = OperationModeTypes.COPY;
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expectedCopyName, copy.getName(), "getName()が正しい名称を返すこと");
+        Assertions.assertEquals(expectedCopyValue, copy.getValue(), "getValue()が正しい値を返すこと");
+        Assertions.assertEquals(expectedCopyValue, copy.get(), "get()が正しい値を返すこと");
+        Assertions.assertEquals(expectedCopyValue, copy.toString(), "toString()が正しい値を返すこと");
+
+    }
 }
