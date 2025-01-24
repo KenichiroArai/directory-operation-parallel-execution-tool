@@ -70,11 +70,11 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         final AbstractDirectoryService service = switch (operationModeTypes) {
 
+            case NONE -> throw new IllegalArgumentException(
+                    KmgString.concat("Unexpected value: ", operationModeTypes.getName()));
             case COPY -> this.copyService;
             case MOVE -> this.moveService;
             case DIFF -> this.diffService;
-            case NONE -> throw new IllegalArgumentException(
-                    KmgString.concat("Unexpected value: ", operationModeTypes.getName()));
             default   -> throw new IllegalArgumentException(
                     KmgString.concat("Unexpected value: ", operationModeTypes.getName()));
 

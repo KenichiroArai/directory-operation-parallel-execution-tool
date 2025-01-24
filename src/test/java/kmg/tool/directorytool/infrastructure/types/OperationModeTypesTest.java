@@ -3,8 +3,6 @@ package kmg.tool.directorytool.infrastructure.types;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
-
 /**
  * OperationModeTypesの列挙型のテストクラス
  */
@@ -18,7 +16,7 @@ public class OperationModeTypesTest {
     public void testEnumValues() {
 
         /* 期待値の定義 */
-        final int expectedLength = 3;
+        final int expectedLength = 4;
 
         /* 準備 */
         // 期待値の定義は不要
@@ -29,10 +27,11 @@ public class OperationModeTypesTest {
         /* 検証の準備 */
 
         /* 検証の実施 */
-        Assertions.assertEquals(expectedLength, actualLength, "列挙型は3つの値を持つこと");
-        Assertions.assertEquals(true, OperationModeTypesTest.containsEnumConstant("COPY"), "COPYが定義されていること");
-        Assertions.assertEquals(true, OperationModeTypesTest.containsEnumConstant("MOVE"), "MOVEが定義されていること");
-        Assertions.assertEquals(true, OperationModeTypesTest.containsEnumConstant("DIFF"), "DIFFが定義されていること");
+        Assertions.assertEquals(expectedLength, actualLength, "列挙型は4つの値を持つこと");
+        Assertions.assertTrue(OperationModeTypesTest.containsEnumConstant("NONE"), "NONEが定義されていること");
+        Assertions.assertTrue(OperationModeTypesTest.containsEnumConstant("COPY"), "COPYが定義されていること");
+        Assertions.assertTrue(OperationModeTypesTest.containsEnumConstant("MOVE"), "MOVEが定義されていること");
+        Assertions.assertTrue(OperationModeTypesTest.containsEnumConstant("DIFF"), "DIFFが定義されていること");
 
     }
 
