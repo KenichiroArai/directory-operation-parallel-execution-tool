@@ -251,7 +251,7 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証 */
-        Assertions.assertEquals(1, this.runner.getExitCode());
+        Assertions.assertEquals(2, this.runner.getExitCode());
 
     }
 
