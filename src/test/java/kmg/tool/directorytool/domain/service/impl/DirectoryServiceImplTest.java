@@ -208,4 +208,23 @@ public class DirectoryServiceImplTest {
         Assertions.assertEquals(expectedMessage, exception.getMessage(), "期待したエラーメッセージが返されること");
 
     }
+
+    /**
+     * スレッドプールサイズの設定が各サービスに正しく反映されることを検証します。
+     */
+    @Test
+    public void testSetThreadPoolSize() {
+
+        /* 期待値の定義 */
+        final int expectedThreadPoolSize = 4;
+
+        /* テスト対象の実行 */
+        this.directoryService.setThreadPoolSize(expectedThreadPoolSize);
+
+        /* 検証の実施 */
+        Mockito.verify(this.copyService).setThreadPoolSize(expectedThreadPoolSize);
+        Mockito.verify(this.moveService).setThreadPoolSize(expectedThreadPoolSize);
+        Mockito.verify(this.diffService).setThreadPoolSize(expectedThreadPoolSize);
+
+    }
 }
