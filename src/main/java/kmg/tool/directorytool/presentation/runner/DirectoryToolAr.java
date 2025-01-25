@@ -127,17 +127,37 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
         /* 引数の変換 */
 
+        // スレッドプールサイズのオプションを取得
+        int threadPoolSize = 0;
+
+        if (args.containsOption("thread-pool-size")) {
+
+            try {
+
+                threadPoolSize = Integer.parseInt(args.getOptionValues("thread-pool-size").get(0));
+
+            } catch (final NumberFormatException e) {
+
+                DirectoryToolAr.logger.error("スレッドプールサイズは数値で指定してください。", e);
+                this.exitCode = ExitCodeTypes.ARGUMENT_ERROR;
+                return;
+
+            }
+
+        }
+
         // 非オプション引数を取得
         final String[] nonOptionArgs = args.getNonOptionArgs().toArray(String[]::new);
 
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
 
-            DirectoryToolAr.logger.error("使用方法: <mode> <src> <dest>");
+            DirectoryToolAr.logger.error("使用方法: [--thread-pool-size=<size>] <mode> <src> <dest>");
             DirectoryToolAr.logger.error("モデルの種類: COPY, MOVE, DIFF");
+            DirectoryToolAr.logger.error("オプション:");
+            DirectoryToolAr.logger.error("  --thread-pool-size=<size>  並列処理で使用するスレッド数（デフォルト: 利用可能なCPUの論理コア数）");
 
             this.exitCode = ExitCodeTypes.ARGUMENT_ERROR;
-
             return;
 
         }
@@ -172,6 +192,9 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
         /* ディレクトリ操作を実行 */
         try {
+
+            // スレッドプールサイズを設定（設定されている場合のみ）
+            this.directoryService.setThreadPoolSize(threadPoolSize);
 
             this.directoryService.processDirectory(src, dest, operationModeTypes);
             DirectoryToolAr.logger.info("ディレクトリ操作の処理が終了しました。");

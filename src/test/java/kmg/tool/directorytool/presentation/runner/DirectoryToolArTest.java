@@ -162,7 +162,7 @@ public class DirectoryToolArTest {
 
         /* 期待値の定義 */
         final String[] expectedMsgs = {
-                "使用方法: <mode> <src> <dest>"
+                "使用方法: [--thread-pool-size=<size>] <mode> <src> <dest>",
         };
 
         /* 準備 */

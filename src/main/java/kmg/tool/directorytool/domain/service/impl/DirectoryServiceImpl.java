@@ -49,6 +49,21 @@ public class DirectoryServiceImpl implements DirectoryService {
     private DiffDirectoryService diffService;
 
     /**
+     * スレッドプールのサイズを設定します。 全ての実装サービス（コピー、移動、差分比較）のスレッドプールサイズを更新します。
+     *
+     * @param threadPoolSize
+     *                       スレッドプールのサイズ。0以下の場合はデフォルト値（利用可能なプロセッサ数）が使用されます。
+     */
+    @Override
+    public void setThreadPoolSize(final int threadPoolSize) {
+
+        this.copyService.setThreadPoolSize(threadPoolSize);
+        this.moveService.setThreadPoolSize(threadPoolSize);
+        this.diffService.setThreadPoolSize(threadPoolSize);
+
+    }
+
+    /**
      * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。<br>
      * <p>
      * 処理内容は指定された操作モード（COPY、MOVE、またはDIFF）に依存する。<br>

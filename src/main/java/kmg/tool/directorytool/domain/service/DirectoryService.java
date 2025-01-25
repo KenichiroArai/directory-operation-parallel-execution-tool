@@ -24,6 +24,14 @@ import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 public interface DirectoryService {
 
     /**
+     * スレッドプールのサイズを設定します。
+     *
+     * @param threadPoolSize
+     *                       スレッドプールのサイズ。0以下の場合はデフォルト値（利用可能なプロセッサ数）が使用されます。
+     */
+    void setThreadPoolSize(int threadPoolSize);
+
+    /**
      * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。<br>
      * <p>
      * 処理内容は指定された操作モード（COPY、MOVE、またはDIFF）に依存する。<br>

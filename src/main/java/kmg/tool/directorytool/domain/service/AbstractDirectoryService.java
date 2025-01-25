@@ -34,4 +34,11 @@ public interface AbstractDirectoryService {
      */
     void processDirectory(final String srcPath, final String destPath) throws IOException;
 
+    /**
+     * スレッドプールのサイズを設定します。
+     *
+     * @param threadPoolSize
+     *                       スレッドプールのサイズ。0以下の場合はデフォルト値が使用されます。
+     */
+    void setThreadPoolSize(int threadPoolSize);
 }
