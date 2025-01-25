@@ -2,7 +2,7 @@ package kmg.tool.directorytool.presentation.runner;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -99,8 +99,8 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
-                .toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream()
+                .flatMap(event -> Stream.of(event.getMessage().split(System.lineSeparator()))).toArray(String[]::new);
 
         /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.COPY);
@@ -136,8 +136,8 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final List<ILoggingEvent> logsList   = this.listAppender.list;
-        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream()
+                .flatMap(event -> Stream.of(event.getMessage().split(System.lineSeparator()))).toArray(String[]::new);
 
         /* 検証 */
 
@@ -166,7 +166,8 @@ public class DirectoryToolArTest {
 
         /* 期待値の定義 */
         final String[] expectedMsgs = {
-                "使用方法: [--thread-pool-size=<size>] <mode> <src> <dest>",
+                "使用方法: [--thread-pool-size=<size>] <mode> <src> <dest>", "モデルの種類: COPY, MOVE, DIFF", "オプション:",
+                "  --thread-pool-size=<size>  並列処理で使用するスレッド数（デフォルト: 利用可能なCPUの論理コア数）",
         };
 
         /* 準備 */
@@ -176,8 +177,8 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
-                .toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream()
+                .flatMap(event -> Stream.of(event.getMessage().split(System.lineSeparator()))).toArray(String[]::new);
 
         /* 検証 */
 
@@ -206,7 +207,7 @@ public class DirectoryToolArTest {
 
         /* 期待値の定義 */
         final String[] expectedMsgs = {
-                "無効なモードが選択されています。: [INVALID]", "有効なモードの種類: COPY, MOVE, DIFF"
+                "無効なモードが選択されています。: [INVALID]", "有効なモードの種類: COPY, MOVE, DIFF",
         };
 
         /* 準備 */
@@ -220,8 +221,8 @@ public class DirectoryToolArTest {
         /* 検証の準備 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
-        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
-                .toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream()
+                .flatMap(event -> Stream.of(event.getMessage().split(System.lineSeparator()))).toArray(String[]::new);
 
         /* 検証 */
 
@@ -285,8 +286,8 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
-                .toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream()
+                .flatMap(event -> Stream.of(event.getMessage().split(System.lineSeparator()))).toArray(String[]::new);
 
         /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.DIFF);
@@ -363,8 +364,8 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
-                .toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream()
+                .flatMap(event -> Stream.of(event.getMessage().split(System.lineSeparator()))).toArray(String[]::new);
 
         /* 検証 */
         Mockito.verify(this.directoryService).setThreadPoolSize(4);
@@ -399,8 +400,6 @@ public class DirectoryToolArTest {
         };
 
         /* 準備 */
-        Mockito.when(this.applicationArguments.getNonOptionArgs())
-                .thenReturn(Arrays.asList("COPY", "source", "target"));
         Mockito.when(this.applicationArguments.containsOption("thread-pool-size")).thenReturn(true);
         Mockito.when(this.applicationArguments.getOptionValues("thread-pool-size"))
                 .thenReturn(Arrays.asList("invalid"));
@@ -409,8 +408,8 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
-                .toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream()
+                .flatMap(event -> Stream.of(event.getMessage().split(System.lineSeparator()))).toArray(String[]::new);
 
         /* 検証 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
