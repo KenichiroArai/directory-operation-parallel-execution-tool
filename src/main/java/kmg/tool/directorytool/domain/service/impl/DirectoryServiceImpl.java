@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import kmg.core.infrastructure.type.KmgString;
 import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
 import kmg.tool.directorytool.domain.service.CopyDirectoryService;
 import kmg.tool.directorytool.domain.service.DiffDirectoryService;
@@ -85,8 +84,8 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         final AbstractDirectoryService service = switch (operationModeTypes) {
 
-            case NONE -> throw new IllegalArgumentException(
-                    KmgString.concat("Unexpected value: ", operationModeTypes.getName()));
+            case NONE ->
+                throw new IllegalArgumentException(String.format("Unexpected value: %s", operationModeTypes.getName()));
             case COPY -> this.copyService;
             case MOVE -> this.moveService;
             case DIFF -> this.diffService;

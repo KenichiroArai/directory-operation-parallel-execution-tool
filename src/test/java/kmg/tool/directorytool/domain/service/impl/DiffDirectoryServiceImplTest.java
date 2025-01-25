@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import kmg.core.infrastructure.type.KmgString;
 import kmg.tool.directorytool.domain.service.DiffDirectoryService;
 
 /**
@@ -245,7 +244,7 @@ public class DiffDirectoryServiceImplTest extends AbstractDirectoryServiceImplTe
         final Path   invalidSourcePath          = Path.of("/invalid/source/path");
         final Path   invalidTargetPath          = Path.of("/invalid/target/path");
         final String expectedSourceErrorMessage = "ソースディレクトリが存在しません。";
-        final String expectedTargetErrorMessage = KmgString.concat("ターゲットディレクトリが存在しません。: ",
+        final String expectedTargetErrorMessage = String.format("ターゲットディレクトリが存在しません。: %s",
                 invalidTargetPath.toString());
 
         /* 準備 */
