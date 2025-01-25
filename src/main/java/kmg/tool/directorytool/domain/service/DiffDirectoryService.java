@@ -1,9 +1,9 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.domain.service;
 
 import org.springframework.stereotype.Service;
 
 /**
- * ディレクトリの差分を検出するインタフェース。 <br>
+ * ディレクトリの差分を検出するサービスインタフェース。 <br>
  * <p>
  * {@link AbstractDirectoryService}を継承し、2つのディレクトリ間の差分を検出・報告する機能を提供する。
  * </p>

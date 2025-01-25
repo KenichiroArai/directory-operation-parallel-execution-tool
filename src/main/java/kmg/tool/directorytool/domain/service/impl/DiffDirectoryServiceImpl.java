@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service.impl;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import kmg.tool.directorytool.service.DiffDirectoryService;
+import kmg.tool.directorytool.domain.service.DiffDirectoryService;
 
 /**
  * ディレクトリの差分を検出するサービスクラス。 <br>

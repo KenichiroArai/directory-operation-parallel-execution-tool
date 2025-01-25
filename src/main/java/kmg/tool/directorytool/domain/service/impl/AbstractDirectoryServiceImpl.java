@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service.impl;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import kmg.tool.directorytool.service.AbstractDirectoryService;
+import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
 
 /**
  * ディレクトリ操作の基本機能を提供する抽象クラス。 <br>
@@ -35,12 +35,40 @@ import kmg.tool.directorytool.service.AbstractDirectoryService;
  */
 public abstract class AbstractDirectoryServiceImpl implements AbstractDirectoryService {
 
-    /** 並列処理で使用するスレッド数。システムで利用可能なCPUの論理コア数に基づいて設定されます。 */
-    protected static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    /** デフォルトのスレッド数。システムで利用可能なCPUの論理コア数に基づきます。 */
+    protected static final int DEFAULT_THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
-    /** 並列処理用のスレッドプール。タスクの実行を管理し、スレッドの再利用を可能にします。 */
-    protected final ExecutorService executorService = Executors
-            .newFixedThreadPool(AbstractDirectoryServiceImpl.THREAD_POOL_SIZE);
+    /** スレッドプール */
+    private int threadPoolSize;
+
+    /**
+     * デフォルトのスレッドプールサイズでインスタンスを作成します。
+     */
+    protected AbstractDirectoryServiceImpl() {
+
+        this.setThreadPoolSize(AbstractDirectoryServiceImpl.DEFAULT_THREAD_POOL_SIZE);
+
+    }
+
+    /**
+     * スレッドプールのサイズを設定します。 既存のスレッドプールがある場合はシャットダウンして新しいプールを作成します。
+     *
+     * @param threadPoolSize
+     *                       スレッドプールのサイズ。0以下の場合はデフォルト値が使用されます。
+     */
+    @Override
+    public void setThreadPoolSize(final int threadPoolSize) {
+
+        if (threadPoolSize <= 0) {
+
+            this.threadPoolSize = AbstractDirectoryServiceImpl.DEFAULT_THREAD_POOL_SIZE;
+            return;
+
+        }
+
+        this.threadPoolSize = threadPoolSize;
+
+    }
 
     /**
      * ディレクトリの処理を実行する。
@@ -65,41 +93,48 @@ public abstract class AbstractDirectoryServiceImpl implements AbstractDirectoryS
         // 非同期タスクの結果を保持するリストを用意
         final List<Future<?>> futures = new ArrayList<>();
 
-        // ソースパス内のすべてのファイルとディレクトリを再帰的に処理
-        try (Stream<Path> stream = Files.walk(source)) {
+        // 並列処理用のスレッドプール。タスクの実行を管理し、スレッドの再利用を可能にします。
+        try (ExecutorService executorService = Executors.newFixedThreadPool(this.threadPoolSize)) {
 
-            stream.forEach(path -> {
+            // ソースパス内のすべてのファイルとディレクトリを再帰的に処理
+            try (Stream<Path> stream = Files.walk(source)) {
 
-                // 非同期タスクを開始してファイルを処理
-                final Future<?> future = this.executorService.submit(() -> {
+                stream.forEach(path -> {
 
-                    try {
+                    /* 非同期タスクを開始してファイルを処理 */
 
-                        // 相対パスを計算
-                        final Path relativePath = source.relativize(path);
-                        // ターゲットパスを計算
-                        final Path targetPath = destination.resolve(relativePath);
-                        // 個別のファイルやディレクトリを処理
-                        this.processPath(path, targetPath, relativePath);
+                    final Future<?> future = executorService.submit(() -> {
 
-                    } catch (final IOException e) {
+                        try {
 
-                        // 処理中にエラーが発生した場合はランタイム例外をスロー
-                        throw new RuntimeException(
-                                String.format("ファイルの処理に失敗しました。パス=[%s], エラー=[%s]", path, e.toString()), e);
+                            // 相対パスを計算
+                            final Path relativePath = source.relativize(path);
+                            // ターゲットパスを計算
+                            final Path targetPath = destination.resolve(relativePath);
+                            // 個別のファイルやディレクトリを処理
+                            this.processPath(path, targetPath, relativePath);
 
-                    }
+                        } catch (final IOException e) {
+
+                            // 処理中にエラーが発生した場合はランタイム例外をスロー
+                            throw new RuntimeException(
+                                    String.format("ファイルの処理に失敗しました。パス=[%s], エラー=[%s]", path, e.toString()), e);
+
+                        }
+
+                    });
+                    // 結果をリストに追加
+                    futures.add(future);
 
                 });
-                // 結果をリストに追加
-                futures.add(future);
 
-            });
+            }
+
+            // すべての非同期処理が完了するのを待機
+            AbstractDirectoryServiceImpl.waitForCompletion(futures);
 
         }
 
-        // すべての非同期処理が完了するのを待機
-        AbstractDirectoryServiceImpl.waitForCompletion(futures);
         // 全体の後処理を実行
         this.postProcess(source, destination);
 

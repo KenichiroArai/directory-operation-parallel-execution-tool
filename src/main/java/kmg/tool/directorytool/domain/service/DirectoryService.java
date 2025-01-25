@@ -1,11 +1,11 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.domain.service;
 
 import java.io.IOException;
 
-import kmg.tool.directorytool.model.OperationMode;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
- * ディレクトリ操作のファサードとして機能するサービスクラス。 <br>
+ * ディレクトリ操作のファサードとして機能するサービスインタフェース。 <br>
  * <p>
  * 操作モードに応じて適切なサービスクラスに処理を委譲する。<br>
  * Spring Frameworkのサービスレイヤーとして実装され、DIコンテナによって管理される。
@@ -24,6 +24,14 @@ import kmg.tool.directorytool.model.OperationMode;
 public interface DirectoryService {
 
     /**
+     * スレッドプールのサイズを設定します。
+     *
+     * @param threadPoolSize
+     *                       スレッドプールのサイズ。0以下の場合はデフォルト値（利用可能なプロセッサ数）が使用されます。
+     */
+    void setThreadPoolSize(int threadPoolSize);
+
+    /**
      * 指定されたソースディレクトリをターゲットディレクトリに対して処理する。<br>
      * <p>
      * 処理内容は指定された操作モード（COPY、MOVE、またはDIFF）に依存する。<br>
@@ -31,14 +39,14 @@ public interface DirectoryService {
      * </p>
      *
      * @param srcPath
-     *                 ソースディレクトリのパス（存在するディレクトリである必要がある）
+     *                           ソースディレクトリのパス（存在するディレクトリである必要がある）
      * @param destPath
-     *                 ターゲットディレクトリのパス
-     * @param mode
-     *                 操作モード（COPY、MOVE、またはDIFF）
+     *                           ターゲットディレクトリのパス
+     * @param operationModeTypes
+     *                           操作モードの種類
      * @throws IOException
      *                     ディレクトリの読み書き中にエラーが発生した場合、 またはソースディレクトリが存在しない場合
-     * @see OperationMode
      */
-    void processDirectory(final String srcPath, final String destPath, final OperationMode mode) throws IOException;
+    void processDirectory(final String srcPath, final String destPath, final OperationModeTypes operationModeTypes)
+            throws IOException;
 }

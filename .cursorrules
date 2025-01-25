@@ -314,18 +314,22 @@ public void testMethod() {
     /* テスト対象の実行 */
 
     /* 検証の準備 */
-    final String[] actualLogMessages = this.listAppender.list.stream().map(ILoggingEvent::getFormattedMessage)
-            .toArray(String[]::new);
+    final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
+        .toArray(String[]::new);
 
     /* 検証の実施 */
-    Assertions.assertEquals(expectedOutputLines.length, actualLogMessages.length, "ログメッセージの数が正しいこと");
-    for (int i = 0; i < expectedOutputLines.length; i++) {
 
-        final String expectedLine = expectedOutputLines[i];
-        Assertions.assertEquals(expectedLine, actualLogMessages[i],
-                String.format("出力に「%s」が含まれること", expectedLine));
+    // ログのチェック
+    final int verMsgLengh = Math.min(expectedMsgs.length, actualMsgs.length);
+
+    for (int i = 0; i < verMsgLengh; i++) {
+
+        Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
 
     }
+
+    // ログの数のチェック
+    Assertions.assertEquals(expectedMsgs.length, actualMsgs.length);
 
 }
 ```

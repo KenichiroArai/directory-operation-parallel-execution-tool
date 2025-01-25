@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 
@@ -11,8 +11,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import kmg.tool.directorytool.model.OperationMode;
-import kmg.tool.directorytool.service.impl.DirectoryServiceImpl;
+import kmg.tool.directorytool.domain.service.CopyDirectoryService;
+import kmg.tool.directorytool.domain.service.DiffDirectoryService;
+import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.domain.service.MoveDirectoryService;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
  * DirectoryServiceのファサードパターンの機能をテストするクラス。 <br>
@@ -68,7 +71,7 @@ public class DirectoryServiceImplTest {
         /* 準備 */
 
         /* テスト対象の実行 */
-        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.COPY);
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.COPY);
 
         /* 検証の準備 */
 
@@ -95,7 +98,7 @@ public class DirectoryServiceImplTest {
         /* 準備 */
 
         /* テスト対象の実行 */
-        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.MOVE);
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.MOVE);
 
         /* 検証の準備 */
 
@@ -122,7 +125,7 @@ public class DirectoryServiceImplTest {
         /* 準備 */
 
         /* テスト対象の実行 */
-        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.DIFF);
+        this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.DIFF);
 
         /* 検証の準備 */
 
@@ -153,7 +156,7 @@ public class DirectoryServiceImplTest {
         /* テスト対象の実行 */
         try {
 
-            this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationMode.COPY);
+            this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, OperationModeTypes.COPY);
 
         } catch (final IOException actualException) {
             /* 検証の準備 */
@@ -162,6 +165,66 @@ public class DirectoryServiceImplTest {
             Assertions.assertEquals(expectedException, actualException, "期待した例外が発生すること");
 
         }
+
+    }
+
+    /**
+     * NONEモードで適切な例外が発生することを検証します。
+     */
+    @Test
+    public void testNoneModeThrowsException() {
+
+        /* 期待値の定義 */
+        final String expectedSrcPath  = "source";
+        final String expectedDestPath = "target";
+        final String expectedMessage  = "Unexpected value: 指定無し";
+
+        /* テスト対象の実行と検証 */
+        final IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> this.directoryService.processDirectory(expectedSrcPath, expectedDestPath,
+                        OperationModeTypes.NONE));
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expectedMessage, exception.getMessage(), "期待したエラーメッセージが返されること");
+
+    }
+
+    /**
+     * 操作モードにnullが指定された場合に適切な例外が発生することを検証します。
+     */
+    @Test
+    public void testNullOperationModeThrowsException() {
+
+        /* 期待値の定義 */
+        final String expectedSrcPath  = "source";
+        final String expectedDestPath = "target";
+        final String expectedMessage  = "Cannot invoke \"kmg.tool.directorytool.infrastructure.types.OperationModeTypes.ordinal()\" because \"operationModeTypes\" is null";
+
+        /* テスト対象の実行と検証 */
+        final NullPointerException exception = Assertions.assertThrows(NullPointerException.class,
+                () -> this.directoryService.processDirectory(expectedSrcPath, expectedDestPath, null));
+
+        /* 検証の実施 */
+        Assertions.assertEquals(expectedMessage, exception.getMessage(), "期待したエラーメッセージが返されること");
+
+    }
+
+    /**
+     * スレッドプールサイズの設定が各サービスに正しく反映されることを検証します。
+     */
+    @Test
+    public void testSetThreadPoolSize() {
+
+        /* 期待値の定義 */
+        final int expectedThreadPoolSize = 4;
+
+        /* テスト対象の実行 */
+        this.directoryService.setThreadPoolSize(expectedThreadPoolSize);
+
+        /* 検証の実施 */
+        Mockito.verify(this.copyService).setThreadPoolSize(expectedThreadPoolSize);
+        Mockito.verify(this.moveService).setThreadPoolSize(expectedThreadPoolSize);
+        Mockito.verify(this.diffService).setThreadPoolSize(expectedThreadPoolSize);
 
     }
 }

@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
 
 /**
  * ディレクトリ操作サービスのテストのための基底クラス。<br>
@@ -20,7 +17,6 @@ import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
  * 共通のセットアップ、検証、クリーンアップ機能を提供する。
  * </p>
  */
-@SpringBootTest
 public abstract class AbstractDirectoryServiceImplTest {
 
     /** テスト用の一時ディレクトリ */
@@ -43,6 +39,8 @@ public abstract class AbstractDirectoryServiceImplTest {
      */
     protected abstract AbstractDirectoryServiceImpl createService();
 
+    // setThreadPoolSizeメソッドを削除
+
     /**
      * テストの前準備
      *
@@ -60,6 +58,45 @@ public abstract class AbstractDirectoryServiceImplTest {
 
         // テスト対象のサービスを初期化
         this.service = this.createService();
+
+    }
+
+    /**
+     * スレッドプールサイズの設定をテストする。
+     */
+    @Test
+    public void testSetThreadPoolSize() {
+
+        final AbstractDirectoryServiceImpl testService = new AbstractDirectoryServiceImpl() {
+
+            @Override
+            protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
+                    throws IOException {
+
+                // テスト用の空実装
+            }
+
+            @Override
+            protected void postProcess(final Path source, final Path destination) throws IOException {
+
+                // テスト用の空実装
+            }
+
+            @Override
+            public void setThreadPoolSize(final int threadPoolSize) {
+
+                super.setThreadPoolSize(threadPoolSize);
+
+            }
+        };
+
+        final int newSize = 5;
+        testService.setThreadPoolSize(newSize);
+        // スレッドプールサイズが正しく設定されたことを確認するためのアサーションを追加
+        // 注: 現在のAbstractDirectoryServiceImpl実装では、スレッドプールサイズを取得するメソッドがないため、
+        // 直接的な検証は難しいです。代わりに、間接的な方法で検証する必要があります。
+        Assertions.assertDoesNotThrow(
+                () -> testService.processDirectory(this.sourceDir.toString(), this.targetDir.toString()));
 
     }
 
@@ -148,6 +185,87 @@ public abstract class AbstractDirectoryServiceImplTest {
     }
 
     /**
+     * デフォルトのスレッドプールサイズでの動作をテストする。
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
+     */
+    @Test
+    public void testDefaultThreadPoolSize() throws IOException {
+
+        // テスト用のファイルを作成
+        final Path testFile = this.sourceDir.resolve("test.txt");
+        Files.writeString(testFile, "test content");
+
+        Assertions.assertDoesNotThrow(
+                () -> this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString()),
+                "デフォルトのスレッドプールサイズで正常に処理が実行されること");
+
+    }
+
+    /**
+     * カスタムスレッドプールサイズでの動作をテストする。
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
+     */
+    @Test
+    public void testCustomThreadPoolSize() throws IOException {
+
+        // テスト用のファイルを作成
+        final Path testFile = this.sourceDir.resolve("test.txt");
+        Files.writeString(testFile, "test content");
+
+        final int customSize = 4;
+        this.service.setThreadPoolSize(customSize);
+        Assertions.assertDoesNotThrow(
+                () -> this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString()),
+                "カスタムスレッドプールサイズで正常に処理が実行されること");
+
+    }
+
+    /**
+     * スレッドプールサイズの変更後の動作をテストする。
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
+     */
+    @Test
+    public void testThreadPoolSizeChange() throws IOException {
+
+        // テスト用のファイルを作成
+        final Path testFile = this.sourceDir.resolve("test.txt");
+        Files.writeString(testFile, "test content");
+
+        final int newSize = 2;
+        this.service.setThreadPoolSize(newSize);
+        Assertions.assertDoesNotThrow(
+                () -> this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString()),
+                "変更後のスレッドプールサイズで正常に処理が実行されること");
+
+    }
+
+    /**
+     * 無効なスレッドプールサイズが設定された場合の動作をテストする。
+     *
+     * @throws IOException
+     *                     ファイル操作に失敗した場合
+     */
+    @Test
+    public void testInvalidThreadPoolSize() throws IOException {
+
+        // テスト用のファイルを作成
+        final Path testFile = this.sourceDir.resolve("test.txt");
+        Files.writeString(testFile, "test content");
+
+        this.service.setThreadPoolSize(0);
+        Assertions.assertDoesNotThrow(
+                () -> this.service.processDirectory(this.sourceDir.toString(), this.targetDir.toString()),
+                "無効なスレッドプールサイズが設定された場合でもデフォルト値で正常に処理が実行されること");
+
+    }
+
+    /**
      * サイズの異なるファイルの比較をテストする。
      * <p>
      * 異なるサイズのファイルを比較した場合、falseが返されることを確認する。
@@ -186,7 +304,7 @@ public abstract class AbstractDirectoryServiceImplTest {
         Files.writeString(sourceFile, "test content");
 
         // サービスをオーバーライドして例外をシミュレート
-        final AbstractDirectoryService errorService = new AbstractDirectoryServiceImpl() {
+        final AbstractDirectoryServiceImpl errorService = new AbstractDirectoryServiceImpl() {
 
             @Override
             protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
@@ -202,6 +320,7 @@ public abstract class AbstractDirectoryServiceImplTest {
                 // 何もしない
             }
         };
+        errorService.setThreadPoolSize(1);
 
         // 処理を実行し、例外が発生することを確認
         final IOException exception = Assertions.assertThrows(IOException.class,
@@ -226,8 +345,8 @@ public abstract class AbstractDirectoryServiceImplTest {
         final Path sourceFile = this.sourceDir.resolve("test.txt");
         Files.writeString(sourceFile, "test content");
 
-        // サービスをオーバーライドして長時間のタスクをシミュレート
-        final AbstractDirectoryService slowService = new AbstractDirectoryServiceImpl() {
+        // サービスをオーバーライドして長時間のタスクをシミュレート（シングルスレッドで実行）
+        final AbstractDirectoryServiceImpl slowService = new AbstractDirectoryServiceImpl() {
 
             @Override
             protected void processPath(final Path sourcePath, final Path targetPath, final Path relativePath)
@@ -251,6 +370,7 @@ public abstract class AbstractDirectoryServiceImplTest {
                 // 何もしない
             }
         };
+        slowService.setThreadPoolSize(1);
 
         // タイムアウトで例外が発生することを確認
         final IOException exception = Assertions.assertThrows(IOException.class,

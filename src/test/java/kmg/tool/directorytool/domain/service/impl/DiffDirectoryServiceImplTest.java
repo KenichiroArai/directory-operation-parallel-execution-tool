@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,8 +19,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import kmg.tool.directorytool.service.impl.AbstractDirectoryServiceImpl;
-import kmg.tool.directorytool.service.impl.DiffDirectoryServiceImpl;
+import kmg.tool.directorytool.domain.service.DiffDirectoryService;
 
 /**
  * 差分検出操作を実行するサービスのテストクラス。
@@ -245,7 +244,8 @@ public class DiffDirectoryServiceImplTest extends AbstractDirectoryServiceImplTe
         final Path   invalidSourcePath          = Path.of("/invalid/source/path");
         final Path   invalidTargetPath          = Path.of("/invalid/target/path");
         final String expectedSourceErrorMessage = "ソースディレクトリが存在しません。";
-        final String expectedTargetErrorMessage = "ターゲットディレクトリが存在しません。: " + invalidTargetPath;
+        final String expectedTargetErrorMessage = String.format("ターゲットディレクトリが存在しません。: %s",
+                invalidTargetPath.toString());
 
         /* 準備 */
 

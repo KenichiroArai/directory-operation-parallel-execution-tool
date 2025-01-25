@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.service.impl;
+package kmg.tool.directorytool.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,9 +7,9 @@ import java.nio.file.StandardCopyOption;
 
 import org.springframework.stereotype.Service;
 
-import kmg.tool.directorytool.service.AbstractDirectoryService;
-import kmg.tool.directorytool.service.CopyDirectoryService;
-import kmg.tool.directorytool.service.DirectoryService;
+import kmg.tool.directorytool.domain.service.AbstractDirectoryService;
+import kmg.tool.directorytool.domain.service.CopyDirectoryService;
+import kmg.tool.directorytool.domain.service.DirectoryService;
 
 /**
  * ディレクトリのコピー操作を実行するサービスクラス。 <br>

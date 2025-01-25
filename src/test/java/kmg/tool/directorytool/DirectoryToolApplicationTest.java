@@ -13,8 +13,10 @@ import org.springframework.context.ConfigurableApplicationContext;
  * アプリケーションの主要な機能とエラーハンドリングをテストします。
  * </p>
  */
+@SpringBootTest(properties = {
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
+})
 @SuppressWarnings("static-method")
-@SpringBootTest
 public class DirectoryToolApplicationTest {
 
     /**
@@ -39,7 +41,11 @@ public class DirectoryToolApplicationTest {
 
         Assertions.assertDoesNotThrow(() -> {
 
-            DirectoryToolApplication.main(new String[] {});
+            final String[] args = {
+                    "--spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
+            };
+
+            DirectoryToolApplication.main(args);
 
         }, "メインメソッドの実行中に例外が発生しました");
 
@@ -54,7 +60,8 @@ public class DirectoryToolApplicationTest {
         Assertions.assertDoesNotThrow(() -> {
 
             DirectoryToolApplication.main(new String[] {
-                    "--spring.main.banner-mode=off"
+                    "--spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration",
+                    "--spring.main.banner-mode=off",
             });
 
         }, "引数付きメインメソッドの実行中に例外が発生しました");
@@ -67,7 +74,12 @@ public class DirectoryToolApplicationTest {
     @Test
     public void testApplicationShutdown() {
 
-        try (final ConfigurableApplicationContext context = SpringApplication.run(DirectoryToolApplication.class)) {
+        final String[] args = {
+                "--spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
+        };
+
+        try (final ConfigurableApplicationContext context = SpringApplication.run(DirectoryToolApplication.class,
+                args)) {
 
             Assertions.assertDoesNotThrow(() -> {
 

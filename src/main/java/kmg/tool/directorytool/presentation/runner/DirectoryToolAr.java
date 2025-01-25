@@ -1,4 +1,4 @@
-package kmg.tool.directorytool.runner;
+package kmg.tool.directorytool.presentation.runner;
 
 import java.io.IOException;
 
@@ -11,8 +11,9 @@ import org.springframework.boot.ExitCodeExceptionMapper;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.stereotype.Component;
 
-import kmg.tool.directorytool.model.OperationMode;
-import kmg.tool.directorytool.service.DirectoryService;
+import kmg.tool.directorytool.domain.service.DirectoryService;
+import kmg.tool.directorytool.infrastructure.types.ExitCodeTypes;
+import kmg.tool.directorytool.infrastructure.types.OperationModeTypes;
 
 /**
  * コマンドラインインターフェースを提供するクラス。 Spring Bootのコマンドラインランナーとして実装され、アプリケーションの起動時に コマンドライン引数を処理し、適切なディレクトリ操作を実行する。
@@ -61,8 +62,6 @@ import kmg.tool.directorytool.service.DirectoryService;
  *
  * @author kmg
  * @version 1.0
- * @see kmg.tool.directorytool.service.DirectoryService
- * @see kmg.tool.directorytool.model.OperationMode
  */
 @Component
 public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, ExitCodeExceptionMapper {
@@ -74,15 +73,15 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     @Autowired
     private DirectoryService directoryService;
 
-    /** 終了コード */
-    private int exitCode;
+    /** 終了コードの種類 */
+    private ExitCodeTypes exitCode;
 
     /**
      * デフォルトコンストラクタ。
      */
     public DirectoryToolAr() {
 
-        this.exitCode = 0;      // TODO 2025/01/18 列挙型で定義する
+        this.exitCode = ExitCodeTypes.SUCCESS;
 
     }
 
@@ -92,7 +91,7 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     @Override
     public int getExitCode() {
 
-        final int result = this.exitCode;
+        final int result = this.exitCode.getValue();
         return result;
 
     }
@@ -103,7 +102,8 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
     @Override
     public int getExitCode(final Throwable exception) {
 
-        final int result = 2;
+        final int result = ExitCodeTypes.UNEXPECTED_ERROR.getValue();
+        DirectoryToolAr.logger.error("例外を受け取りました。", exception);
         return result;
 
     }
@@ -127,32 +127,55 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
 
         /* 引数の変換 */
 
+        // スレッドプールサイズのオプションを取得
+        int threadPoolSize = 0;
+
+        if (args.containsOption("thread-pool-size")) {
+
+            try {
+
+                threadPoolSize = Integer.parseInt(args.getOptionValues("thread-pool-size").get(0));
+
+            } catch (final NumberFormatException e) {
+
+                DirectoryToolAr.logger.error("スレッドプールサイズは数値で指定してください。", e);
+                this.exitCode = ExitCodeTypes.ARGUMENT_ERROR;
+                return;
+
+            }
+
+        }
+
         // 非オプション引数を取得
         final String[] nonOptionArgs = args.getNonOptionArgs().toArray(String[]::new);
 
         // 引数の数をチェック
         if (nonOptionArgs.length != 3) {
 
-            DirectoryToolAr.logger.error("使用方法: <mode> <src> <dest>");
+            DirectoryToolAr.logger.error("使用方法: [--thread-pool-size=<size>] <mode> <src> <dest>");
             DirectoryToolAr.logger.error("モデルの種類: COPY, MOVE, DIFF");
+            DirectoryToolAr.logger.error("オプション:");
+            DirectoryToolAr.logger.error("  --thread-pool-size=<size>  並列処理で使用するスレッド数（デフォルト: 利用可能なCPUの論理コア数）");
+
+            this.exitCode = ExitCodeTypes.ARGUMENT_ERROR;
             return;
 
         }
 
         // 引数をパース
         // モード
-        final String  modeStr = nonOptionArgs[0];
-        OperationMode mode;
+        final String       modeStr = nonOptionArgs[0];
+        OperationModeTypes operationModeTypes;
 
         try {
 
             // モード文字列をenumに変換
-            mode = OperationMode.valueOf(modeStr.toUpperCase());
+            operationModeTypes = OperationModeTypes.valueOf(modeStr.toUpperCase());
 
         } catch (final IllegalArgumentException e) {
 
             // 無効なモードが指定された場合
-            this.exitCode = 1;
+            this.exitCode = ExitCodeTypes.ARGUMENT_ERROR;
 
             final String[] logMsgs = {
                     String.format("無効なモードが選択されています。: [%s]", modeStr), "有効なモードの種類: COPY, MOVE, DIFF",
@@ -170,13 +193,16 @@ public class DirectoryToolAr implements ApplicationRunner, ExitCodeGenerator, Ex
         /* ディレクトリ操作を実行 */
         try {
 
-            this.directoryService.processDirectory(src, dest, mode);
+            // スレッドプールサイズを設定（設定されている場合のみ）
+            this.directoryService.setThreadPoolSize(threadPoolSize);
+
+            this.directoryService.processDirectory(src, dest, operationModeTypes);
             DirectoryToolAr.logger.info("ディレクトリ操作の処理が終了しました。");
 
         } catch (final IOException e) {
 
             // ディレクトリ操作中にエラーが発生した場合
-            this.exitCode = 1;
+            this.exitCode = ExitCodeTypes.EXPECTED_ERROR;
             DirectoryToolAr.logger.error("ディレクトリ操作エラー", e);
 
         }
