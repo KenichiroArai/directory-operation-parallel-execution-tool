@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * ディレクトリ操作サービスのテストのための基底クラス。<br>
@@ -18,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 共通のセットアップ、検証、クリーンアップ機能を提供する。
  * </p>
  */
-@SpringBootTest
 public abstract class AbstractDirectoryServiceImplTest {
 
     /** テスト用の一時ディレクトリ */
