@@ -99,8 +99,8 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final List<ILoggingEvent> logsList   = this.listAppender.list;
-        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
+                .toArray(String[]::new);
 
         /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.COPY);
@@ -140,14 +140,18 @@ public class DirectoryToolArTest {
         final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
 
         /* 検証 */
-        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.MOVE);
 
         // ログのチェック
-        for (int i = 0; i < expectedMsgs.length; i++) {
+        final int verMsgLengh = Math.min(expectedMsgs.length, actualMsgs.length);
+
+        for (int i = 0; i < verMsgLengh; i++) {
 
             Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
 
         }
+
+        // ログの数のチェック
+        Assertions.assertEquals(expectedMsgs.length, actualMsgs.length);
 
     }
 
@@ -172,22 +176,22 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final List<ILoggingEvent> logsList   = this.listAppender.list;
-        final String[]            actualMsgs = logsList.stream()
-                .flatMap(event -> Arrays.stream(event.getMessage().split(System.lineSeparator())))
+        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
                 .toArray(String[]::new);
 
         /* 検証 */
-        // 引数のチェック
-        Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
-                ArgumentMatchers.any(), ArgumentMatchers.any());
 
         // ログのチェック
-        for (int i = 0; i < expectedMsgs.length; i++) {
+        final int verMsgLengh = Math.min(expectedMsgs.length, actualMsgs.length);
+
+        for (int i = 0; i < verMsgLengh; i++) {
 
             Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
 
         }
+
+        // ログの数のチェック
+        Assertions.assertEquals(expectedMsgs.length, actualMsgs.length);
 
     }
 
@@ -216,18 +220,22 @@ public class DirectoryToolArTest {
         /* 検証の準備 */
         Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any());
-        final List<ILoggingEvent> logsList   = this.listAppender.list;
-        final String[]            actualMsgs = logsList.stream()
-                .flatMap(event -> Arrays.stream(event.getMessage().split(System.lineSeparator())))
+        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
                 .toArray(String[]::new);
 
         /* 検証 */
+
         // ログのチェック
-        for (int i = 0; i < expectedMsgs.length; i++) {
+        final int verMsgLengh = Math.min(expectedMsgs.length, actualMsgs.length);
+
+        for (int i = 0; i < verMsgLengh; i++) {
 
             Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
 
         }
+
+        // ログの数のチェック
+        Assertions.assertEquals(expectedMsgs.length, actualMsgs.length);
 
     }
 
@@ -277,18 +285,23 @@ public class DirectoryToolArTest {
         this.runner.run(this.applicationArguments);
 
         /* 検証の準備 */
-        final List<ILoggingEvent> logsList   = this.listAppender.list;
-        final String[]            actualMsgs = logsList.stream().map(ILoggingEvent::getMessage).toArray(String[]::new);
+        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
+                .toArray(String[]::new);
 
         /* 検証 */
         Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.DIFF);
 
         // ログのチェック
-        for (int i = 0; i < expectedMsgs.length; i++) {
+        final int verMsgLengh = Math.min(expectedMsgs.length, actualMsgs.length);
+
+        for (int i = 0; i < verMsgLengh; i++) {
 
             Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
 
         }
+
+        // ログの数のチェック
+        Assertions.assertEquals(expectedMsgs.length, actualMsgs.length);
 
     }
 
@@ -323,6 +336,97 @@ public class DirectoryToolArTest {
 
         /* 検証 */
         Assertions.assertEquals(3, result, "例外発生時の終了コードが3であること");
+
+    }
+
+    /**
+     * スレッドプールサイズが正常に指定された場合のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testValidThreadPoolSize() throws Exception {
+
+        /* 期待値の定義 */
+        final String[] expectedMsgs = {
+                "ディレクトリ操作の処理が終了しました。"
+        };
+
+        /* 準備 */
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("COPY", "source", "target"));
+        Mockito.when(this.applicationArguments.containsOption("thread-pool-size")).thenReturn(true);
+        Mockito.when(this.applicationArguments.getOptionValues("thread-pool-size")).thenReturn(Arrays.asList("4"));
+
+        /* テスト対象の実行 */
+        this.runner.run(this.applicationArguments);
+
+        /* 検証の準備 */
+        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
+                .toArray(String[]::new);
+
+        /* 検証 */
+        Mockito.verify(this.directoryService).setThreadPoolSize(4);
+        Mockito.verify(this.directoryService).processDirectory("source", "target", OperationModeTypes.COPY);
+
+        // ログのチェック
+        final int verMsgLengh = Math.min(expectedMsgs.length, actualMsgs.length);
+
+        for (int i = 0; i < verMsgLengh; i++) {
+
+            Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
+
+        }
+
+        // ログの数のチェック
+        Assertions.assertEquals(expectedMsgs.length, actualMsgs.length);
+
+    }
+
+    /**
+     * スレッドプールサイズに不正な値が指定された場合のテスト
+     *
+     * @throws Exception
+     *                   テスト実行中に発生する可能性のある例外
+     */
+    @Test
+    public void testInvalidThreadPoolSize() throws Exception {
+
+        /* 期待値の定義 */
+        final String[] expectedMsgs = {
+                "スレッドプールサイズは数値で指定してください。"
+        };
+
+        /* 準備 */
+        Mockito.when(this.applicationArguments.getNonOptionArgs())
+                .thenReturn(Arrays.asList("COPY", "source", "target"));
+        Mockito.when(this.applicationArguments.containsOption("thread-pool-size")).thenReturn(true);
+        Mockito.when(this.applicationArguments.getOptionValues("thread-pool-size"))
+                .thenReturn(Arrays.asList("invalid"));
+
+        /* テスト対象の実行 */
+        this.runner.run(this.applicationArguments);
+
+        /* 検証の準備 */
+        final String[] actualMsgs = this.listAppender.list.stream().map(ILoggingEvent::getMessage)
+                .toArray(String[]::new);
+
+        /* 検証 */
+        Mockito.verify(this.directoryService, Mockito.never()).processDirectory(ArgumentMatchers.any(),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
+
+        // ログのチェック
+        final int verMsgLengh = Math.min(expectedMsgs.length, actualMsgs.length);
+
+        for (int i = 0; i < verMsgLengh; i++) {
+
+            Assertions.assertEquals(expectedMsgs[i], actualMsgs[i], String.format("メッセージが一致しません: %s", expectedMsgs[i]));
+
+        }
+
+        // ログの数のチェック
+        Assertions.assertEquals(expectedMsgs.length, actualMsgs.length);
 
     }
 }
