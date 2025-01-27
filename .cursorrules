@@ -3,7 +3,7 @@
 ## コア技術
 
 - Java: 21
-- Spring Boot: 3.2.1
+- Spring Boot: 3.4.2
 - JUnit Jupiter: (Spring Boot依存バージョン)
 - Mockito: 5.11.0
 
@@ -34,30 +34,35 @@ directory-operation-parallel-execution-tool/
 │   │   │   └── kmg/
 │   │   │       └── tool/
 │   │   │           └── directorytool/
-│   │   │               ├── service/      # サービス層
-│   │   │               ├── model/        # モデル
-│   │   │               └── runner/       # 実行クラス
-│   │   └── resources/                    # リソースファイル
+│   │   │               ├── domain/           # ドメイン層
+│   │   │               │   ├── model/       # ドメインモデル
+│   │   │               │   └── service/     # ドメインサービス
+│   │   │               ├── infrastructure/   # インフラストラクチャ層
+│   │   │               ├── presentation/     # プレゼンテーション層
+│   │   │               └── runner/          # 実行クラス
+│   │   └── resources/                       # リソースファイル
 │   └── test/
-│       ├── java/                         # テストコード
+│       ├── java/                            # テストコード
 │       │   └── kmg/
 │       │       └── tool/
 │       │           └── directorytool/
-│       │               ├── service/      # サービステスト
-│       │               ├── model/        # モデルテスト
-│       │               └── runner/       # 実行クラステスト
-│       └── resources/                    # テストリソース
-├── .settings/                            # Eclipse設定
-│   ├── org.eclipse.jdt.core.prefs       # Java開発設定
-│   ├── org.eclipse.jdt.ui.prefs         # UI設定
-│   └── org.eclipse.core.resources.prefs  # リソース設定
-└── pom.xml                              # Mavenプロジェクト設定
+│       │               ├── domain/          # ドメインテスト
+│       │               ├── infrastructure/  # インフラストラクチャテスト
+│       │               ├── presentation/    # プレゼンテーションテスト
+│       │               └── runner/         # 実行クラステスト
+│       └── resources/                      # テストリソース
+├── .settings/                              # Eclipse設定
+│   ├── org.eclipse.jdt.core.prefs         # Java開発設定
+│   ├── org.eclipse.jdt.ui.prefs           # UI設定
+│   └── org.eclipse.core.resources.prefs    # リソース設定
+└── pom.xml                                # Mavenプロジェクト設定
 ```
 
 ### 配置ルール
 
-- サービスクラス → `src/main/java/kmg/tool/directorytool/service/`
-- モデルクラス → `src/main/java/kmg/tool/directorytool/model/`
+- ドメインクラス → `src/main/java/kmg/tool/directorytool/domain/`
+- インフラストラクチャクラス → `src/main/java/kmg/tool/directorytool/infrastructure/`
+- プレゼンテーションクラス → `src/main/java/kmg/tool/directorytool/presentation/`
 - 実行クラス → `src/main/java/kmg/tool/directorytool/runner/`
 - テストクラス → 対応する実装クラスと同じパッケージ構成
 
