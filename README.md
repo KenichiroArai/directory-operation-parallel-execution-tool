@@ -43,3 +43,15 @@ java -jar target/directory-tool-1.0.0.jar <MODE> <SOURCE_DIR> <DEST_DIR>
 ```bash
 java -jar target/directory-tool-1.0.0.jar DIFF "C:/dev/wk/src" "C:/dev/wk/dest"
 ```
+
+## コーディング支援
+
+### Eclipse
+
+.settings
+
+### Cursor
+
+[Javaルール](https://github.com/KenichiroArai/.cursor/blob/main/rules/java-rule.mdc)
+
+.cursorrules
